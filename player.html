@@ -28,57 +28,32 @@
     
 </div>
 <script>
-const channels = {
-  "haunted-house": {
-  title: "House on Haunted Hill",
-  stream: "https://archive.org/download/HouseOnHauntedHill1959/HouseOnHauntedHill1959_512kb.mp4"
-},
+let channels = {};
 
-  "midnight-hospital": {
-    title: "Midnight Hospital",
-    stream: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-  },
-  "scarecrow-field": {
-    title: "Scarecrow Field",
-    stream: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-  },
-  "possession-room": {
-    title: "Possession Room",
-    stream: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-  },
-  "creeper-road": {
-    title: "Creeper Road",
-    stream: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-  },
-  "phantasm": {
-    title: "Phantasm",
-    stream: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-  },
-  "haddonfield": {
-    title: "Haddonfield",
-    stream: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-  },
-  "graveyard-shift": {
-    title: "Graveyard Shift",
-    stream: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-  }
-};
+fetch("movies.json")
+  .then(response => response.json())
+  .then(data => {
+    channels = data;
 
-const params = new URLSearchParams(window.location.search);
-const channelId = params.get("channel") || "haunted-house";
-const channel = channels[channelId];
+    const params = new URLSearchParams(window.location.search);
+    const channelId = params.get("channel") || "haunted-house";
+    const channel = channels[channelId];
 
-const title = document.getElementById("channelTitle");
-const video = document.getElementById("tvPlayer");
-const source = document.getElementById("videoSource");
+    const title = document.getElementById("channelTitle");
+    const video = document.getElementById("tvPlayer");
+    const source = document.getElementById("videoSource");
 
-if (channel) {
-  title.textContent = channel.title;
-  source.src = channel.stream;
-  video.load();
-} else {
-  title.textContent = "Channel Not Found";
-}
+    if (channel) {
+      title.textContent = channel.title;
+      source.src = channel.stream;
+      video.load();
+    } else {
+      title.textContent = "Channel Not Found";
+    }
+  });
+
+
+
 </script>
 </body>
 </html>
