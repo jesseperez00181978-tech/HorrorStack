@@ -8,18 +8,24 @@ localStorage.setItem("horrorMovies", JSON.stringify(movies));
 function displayMovies() {
     movieList.innerHTML = "";
 
-    movies.forEach((movie) => {
+    movies.forEach((movie, index) => {
         const movieCard = document.createElement("div");
         movieCard.classList.add("movie-card");
 
         movieCard.innerHTML = `
-            <h3>🎬 ${movie.title} (${movie.year})</h3>
-            <p>Genre: ${movie.genre}</p>
-            <p>Rating: ⭐ ${movie.rating}/10</p>
-        `;
+    <h3>🎬 ${movie.title} (${movie.year})</h3>
+    <p>Genre: ${movie.genre}</p>
+    <p>Rating: ⭐ ${movie.rating}/10</p>
+    <button class="delete-btn">🗑️ Delete</button>
+`;
 
         movieList.appendChild(movieCard);
     });
+movieCard.querySelector(".delete-btn").addEventListener("click", () => {
+    movies.splice(index, 1);
+    localStorage.setItem("horrorMovies", JSON.stringify(movies));
+    displayMovies();
+});
 }
 
 saveButton.addEventListener("click", () => {
