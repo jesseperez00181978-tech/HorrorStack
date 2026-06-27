@@ -5,6 +5,6 @@ buttons.forEach((button) => {
         const card = button.closest(".channel-card");
         const channelName = card.querySelector("h3").innerText;
 
-        alert(`Now opening ${channelName}`);
+     window.location.href = "player.html";   
     });
 });
