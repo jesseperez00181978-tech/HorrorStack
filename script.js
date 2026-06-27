@@ -1,13 +1,19 @@
-const button = document.querySelector("button");
+const saveButton = document.querySelectorAll("button")[1];
+const movieList = document.querySelector("#movieList");
 
-button.addEventListener("click", () => {
+saveButton.addEventListener("click", () => {
     const title = document.querySelector("#movieTitle").value;
     const year = document.querySelector("#movieYear").value;
     const genre = document.querySelector("#movieGenre").value;
     const rating = document.querySelector("#movieRating").value;
 
-    console.log(title);
-    console.log(year);
-    console.log(genre);
-    console.log(rating);
-});
+    const movieCard = document.createElement("div");
+    movieCard.classList.add("movie-card");
+
+    movieCard.innerHTML = `
+        <h3>🎬 ${title} (${year})</h3>
+        <p>Genre: ${genre}</p>
+        <p>Rating: ⭐ ${rating}/10</p>
+    `;
+
+    movieList.appendChild(movieCard
