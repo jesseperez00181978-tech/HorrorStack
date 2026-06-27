@@ -1,0 +1,34 @@
+{
+  "haunted-house": {
+    "title": "House on Haunted Hill",
+    "stream": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+  },
+  "midnight-hospital": {
+    "title": "Midnight Hospital",
+    "stream": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+  },
+  "scarecrow-field": {
+    "title": "Scarecrow Field",
+    "stream": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+  },
+  "possession-room": {
+    "title": "Possession Room",
+    "stream": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+  },
+  "creeper-road": {
+    "title": "Creeper Road",
+    "stream": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+  },
+  "phantasm": {
+    "title": "Phantasm",
+    "stream": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+  },
+  "haddonfield": {
+    "title": "Haddonfield",
+    "stream": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+  },
+  "graveyard-shift": {
+    "title": "Graveyard Shift",
+    "stream": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
+  }
+}
