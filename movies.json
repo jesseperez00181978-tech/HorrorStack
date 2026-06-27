@@ -1,8 +1,8 @@
 {
   "haunted-house": {
-    "title": "House on Haunted Hill",
-    "stream": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
-  },
+  "title": "House on Haunted Hill",
+  "stream": "https://archive.org/download/HouseOnHauntedHill1959/HouseOnHauntedHill1959_512kb.mp4"
+},
   "midnight-hospital": {
     "title": "Midnight Hospital",
     "stream": "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"
