@@ -1,8 +1,9 @@
 const saveButton = document.querySelector(".modal-content button");
 const movieList = document.querySelector("#movieList");
 
-let movies = [];
-localStorage.removeItem("horrorMovies");
+let movies = JSON.parse(localStorage.getItem("horrorMovies")) || [];
+movies = movies.filter(movie => movie.title && movie.year && movie.genre && movie.rating);
+localStorage.setItem("horrorMovies", JSON.stringify(movies));
 
 function displayMovies() {
     movieList.innerHTML = "";
