@@ -17,3 +17,27 @@ p {
     color: #cfcfcf;
     font-size: 18px;
 }
+input {
+    width: 300px;
+    padding: 12px;
+    font-size: 16px;
+    border: 2px solid #ff3b3b;
+    border-radius: 8px;
+    background: #1a1a1a;
+    color: white;
+}
+
+button {
+    margin-top: 15px;
+    padding: 12px 24px;
+    font-size: 16px;
+    background: #ff3b3b;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #cc0000;
+}
