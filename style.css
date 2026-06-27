@@ -41,3 +41,25 @@ button {
 button:hover {
     background: #cc0000;
 }
+.channel-card {
+    background: #1a1a1a;
+    border: 2px solid #ff3b3b;
+    border-radius: 14px;
+    padding: 20px;
+    margin: 25px auto;
+    max-width: 420px;
+    box-shadow: 0 0 15px rgba(255,59,59,.3);
+}
+
+.channel-card h3 {
+    color: white;
+    margin-bottom: 10px;
+}
+
+.channel-card p {
+    color: #cfcfcf;
+}
+
+.channel-card button {
+    margin-top: 15px;
+}
