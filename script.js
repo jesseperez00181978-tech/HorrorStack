@@ -25,7 +25,9 @@ saveButton.addEventListener("click", () => {
     const year = document.querySelector("#movieYear").value;
     const genre = document.querySelector("#movieGenre").value;
     const rating = document.querySelector("#movieRating").value;
-
+if (!title || !year || !genre || !rating) {
+    return;
+}
     const movie = {
         title: title,
         year: year,
