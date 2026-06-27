@@ -1,4 +1,4 @@
-const saveButton = document.querySelectorAll("button")[1];
+const saveButton = document.querySelector(".modal-content button");
 const movieList = document.querySelector("#movieList");
 
 saveButton.addEventListener("click", () => {
@@ -16,4 +16,5 @@ saveButton.addEventListener("click", () => {
         <p>Rating: ⭐ ${rating}/10</p>
     `;
 
-    movieList.appendChild(movieCard
+    movieList.appendChild(movieCard);
+});
