@@ -46,8 +46,14 @@ fetch("movies.json")
 
     if (channel) {
       title.textContent = channel.title;
-      source.src = channel.stream;
-      video.load();
+      if (Hls.isSupported()) {
+    const hls = new Hls();
+    hls.loadSource(channel.stream);
+    hls.attachMedia(video);
+} else {
+    source.src = channel.stream;
+    video.load();
+      }
     } else {
       title.textContent = "Channel Not Found";
     }
