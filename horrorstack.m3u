@@ -1,3 +1,25 @@
 #EXTM3U
-#EXTINF:-1,Test Channel
+
+#EXTINF:-1 tvg-id="HauntedHouse" tvg-logo="" group-title="Horror",🏚️ Haunted House
+https://archive.org/download/night_of_the_living_dead/night_of_the_living_dead_512kb.mp4
+
+#EXTINF:-1 tvg-id="MidnightHospital" tvg-logo="" group-title="Horror",🏥 Midnight Hospital
+https://archive.org/download/night_of_the_living_dead/night_of_the_living_dead_512kb.mp4
+
+#EXTINF:-1 tvg-id="ScarecrowField" tvg-logo="" group-title="Horror",🌽 Scarecrow Field
+https://archive.org/download/night_of_the_living_dead/night_of_the_living_dead_512kb.mp4
+
+#EXTINF:-1 tvg-id="PossessionRoom" tvg-logo="" group-title="Horror",😈 Possession Room
+https://archive.org/download/night_of_the_living_dead/night_of_the_living_dead_512kb.mp4
+
+#EXTINF:-1 tvg-id="CreeperRoad" tvg-logo="" group-title="Horror",🚗 Creeper Road
+https://archive.org/download/night_of_the_living_dead/night_of_the_living_dead_512kb.mp4
+
+#EXTINF:-1 tvg-id="Phantasm" tvg-logo="" group-title="Horror",☠️ Phantasm
+https://archive.org/download/night_of_the_living_dead/night_of_the_living_dead_512kb.mp4
+
+#EXTINF:-1 tvg-id="Haddonfield" tvg-logo="" group-title="Horror",🎃 Haddonfield
+https://archive.org/download/night_of_the_living_dead/night_of_the_living_dead_512kb.mp4
+
+#EXTINF:-1 tvg-id="GraveyardShift" tvg-logo="" group-title="Horror",🪦 Graveyard Shift
 https://archive.org/download/night_of_the_living_dead/night_of_the_living_dead_512kb.mp4
