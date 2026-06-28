@@ -1,7 +1,7 @@
 #EXTM3U
 
 #EXTINF:-1 tvg-id="HauntedHouse" tvg-logo="" group-title="HorrorStack TV",Haunted House
-https://haunttv-roku.amagi.tv/playlist.m3u8
+https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8
 
 #EXTINF:-1 tvg-id="MidnightHospital" tvg-logo="" group-title="HorrorStack TV",Midnight Hospital (Sci-Fi/Horror)
 https://gandb.com.ng:2020/ClassicSciFi/index.m3u8
