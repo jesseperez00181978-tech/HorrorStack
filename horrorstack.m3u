@@ -1,8 +1,7 @@
 #EXTM3U
 
-#EXTINF:-1 tvg-id="HauntedHouse" tvg-logo="" group-title="HorrorStack TV",Haunted House (Test Stream)
-https://demo.unified-streaming.com/k8s/features/stable/video/tears-of-steel/tears-of-steel.ism/.m3u8
-
+#EXTINF:-1 tvg-id="HauntedHouse" tvg-logo="" group-title="HorrorStack TV",Haunted House
+https://bloodydisgusting-tcl.amagi.tv/playlist.m3u8
 
 #EXTINF:-1 tvg-id="MidnightHospital" tvg-logo="" group-title="HorrorStack TV",Midnight Hospital (Sci-Fi/Horror)
 https://gandb.com.ng:2020/ClassicSciFi/index.m3u8
