@@ -1,10 +1,10 @@
 #EXTM3U
 
 #EXTINF:-1 tvg-name="House on Haunted Hill" group-title="HorrorStack TV",House on Haunted Hill
-https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8
+https://commercials.m3u8.tv/horror/index.m3u8
 
 #EXTINF:-1 tvg-name="Midnight Hospital" group-title="HorrorStack TV",Midnight Hospital
-https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8
+https://bcliveuniverse-clv.amagi.tv/playlist/bcliveuniverse-screamboxtv-roku/playlist.m3u8
 
-#EXTINF:-1 tvg-name="Scarecrow Field" group-title="HorrorStack TV",Scarecrow Field
-https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8
+#EXTINF:-1 tvg-name="Scarecrow" group-title="HorrorStack TV",Scarecrow
+https://fallon-horror-1-us.samsung.wurl.tv/playlist.m3u8
