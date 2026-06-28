@@ -1,10 +1,10 @@
 #EXTM3U
 
-#EXTINF:-1 tvg-name="House on Haunted Hill" group-title="HorrorStack TV",House on Haunted Hill
+#EXTINF:-1 tvg-name="House on Haunted Hill" group-title="HorrorStack TV" user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64)", House on Haunted Hill
 https://commercials.m3u8.tv/horror/index.m3u8
 
-#EXTINF:-1 tvg-name="Midnight Hospital" group-title="HorrorStack TV",Midnight Hospital
+#EXTINF:-1 tvg-name="Midnight Hospital" group-title="HorrorStack TV" user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64)", Midnight Hospital
 https://bcliveuniverse-clv.amagi.tv/playlist/bcliveuniverse-screamboxtv-roku/playlist.m3u8
 
-#EXTINF:-1 tvg-name="Scarecrow" group-title="HorrorStack TV",Scarecrow
+#EXTINF:-1 tvg-name="Scarecrow" group-title="HorrorStack TV" user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64)", Scarecrow
 https://fallon-horror-1-us.samsung.wurl.tv/playlist.m3u8
