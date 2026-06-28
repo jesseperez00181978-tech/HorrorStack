@@ -1,10 +1,10 @@
 #EXTM3U
 
-#EXTINF:-1 tvg-name="House on Haunted Hill" group-title="HorrorStack TV" user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64)", House on Haunted Hill
-https://commercials.m3u8.tv/horror/index.m3u8
+#EXTINF:-1 tvg-name="Screambox TV" group-title="HorrorStack TV", Screambox TV
+https://freetv-live.amagi.tv/playlist/freetv-screamboxtv-us/playlist.m3u8
 
-#EXTINF:-1 tvg-name="Midnight Hospital" group-title="HorrorStack TV" user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64)", Midnight Hospital
-https://bcliveuniverse-clv.amagi.tv/playlist/bcliveuniverse-screamboxtv-roku/playlist.m3u8
+#EXTINF:-1 tvg-name="FilmRise Horror" group-title="HorrorStack TV", FilmRise Horror
+https://filmrise-live.amagi.tv/playlist/filmrise-horror/playlist.m3u8
 
-#EXTINF:-1 tvg-name="Scarecrow" group-title="HorrorStack TV" user-agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64)", Scarecrow
-https://fallon-horror-1-us.samsung.wurl.tv/playlist.m3u8
+#EXTINF:-1 tvg-name="Night of the Living Dead" group-title="HorrorStack TV", Night of the Living Dead (Test File)
+https://archive.org/download/night_of_the_living_dead/night_of_the_living_dead_512kb.mp4
