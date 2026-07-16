@@ -23,3 +23,13 @@ https://uhdtv.io:2020/CreatureFeature/index.m3u8
 
 #EXTINF:-1 tvg-id="SlasherBasement" tvg-logo="" group-title="HorrorStack TV",Slasher Basement (Thriller Ch.)
 http://142.4.216.22:8000/play/a01c
+#EXTM3U
+
+#EXTINF:-1 tvg-id="plutoterror" tvg-name="Pluto Terror" group-title="Horror",Pluto Terror
+<VERIFIED_PLUTO_TERROR_M3U8>
+
+#EXTINF:-1 tvg-id="screamfactory" tvg-name="Scream Factory TV" group-title="Horror",Scream Factory TV
+<VERIFIED_SCREAM_FACTORY_M3U8>
+
+#EXTINF:-1 tvg-id="bijoutheater" tvg-name="Bijou Theater" group-title="Cult Horror",Bijou Theater
+<VERIFIED_BIJOU_THEATER_M3U8>
