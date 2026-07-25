@@ -1,69 +1,490 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HorrorStack</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#080008"
+    >
+
+    <meta
+        name="description"
+        content="HorrorStack TV — 24/7 themed horror channels."
+    >
+
+    <title>HorrorStack TV</title>
+
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-<div class="container">
 
-    <h1>🎃 HorrorStack TV</h1>
-    <p>24/7 horror channels.</p>
-
-    <h2>📺 Featured Channels</h2>
-
-    <div class="channel-card">
-        <h3>🏚️ Haunted House</h3>
-        <p>Ghosts, haunted homes, and supernatural terror.</p>
-        <a href="player.html?channel=haunted-house"class="watch-btn">Watch</a>
+    <!-- Haunted background layers -->
+    <div class="atmosphere" aria-hidden="true">
+        <div class="moon"></div>
+        <div class="cloud cloud-one"></div>
+        <div class="cloud cloud-two"></div>
+        <div class="fog fog-one"></div>
+        <div class="fog fog-two"></div>
+        <div class="embers" id="embers"></div>
+        <div class="lightning" id="lightning"></div>
+        <div class="vignette"></div>
+        <div class="scanlines"></div>
     </div>
 
-    <div class="channel-card">
-  <h3>🏥 Midnight Hospital</h3>
-  <p>Medical horror and abandoned hospitals.</p>
-  <a href="player.html?channel=midnight-hospital" class="watch-btn">Watch</a>
+    <!-- Opening screen -->
+    <div class="intro-screen" id="introScreen">
+        <div class="intro-content">
+
+            <p class="intro-warning">
+                Viewer discretion is advised
+            </p>
+
+            <h1 class="intro-logo" data-text="HORRORSTACK">
+                HORRORSTACK
+            </h1>
+
+            <p class="intro-tagline">
+                Choose your nightmare.
+            </p>
+
+            <button
+                class="enter-btn"
+                id="enterButton"
+                type="button"
+            >
+                Enter HorrorStack
+            </button>
+
+            <button
+                class="enter-silent-btn"
+                id="enterSilentButton"
+                type="button"
+            >
+                Enter Without Sound
+            </button>
+
+        </div>
     </div>
-        
+
+    <!-- Main application -->
+    <div class="app-shell" id="appShell">
+
+        <header class="site-header">
+
+            <div class="brand-area">
+                <p class="eyebrow">
+                    Broadcasting from somewhere in the dark
+                </p>
+
+                <h1 class="main-logo" data-text="HORRORSTACK TV">
+                    🎃 HorrorStack TV
+                </h1>
+
+                <p class="site-description">
+                    24/7 horror channels built for sleepless nights.
+                </p>
+            </div>
+
+            <div class="header-controls">
+
+                <button
+                    class="control-btn"
+                    id="soundToggle"
+                    type="button"
+                    aria-label="Toggle ambient horror sounds"
+                    aria-pressed="false"
+                >
+                    🔇 Sound Off
+                </button>
+
+                <button
+                    class="control-btn"
+                    id="effectsToggle"
+                    type="button"
+                    aria-label="Toggle animated visual effects"
+                    aria-pressed="true"
+                >
+                    🌫️ Effects On
+                </button>
+
+            </div>
+
+        </header>
+
+        <main class="container">
+
+            <section class="featured-section">
+
+                <div class="section-heading">
+
+                    <div>
+                        <p class="section-kicker">
+                            Live nightmares
+                        </p>
+
+                        <h2>
+                            📺 Featured Channels
+                        </h2>
+                    </div>
+
+                    <div class="live-indicator">
+                        <span class="live-dot"></span>
+                        Horror Never Sleeps
+                    </div>
+
+                </div>
+
+                <div class="channel-grid">
+
+                    <article
+                        class="channel-card haunted-house"
+                        data-channel="haunted-house"
+                    >
+                        <div class="card-overlay"></div>
+
+                        <div class="channel-icon">
+                            🏚️
+                        </div>
+
+                        <div class="channel-content">
+                            <p class="channel-status">
+                                Now haunting
+                            </p>
+
+                            <h3>
+                                Haunted House
+                            </h3>
+
+                            <p>
+                                Ghosts, haunted homes, séances,
+                                and supernatural terror.
+                            </p>
+
+                            <a
+                                href="player.html?channel=haunted-house"
+                                class="watch-btn"
+                            >
+                                <span>Watch Channel</span>
+                                <span aria-hidden="true">▶</span>
+                            </a>
+                        </div>
+                    </article>
+
+                    <article
+                        class="channel-card midnight-hospital"
+                        data-channel="midnight-hospital"
+                    >
+                        <div class="card-overlay"></div>
+
+                        <div class="channel-icon">
+                            🏥
+                        </div>
+
+                        <div class="channel-content">
+                            <p class="channel-status">
+                                Night shift active
+                            </p>
+
+                            <h3>
+                                Midnight Hospital
+                            </h3>
+
+                            <p>
+                                Medical horror, abandoned wards,
+                                dark corridors, and surgical nightmares.
+                            </p>
+
+                            <a
+                                href="player.html?channel=midnight-hospital"
+                                class="watch-btn"
+                            >
+                                <span>Watch Channel</span>
+                                <span aria-hidden="true">▶</span>
+                            </a>
+                        </div>
+                    </article>
+
+                    <article
+                        class="channel-card scarecrow-field"
+                        data-channel="scarecrow-field"
+                    >
+                        <div class="card-overlay"></div>
+
+                        <div class="channel-icon">
+                            🌽
+                        </div>
+
+                        <div class="channel-content">
+                            <p class="channel-status">
+                                Harvest in progress
+                            </p>
+
+                            <h3>
+                                Scarecrow Field
+                            </h3>
+
+                            <p>
+                                Farm horror, cornfields,
+                                scarecrows, and rural nightmares.
+                            </p>
+
+                            <a
+                                href="player.html?channel=scarecrow-field"
+                                class="watch-btn"
+                            >
+                                <span>Watch Channel</span>
+                                <span aria-hidden="true">▶</span>
+                            </a>
+                        </div>
+                    </article>
+
+                    <article
+                        class="channel-card possession-room"
+                        data-channel="possession-room"
+                    >
+                        <div class="card-overlay"></div>
+
+                        <div class="channel-icon">
+                            😈
+                        </div>
+
+                        <div class="channel-content">
+                            <p class="channel-status">
+                                Ritual underway
+                            </p>
+
+                            <h3>
+                                Possession Room
+                            </h3>
+
+                            <p>
+                                Demons, exorcisms, cursed objects,
+                                and forbidden rituals.
+                            </p>
+
+                            <a
+                                href="player.html?channel=possession-room"
+                                class="watch-btn"
+                            >
+                                <span>Watch Channel</span>
+                                <span aria-hidden="true">▶</span>
+                            </a>
+                        </div>
+                    </article>
+
+                    <article
+                        class="channel-card creeper-road"
+                        data-channel="creeper-road"
+                    >
+                        <div class="card-overlay"></div>
+
+                        <div class="channel-icon">
+                            🚗
+                        </div>
+
+                        <div class="channel-content">
+                            <p class="channel-status">
+                                Do not stop
+                            </p>
+
+                            <h3>
+                                Creeper Road
+                            </h3>
+
+                            <p>
+                                Roadside horror, highways,
+                                truck stops, and things following you home.
+                            </p>
+
+                            <a
+                                href="player.html?channel=creeper-road"
+                                class="watch-btn"
+                            >
+                                <span>Watch Channel</span>
+                                <span aria-hidden="true">▶</span>
+                            </a>
+                        </div>
+                    </article>
+
+                    <article
+                        class="channel-card phantasm"
+                        data-channel="phantasm"
+                    >
+                        <div class="card-overlay"></div>
+
+                        <div class="channel-icon">
+                            ☠️
+                        </div>
+
+                        <div class="channel-content">
+                            <p class="channel-status">
+                                Reality unstable
+                            </p>
+
+                            <h3>
+                                Phantasm
+                            </h3>
+
+                            <p>
+                                Dreamlike horror, mortuaries,
+                                strange worlds, and nightmare logic.
+                            </p>
+
+                            <a
+                                href="player.html?channel=phantasm"
+                                class="watch-btn"
+                            >
+                                <span>Watch Channel</span>
+                                <span aria-hidden="true">▶</span>
+                            </a>
+                        </div>
+                    </article>
+
+                    <article
+                        class="channel-card haddonfield"
+                        data-channel="haddonfield"
+                    >
+                        <div class="card-overlay"></div>
+
+                        <div class="channel-icon">
+                            🎃
+                        </div>
+
+                        <div class="channel-content">
+                            <p class="channel-status">
+                                The night he came home
+                            </p>
+
+                            <h3>
+                                Haddonfield
+                            </h3>
+
+                            <p>
+                                Slasher nights, quiet streets,
+                                masks, shadows, and Halloween atmosphere.
+                            </p>
+
+                            <a
+                                href="player.html?channel=haddonfield"
+                                class="watch-btn"
+                            >
+                                <span>Watch Channel</span>
+                                <span aria-hidden="true">▶</span>
+                            </a>
+                        </div>
+                    </article>
+
+                    <article
+                        class="channel-card graveyard-shift"
+                        data-channel="graveyard-shift"
+                    >
+                        <div class="card-overlay"></div>
+
+                        <div class="channel-icon">
+                            🪦
+                        </div>
+
+                        <div class="channel-content">
+                            <p class="channel-status">
+                                Open after midnight
+                            </p>
+
+                            <h3>
+                                Graveyard Shift
+                            </h3>
+
+                            <p>
+                                Late-night horror for when sleep
+                                has clearly failed humanity.
+                            </p>
+
+                            <a
+                                href="player.html?channel=graveyard-shift"
+                                class="watch-btn"
+                            >
+                                <span>Watch Channel</span>
+                                <span aria-hidden="true">▶</span>
+                            </a>
+                        </div>
+                    </article>
+
+                </div>
+
+            </section>
+
+            <section class="coming-soon">
+
+                <div class="coming-soon-content">
+                    <p class="section-kicker">
+                        The signal is growing
+                    </p>
+
+                    <h2>
+                        More nightmares are coming.
+                    </h2>
+
+                    <p>
+                        HorrorStack will continue expanding with
+                        new themed channels and a Jellyfin-powered library.
+                    </p>
+                </div>
+
+            </section>
+
+        </main>
+
+        <footer class="site-footer">
+            <p>
+                HorrorStack TV — Built by Jesse Perez
+            </p>
+
+            <p class="footer-warning">
+                The broadcast never truly ends.
+            </p>
+        </footer>
+
     </div>
 
-    <div class="channel-card">
-        <h3>🌽 Scarecrow Field</h3>
-        <p>Farm horror, cornfields, and rural nightmares.</p>
-        <a href="player.html?channel=scarecrow-field" class="watch-btn">Watch</a>
-    </div>
+    <!-- Ambient sound files -->
+    <audio
+        id="ambientAudio"
+        preload="metadata"
+        loop
+    >
+        <source
+            src="sounds/haunted-ambience.mp3"
+            type="audio/mpeg"
+        >
+    </audio>
 
-    <div class="channel-card">
-        <h3>😈 Possession Room</h3>
-        <p>Demons, exorcisms, and cursed rituals.</p>
-        <a href="player.html?channel=possession-room" class="watch-btn">Watch</a>
-    </div>
-<div class="channel-card">
-    <h3>🚗 Creeper Road</h3>
-    <p>Roadside horror, highways, truck stops, and things following you home.</p>
- <a href="player.html?channel=creeper-road" class="watch-btn">Watch</a>   
-</div>
+    <audio
+        id="thunderAudio"
+        preload="metadata"
+    >
+        <source
+            src="sounds/thunder.mp3"
+            type="audio/mpeg"
+        >
+    </audio>
 
-<div class="channel-card">
-    <h3>☠️ Phantasm</h3>
-    <p>Dreamlike horror, mortuaries, strange worlds, and nightmare logic.</p>
-<a href="player.html?channel=phantasm" class="watch-btn">Watch</a>    
-</div>
+    <audio
+        id="staticAudio"
+        preload="metadata"
+    >
+        <source
+            src="sounds/tv-static.mp3"
+            type="audio/mpeg"
+        >
+    </audio>
 
-<div class="channel-card">
-    <h3>🎃 Haddonfield</h3>
-    <p>Slasher nights, quiet streets, masks, and Halloween atmosphere.</p>
- <a href="player.html?channel=haddonfield"class="watch-btn">Watch</a>   
-</div>
+    <script src="script.js"></script>
 
-<div class="channel-card">
-    <h3>🪦 Graveyard Shift</h3>
-    <p>Late-night horror for when sleep has clearly failed humanity.</p>
-  <a href="player.html?channel=graveyard-shift" class="watch-btn">Watch</a>  
-</div>
-</div>
-<script src="script.js"></script>
 </body>
-</html>
+    </html>
