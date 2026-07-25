@@ -1,490 +1,2392 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#07040a">
+<title>HorrorStack TV</title>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+<style>
+:root {
+  --black: #050307;
+  --black-soft: #0b0710;
+  --panel: rgba(17, 10, 20, 0.88);
+  --panel-strong: rgba(27, 12, 22, 0.96);
+  --white: #f4eef2;
+  --muted: #bcaeba;
+  --blood: #9f0018;
+  --blood-bright: #ef2140;
+  --purple: #6b2b91;
+  --gold: #c89232;
+  --green: #516b37;
+  --teal: #1b6a6a;
+  --orange: #a84e00;
+  --blue: #536d91;
+  --shadow: 0 24px 70px rgba(0,0,0,.72);
+  --radius: 22px;
+}
 
-    <meta
-        name="theme-color"
-        content="#080008"
-    >
+* {
+  box-sizing: border-box;
+}
 
-    <meta
-        name="description"
-        content="HorrorStack TV — 24/7 themed horror channels."
-    >
+html {
+  scroll-behavior: smooth;
+}
 
-    <title>HorrorStack TV</title>
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 50% 12%, rgba(110, 10, 39, .18), transparent 34%),
+    linear-gradient(180deg, #0a0710 0%, #040306 100%);
+  color: var(--white);
+  font-family: Georgia, "Times New Roman", serif;
+}
 
-    <link rel="stylesheet" href="style.css">
+body.locked {
+  overflow: hidden;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font: inherit;
+}
+
+.atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 52% 27%, rgba(86, 38, 94, .12), transparent 30%),
+    linear-gradient(180deg, #15101a 0%, #08060b 56%, #030205 100%);
+}
+
+.moon {
+  position: absolute;
+  top: 7vh;
+  right: 8vw;
+  width: min(31vw, 240px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: .48;
+  background:
+    radial-gradient(circle at 31% 30%, #fffbe4 0 8%, transparent 9%),
+    radial-gradient(circle at 63% 38%, rgba(82,76,73,.35) 0 8%, transparent 9%),
+    radial-gradient(circle at 47% 67%, rgba(74,68,70,.3) 0 11%, transparent 12%),
+    radial-gradient(circle at 35% 35%, #f7f1d8, #c4bcab 52%, #6d6870 76%, #26222a 100%);
+  box-shadow:
+    0 0 42px rgba(245, 239, 208, .18),
+    0 0 100px rgba(162, 146, 195, .08);
+}
+
+.cloud {
+  position: absolute;
+  width: 62vw;
+  height: 18vh;
+  border-radius: 50%;
+  filter: blur(26px);
+  opacity: .22;
+  background:
+    radial-gradient(ellipse at center, rgba(110, 99, 123, .6), rgba(36, 31, 44, .16) 56%, transparent 74%);
+}
+
+.cloud.one {
+  top: 8vh;
+  left: -65vw;
+  animation: cloudMove 38s linear infinite;
+}
+
+.cloud.two {
+  top: 22vh;
+  left: -75vw;
+  opacity: .16;
+  animation: cloudMove 52s linear infinite 7s;
+}
+
+.cloud.three {
+  top: 34vh;
+  left: -85vw;
+  opacity: .1;
+  animation: cloudMove 66s linear infinite 14s;
+}
+
+.fog {
+  position: absolute;
+  left: -35%;
+  width: 170%;
+  height: 26vh;
+  border-radius: 50%;
+  filter: blur(30px);
+  background:
+    radial-gradient(ellipse at center,
+      rgba(238, 238, 241, .48),
+      rgba(146, 137, 154, .18) 46%,
+      transparent 74%);
+}
+
+.fog.one {
+  bottom: -2vh;
+  opacity: .25;
+  animation: fogDrift 18s ease-in-out infinite alternate;
+}
+
+.fog.two {
+  bottom: 15vh;
+  opacity: .17;
+  animation: fogDriftReverse 27s ease-in-out infinite alternate;
+}
+
+.fog.three {
+  bottom: 34vh;
+  opacity: .1;
+  animation: fogDrift 36s ease-in-out infinite alternate;
+}
+
+.lightning {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background:
+    radial-gradient(circle at 74% 4%,
+      rgba(255,255,255,.96),
+      rgba(178,196,255,.38) 23%,
+      transparent 58%);
+  mix-blend-mode: screen;
+}
+
+.lightning.flash {
+  animation: lightningFlash .9s ease-out;
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle, transparent 32%, rgba(0,0,0,.76) 100%);
+}
+
+.scanlines {
+  position: absolute;
+  inset: 0;
+  opacity: .07;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 3px,
+      rgba(255,255,255,.14) 4px
+    );
+}
+
+.bat {
+  position: absolute;
+  top: 14vh;
+  left: -12vw;
+  font-size: 1.6rem;
+  opacity: .35;
+  filter: grayscale(1);
+  animation: batFly 24s linear infinite;
+}
+
+.bat.bat-two {
+  top: 22vh;
+  animation-delay: 8s;
+  animation-duration: 31s;
+  font-size: 1.1rem;
+}
+
+.bat.bat-three {
+  top: 31vh;
+  animation-delay: 14s;
+  animation-duration: 37s;
+  font-size: .9rem;
+}
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(103, 0, 27, .3), transparent 35%),
+    rgba(2, 1, 4, .96);
+  transition: opacity .9s ease, visibility .9s ease;
+}
+
+.intro.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.intro-content {
+  width: min(820px, 100%);
+  text-align: center;
+}
+
+.intro-warning,
+.eyebrow,
+.section-kicker,
+.channel-status {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: .19em;
+  font-family: Arial, sans-serif;
+  font-size: .72rem;
+}
+
+.intro-warning {
+  color: #9f8d99;
+  margin-bottom: 18px;
+}
+
+.intro-logo {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-size: clamp(3.2rem, 12vw, 8.5rem);
+  letter-spacing: .055em;
+  color: #eee9e7;
+  text-shadow:
+    0 0 8px rgba(255,255,255,.18),
+    4px 4px 0 #6f0013,
+    8px 8px 0 #1b0005;
+  animation: titleFlicker 4.6s infinite;
+}
+
+.intro-logo::before,
+.intro-logo::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.intro-logo::before {
+  color: rgba(255, 0, 46, .42);
+  transform: translate(2px,0);
+  clip-path: inset(10% 0 68% 0);
+  animation: glitchTop 2.8s infinite steps(1);
+}
+
+.intro-logo::after {
+  color: rgba(92, 55, 255, .32);
+  transform: translate(-2px,0);
+  clip-path: inset(67% 0 8% 0);
+  animation: glitchBottom 2.35s infinite steps(1);
+}
+
+.intro-tagline {
+  margin: 18px 0 30px;
+  color: var(--muted);
+  font-size: 1.08rem;
+}
+
+.intro-actions {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+}
+
+.enter-btn,
+.enter-silent-btn,
+.control-btn,
+.watch-btn,
+.back-btn {
+  border: 1px solid rgba(255,255,255,.15);
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform .2s ease,
+    border-color .2s ease,
+    box-shadow .2s ease,
+    background .2s ease;
+}
+
+.enter-btn {
+  width: min(360px, 100%);
+  padding: 16px 22px;
+  border-radius: 13px;
+  background:
+    linear-gradient(135deg, #b4001d, #4a0010);
+  box-shadow:
+    0 12px 34px rgba(123,0,20,.38);
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+}
+
+.enter-silent-btn {
+  border: 0;
+  padding: 11px 18px;
+  background: transparent;
+  color: #9d9099;
+}
+
+.enter-btn:hover,
+.enter-btn:focus-visible,
+.watch-btn:hover,
+.watch-btn:focus-visible,
+.control-btn:hover,
+.control-btn:focus-visible,
+.back-btn:hover,
+.back-btn:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,.42);
+}
+
+.app-shell {
+  min-height: 100vh;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity .9s ease .15s,
+    transform .9s ease .15s;
+}
+
+.app-shell.visible {
+  opacity: 1;
+  transform: none;
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 34px clamp(18px, 5vw, 72px) 24px;
+  background:
+    linear-gradient(180deg,
+      rgba(5,4,7,.94),
+      rgba(5,4,7,.35),
+      transparent);
+}
+
+.brand-area {
+  max-width: 800px;
+}
+
+.eyebrow,
+.section-kicker {
+  color: #b78491;
+  margin-bottom: 8px;
+}
+
+.main-logo {
+  margin: 0;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-size: clamp(2.4rem, 7vw, 5.4rem);
+  letter-spacing: .03em;
+  text-shadow:
+    0 4px 0 #4f000d,
+    0 0 30px rgba(180,0,25,.2);
+}
+
+.site-description {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
+.header-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.control-btn {
+  padding: 11px 14px;
+  border-radius: 999px;
+  background: rgba(21, 15, 25, .84);
+  font-family: Arial, sans-serif;
+  font-weight: 800;
+}
+
+.container {
+  width: min(1180px, calc(100% - 28px));
+  margin: 0 auto;
+}
+
+.featured-section {
+  padding: 18px 0 42px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.section-heading h2,
+.coming-soon h2 {
+  margin: 0;
+  font-size: clamp(1.75rem, 4vw, 2.9rem);
+}
+
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #cabdc6;
+  font-family: Arial, sans-serif;
+  font-size: .82rem;
+  font-weight: 800;
+}
+
+.live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ff284a;
+  box-shadow: 0 0 12px rgba(255,40,74,.95);
+  animation: livePulse 1.4s infinite;
+}
+
+.channel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.channel-card {
+  position: relative;
+  min-height: 340px;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  background:
+    linear-gradient(145deg,
+      rgba(41, 20, 31, .82),
+      rgba(4,4,7,.94)),
+    radial-gradient(circle at 15% 15%,
+      rgba(255,255,255,.07),
+      transparent 28%);
+  transition:
+    transform .25s ease,
+    border-color .25s ease,
+    box-shadow .25s ease;
+}
+
+.channel-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255,255,255,.3);
+  box-shadow: 0 28px 78px rgba(0,0,0,.75);
+}
+
+.channel-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  opacity: .38;
+  background:
+    radial-gradient(circle at 88% 15%,
+      var(--accent, #a80019),
+      transparent 30%),
+    linear-gradient(130deg,
+      transparent 42%,
+      rgba(255,255,255,.04) 43% 44%,
+      transparent 45%);
+}
+
+.channel-card::after {
+  content: "";
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -35%;
+  height: 58%;
+  z-index: -1;
+  filter: blur(18px);
+  background:
+    radial-gradient(ellipse,
+      rgba(235,235,235,.22),
+      transparent 70%);
+  animation: cardFog 8s ease-in-out infinite alternate;
+}
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg,
+      transparent 0 28%,
+      rgba(0,0,0,.8) 100%);
+}
+
+.channel-icon {
+  position: absolute;
+  top: 20px;
+  right: 22px;
+  font-size: 3.1rem;
+  filter: drop-shadow(0 8px 12px rgba(0,0,0,.6));
+}
+
+.channel-art {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: .26;
+}
+
+.channel-art::before,
+.channel-art::after {
+  content: "";
+  position: absolute;
+}
+
+.channel-content {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 24px;
+}
+
+.channel-status {
+  color: #dea5b2;
+  margin-bottom: 8px;
+}
+
+.channel-card h3 {
+  margin: 0 0 10px;
+  font-size: clamp(1.6rem, 4vw, 2.35rem);
+}
+
+.channel-card p:not(.channel-status) {
+  margin: 0 0 18px;
+  color: #cabfc7;
+  line-height: 1.55;
+}
+
+.watch-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-width: 194px;
+  padding: 12px 15px;
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg,
+      rgba(168,0,25,.96),
+      rgba(57,0,12,.96));
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+}
+
+.haunted-house {
+  --accent: var(--blue);
+}
+
+.midnight-hospital {
+  --accent: var(--teal);
+}
+
+.scarecrow-field {
+  --accent: var(--gold);
+}
+
+.possession-room {
+  --accent: var(--blood);
+}
+
+.creeper-road {
+  --accent: #744100;
+}
+
+.phantasm {
+  --accent: var(--purple);
+}
+
+.haddonfield {
+  --accent: var(--orange);
+}
+
+.graveyard-shift {
+  --accent: var(--green);
+}
+
+.haunted-house .channel-art::before {
+  width: 140px;
+  height: 160px;
+  left: 8%;
+  top: 11%;
+  border: 4px solid rgba(255,255,255,.18);
+  border-bottom: 0;
+  transform: skewY(-4deg);
+  box-shadow:
+    24px 24px 0 rgba(255,255,255,.03),
+    inset 0 0 35px rgba(255,255,255,.05);
+}
+
+.haunted-house .channel-art::after {
+  width: 44px;
+  height: 64px;
+  left: 18%;
+  top: 36%;
+  background: rgba(255,255,255,.05);
+  box-shadow: 52px 0 0 rgba(255,255,255,.04);
+}
+
+.midnight-hospital .channel-art::before {
+  width: 58%;
+  height: 55%;
+  left: 5%;
+  top: 10%;
+  border: 3px solid rgba(255,255,255,.12);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 22px,
+      rgba(255,255,255,.05) 23px 26px
+    );
+}
+
+.midnight-hospital .channel-art::after {
+  width: 56px;
+  height: 56px;
+  left: 19%;
+  top: 23%;
+  background:
+    linear-gradient(
+      rgba(255,255,255,.1),
+      rgba(255,255,255,.1)
+    ),
+    linear-gradient(
+      90deg,
+      transparent 38%,
+      rgba(255,255,255,.2) 39% 61%,
+      transparent 62%
+    ),
+    linear-gradient(
+      transparent 38%,
+      rgba(255,255,255,.2) 39% 61%,
+      transparent 62%
+    );
+}
+
+.scarecrow-field .channel-art::before {
+  left: 16%;
+  top: 8%;
+  width: 5px;
+  height: 190px;
+  background: rgba(255,255,255,.15);
+  box-shadow:
+    52px 15px 0 rgba(255,255,255,.08),
+    104px -4px 0 rgba(255,255,255,.06);
+}
+
+.scarecrow-field .channel-art::after {
+  left: 10%;
+  top: 28%;
+  width: 145px;
+  height: 6px;
+  background: rgba(255,255,255,.12);
+  transform: rotate(-7deg);
+}
+
+.possession-room .channel-art::before {
+  width: 160px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  left: 10%;
+  top: 9%;
+  border: 3px solid rgba(255,255,255,.12);
+  box-shadow:
+    inset 0 0 0 18px rgba(255,255,255,.02),
+    inset 0 0 0 38px rgba(255,255,255,.02);
+}
+
+.possession-room .channel-art::after {
+  left: 23%;
+  top: 21%;
+  width: 85px;
+  height: 85px;
+  border: 3px solid rgba(255,255,255,.09);
+  transform: rotate(45deg);
+}
+
+.creeper-road .channel-art::before {
+  left: 7%;
+  bottom: 24%;
+  width: 220px;
+  height: 100px;
+  clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%);
+  background:
+    linear-gradient(90deg,
+      transparent 47%,
+      rgba(255,255,255,.2) 48% 52%,
+      transparent 53%);
+}
+
+.creeper-road .channel-art::after {
+  left: 12%;
+  top: 14%;
+  width: 170px;
+  height: 2px;
+  background: rgba(255,255,255,.1);
+  box-shadow:
+    0 38px 0 rgba(255,255,255,.06),
+    0 76px 0 rgba(255,255,255,.04);
+}
+
+.phantasm .channel-art::before {
+  width: 118px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  left: 12%;
+  top: 12%;
+  background:
+    radial-gradient(circle at 38% 30%,
+      rgba(255,255,255,.42),
+      rgba(255,255,255,.08) 30%,
+      rgba(0,0,0,.2) 70%);
+  box-shadow:
+    0 0 34px rgba(255,255,255,.12);
+}
+
+.phantasm .channel-art::after {
+  left: 28%;
+  top: 9%;
+  width: 2px;
+  height: 160px;
+  background: rgba(255,255,255,.12);
+  transform: rotate(38deg);
+  box-shadow:
+    -26px 0 0 rgba(255,255,255,.08),
+    26px 0 0 rgba(255,255,255,.08);
+}
+
+.haddonfield .channel-art::before {
+  left: 8%;
+  top: 8%;
+  width: 170px;
+  height: 160px;
+  background:
+    radial-gradient(circle at 33% 34%,
+      rgba(255,255,255,.13) 0 8%,
+      transparent 9%),
+    radial-gradient(circle at 66% 34%,
+      rgba(255,255,255,.13) 0 8%,
+      transparent 9%),
+    linear-gradient(
+      transparent 0 58%,
+      rgba(255,255,255,.08) 59% 66%,
+      transparent 67%
+    );
+  border-radius: 45% 45% 40% 40%;
+  border: 2px solid rgba(255,255,255,.08);
+}
+
+.haddonfield .channel-art::after {
+  left: 4%;
+  bottom: 22%;
+  width: 230px;
+  height: 70px;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,.05) 0 12px,
+      transparent 12px 28px
+    );
+  clip-path: polygon(0 100%, 20% 45%, 40% 72%, 63% 25%, 100% 100%);
+}
+
+.graveyard-shift .channel-art::before {
+  left: 9%;
+  top: 12%;
+  width: 92px;
+  height: 150px;
+  border-radius: 50px 50px 8px 8px;
+  border: 4px solid rgba(255,255,255,.1);
+  border-bottom-width: 10px;
+}
+
+.graveyard-shift .channel-art::after {
+  left: 30%;
+  top: 18%;
+  width: 96px;
+  height: 132px;
+  border-radius: 50px 50px 8px 8px;
+  border: 3px solid rgba(255,255,255,.07);
+}
+
+.coming-soon {
+  margin: 12px 0 50px;
+  padding: 32px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 20px;
+  background:
+    linear-gradient(140deg,
+      rgba(27,13,22,.84),
+      rgba(6,5,8,.92));
+  box-shadow: var(--shadow);
+}
+
+.coming-soon p:last-child {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.site-footer {
+  padding: 26px 18px 34px;
+  text-align: center;
+  color: #8f828b;
+  border-top: 1px solid rgba(255,255,255,.07);
+  background: rgba(4,3,5,.72);
+}
+
+.site-footer p {
+  margin: 6px 0;
+}
+
+.footer-warning {
+  font-style: italic;
+}
+
+.static-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    repeating-radial-gradient(
+      circle at 20% 30%,
+      #fff 0 1px,
+      #000 1px 3px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,.15) 0 1px,
+      transparent 1px 3px
+    );
+  background-size: 5px 5px, 7px 7px;
+  mix-blend-mode: screen;
+}
+
+.static-transition.active {
+  animation: staticBurst .42s steps(2);
+}
+
+.player-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: none;
+  place-items: center;
+  padding: 18px;
+  background:
+    radial-gradient(circle at center,
+      rgba(78, 0, 23, .2),
+      rgba(0,0,0,.94) 64%);
+}
+
+.player-overlay.open {
+  display: grid;
+}
+
+.player-shell {
+  width: min(980px, 100%);
+  max-height: 92vh;
+  overflow-y: auto;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 22px;
+  background:
+    linear-gradient(145deg,
+      rgba(26,12,23,.98),
+      rgba(5,4,7,.99));
+  box-shadow: 0 28px 100px rgba(0,0,0,.9);
+}
+
+.player-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.player-title-wrap p {
+  margin: 0 0 5px;
+  color: #b99eaa;
+  font-size: .76rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  font-family: Arial, sans-serif;
+}
+
+.player-title-wrap h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.back-btn {
+  padding: 10px 13px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.06);
+  font-family: Arial, sans-serif;
+  font-weight: 800;
+}
+
+.video-frame {
+  aspect-ratio: 16/9;
+  margin: 20px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 22px;
+  border: 1px solid rgba(255,255,255,.1);
+  background:
+    radial-gradient(circle at center,
+      rgba(103, 0, 31, .28),
+      rgba(10,7,12,.96) 64%);
+  overflow: hidden;
+  position: relative;
+}
+
+.video-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: .08;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 4px,
+      rgba(255,255,255,.12) 5px
+    );
+}
+
+.signal {
+  position: relative;
+  z-index: 1;
+}
+
+.signal-icon {
+  font-size: 3.2rem;
+  margin-bottom: 12px;
+}
+
+.signal h3 {
+  margin: 0 0 10px;
+  font-size: clamp(1.45rem, 4vw, 2.4rem);
+}
+
+.signal p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.player-info {
+  padding: 0 20px 22px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.effects-off .cloud,
+.effects-off .fog,
+.effects-off .bat,
+.effects-off .scanlines,
+.effects-off .moon {
+  animation: none !important;
+}
+
+.effects-off .fog,
+.effects-off .cloud {
+  opacity: .04;
+}
+
+@keyframes cloudMove {
+  from { transform: translateX(0); }
+  to { transform: translateX(170vw); }
+}
+
+@keyframes fogDrift {
+  from { transform: translateX(-8%) scale(1); }
+  to { transform: translateX(10%) scale(1.08); }
+}
+
+@keyframes fogDriftReverse {
+  from { transform: translateX(10%) scale(1.06); }
+  to { transform: translateX(-10%) scale(.98); }
+}
+
+@keyframes lightningFlash {
+  0%, 100% { opacity: 0; }
+  8% { opacity: .98; }
+  14% { opacity: .05; }
+  21% { opacity: .74; }
+  28% { opacity: 0; }
+  39% { opacity: .46; }
+  48% { opacity: 0; }
+}
+
+@keyframes titleFlicker {
+  0%, 18%, 22%, 24%, 53%, 55%, 100% { opacity: 1; }
+  19%, 23%, 54% { opacity: .26; }
+}
+
+@keyframes glitchTop {
+  0%, 86%, 100% { transform: translate(2px,0); }
+  87% { transform: translate(8px,-2px); }
+  89% { transform: translate(-5px,2px); }
+}
+
+@keyframes glitchBottom {
+  0%, 78%, 100% { transform: translate(-2px,0); }
+  79% { transform: translate(-8px,2px); }
+  81% { transform: translate(6px,-1px); }
+}
+
+@keyframes livePulse {
+  50% {
+    opacity: .35;
+    transform: scale(.8);
+  }
+}
+
+@keyframes cardFog {
+  from {
+    transform: translateX(-4%);
+    opacity: .35;
+  }
+  to {
+    transform: translateX(6%);
+    opacity: .62;
+  }
+}
+
+@keyframes staticBurst {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  25% {
+    opacity: .82;
+    transform: scale(1.03);
+  }
+  60% {
+    opacity: .46;
+    transform: scale(.99);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+@keyframes batFly {
+  0% {
+    transform: translate(-10vw, 0) rotate(-6deg);
+  }
+  25% {
+    transform: translate(35vw, 7vh) rotate(5deg);
+  }
+  50% {
+    transform: translate(75vw, -3vh) rotate(-4deg);
+  }
+  100% {
+    transform: translate(125vw, 8vh) rotate(7deg);
+  }
+}
+
+@media (max-width: 760px) {
+  .site-header,
+  .section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .header-controls {
+    justify-content: flex-start;
+  }
+
+  .channel-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .channel-card {
+    min-height: 315px;
+  }
+
+  .moon {
+    top: 6vh;
+    right: -9vw;
+    width: 50vw;
+  }
+
+  .player-topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .back-btn {
+    width: 100%;
+  }
+
+  .video-frame {
+    margin: 14px;
+  }
+
+  .player-info {
+    padding: 0 14px 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
 </head>
 
-<body>
+<body class="locked">
 
-    <!-- Haunted background layers -->
-    <div class="atmosphere" aria-hidden="true">
-        <div class="moon"></div>
-        <div class="cloud cloud-one"></div>
-        <div class="cloud cloud-two"></div>
-        <div class="fog fog-one"></div>
-        <div class="fog fog-two"></div>
-        <div class="embers" id="embers"></div>
-        <div class="lightning" id="lightning"></div>
-        <div class="vignette"></div>
-        <div class="scanlines"></div>
+<div class="atmosphere" aria-hidden="true">
+  <div class="moon"></div>
+  <div class="cloud one"></div>
+  <div class="cloud two"></div>
+  <div class="cloud three"></div>
+  <div class="fog one"></div>
+  <div class="fog two"></div>
+  <div class="fog three"></div>
+  <div class="bat">🦇</div>
+  <div class="bat bat-two">🦇</div>
+  <div class="bat bat-three">🦇</div>
+  <div class="lightning" id="lightning"></div>
+  <div class="vignette"></div>
+  <div class="scanlines"></div>
+</div>
+
+<section class="intro" id="introScreen">
+  <div class="intro-content">
+    <p class="intro-warning">Viewer discretion is advised</p>
+
+    <h1 class="intro-logo" data-text="HORRORSTACK">
+      HORRORSTACK
+    </h1>
+
+    <p class="intro-tagline">
+      Choose your nightmare.
+    </p>
+
+    <div class="intro-actions">
+      <button class="enter-btn" id="enterButton" type="button">
+        Enter HorrorStack
+      </button>
+
+      <button class="enter-silent-btn" id="enterSilentButton" type="button">
+        Enter Without Sound
+      </button>
+    </div>
+  </div>
+</section>
+
+<div class="app-shell" id="appShell">
+
+  <header class="site-header">
+
+    <div class="brand-area">
+      <p class="eyebrow">
+        Broadcasting from somewhere in the dark
+      </p>
+
+      <h1 class="main-logo">
+        🎃 HorrorStack TV
+      </h1>
+
+      <p class="site-description">
+        24/7 horror channels built for sleepless nights.
+      </p>
     </div>
 
-    <!-- Opening screen -->
-    <div class="intro-screen" id="introScreen">
-        <div class="intro-content">
+    <div class="header-controls">
 
-            <p class="intro-warning">
-                Viewer discretion is advised
-            </p>
+      <button
+        class="control-btn"
+        id="soundToggle"
+        type="button"
+        aria-pressed="false"
+      >
+        🔇 Sound Off
+      </button>
 
-            <h1 class="intro-logo" data-text="HORRORSTACK">
-                HORRORSTACK
-            </h1>
+      <button
+        class="control-btn"
+        id="effectsToggle"
+        type="button"
+        aria-pressed="true"
+      >
+        🌫️ Effects On
+      </button>
 
-            <p class="intro-tagline">
-                Choose your nightmare.
-            </p>
+    </div>
 
-            <button
-                class="enter-btn"
-                id="enterButton"
-                type="button"
-            >
-                Enter HorrorStack
-            </button>
+  </header>
 
-            <button
-                class="enter-silent-btn"
-                id="enterSilentButton"
-                type="button"
-            >
-                Enter Without Sound
-            </button>
+  <main class="container">
 
+    <section class="featured-section">
+
+      <div class="section-heading">
+
+        <div>
+          <p class="section-kicker">
+            Live nightmares
+          </p>
+
+          <h2>
+            📺 Featured Channels
+          </h2>
         </div>
-    </div>
 
-    <!-- Main application -->
-    <div class="app-shell" id="appShell">
+        <div class="live-indicator">
+          <span class="live-dot"></span>
+          Horror Never Sleeps
+        </div>
 
-        <header class="site-header">
+      </div>
 
-            <div class="brand-area">
-                <p class="eyebrow">
-                    Broadcasting from somewhere in the dark
-                </p>
+      <div class="channel-grid">
 
-                <h1 class="main-logo" data-text="HORRORSTACK TV">
-                    🎃 HorrorStack TV
-                </h1>
+        <article
+          class="channel-card haunted-house"
+          data-channel="haunted-house"
+        >
+          <div class="card-overlay"></div>
+          <div class="channel-art"></div>
+          <div class="channel-icon">🏚️</div>
 
-                <p class="site-description">
-                    24/7 horror channels built for sleepless nights.
-                </p>
-            </div>
+          <div class="channel-content">
+            <p class="channel-status">
+              Now haunting
+            </p>
 
-            <div class="header-controls">
+            <h3>
+              Haunted House
+            </h3>
 
-                <button
-                    class="control-btn"
-                    id="soundToggle"
-                    type="button"
-                    aria-label="Toggle ambient horror sounds"
-                    aria-pressed="false"
-                >
-                    🔇 Sound Off
-                </button>
-
-                <button
-                    class="control-btn"
-                    id="effectsToggle"
-                    type="button"
-                    aria-label="Toggle animated visual effects"
-                    aria-pressed="true"
-                >
-                    🌫️ Effects On
-                </button>
-
-            </div>
-
-        </header>
-
-        <main class="container">
-
-            <section class="featured-section">
-
-                <div class="section-heading">
-
-                    <div>
-                        <p class="section-kicker">
-                            Live nightmares
-                        </p>
-
-                        <h2>
-                            📺 Featured Channels
-                        </h2>
-                    </div>
-
-                    <div class="live-indicator">
-                        <span class="live-dot"></span>
-                        Horror Never Sleeps
-                    </div>
-
-                </div>
-
-                <div class="channel-grid">
-
-                    <article
-                        class="channel-card haunted-house"
-                        data-channel="haunted-house"
-                    >
-                        <div class="card-overlay"></div>
-
-                        <div class="channel-icon">
-                            🏚️
-                        </div>
-
-                        <div class="channel-content">
-                            <p class="channel-status">
-                                Now haunting
-                            </p>
-
-                            <h3>
-                                Haunted House
-                            </h3>
-
-                            <p>
-                                Ghosts, haunted homes, séances,
-                                and supernatural terror.
-                            </p>
-
-                            <a
-                                href="player.html?channel=haunted-house"
-                                class="watch-btn"
-                            >
-                                <span>Watch Channel</span>
-                                <span aria-hidden="true">▶</span>
-                            </a>
-                        </div>
-                    </article>
-
-                    <article
-                        class="channel-card midnight-hospital"
-                        data-channel="midnight-hospital"
-                    >
-                        <div class="card-overlay"></div>
-
-                        <div class="channel-icon">
-                            🏥
-                        </div>
-
-                        <div class="channel-content">
-                            <p class="channel-status">
-                                Night shift active
-                            </p>
-
-                            <h3>
-                                Midnight Hospital
-                            </h3>
-
-                            <p>
-                                Medical horror, abandoned wards,
-                                dark corridors, and surgical nightmares.
-                            </p>
-
-                            <a
-                                href="player.html?channel=midnight-hospital"
-                                class="watch-btn"
-                            >
-                                <span>Watch Channel</span>
-                                <span aria-hidden="true">▶</span>
-                            </a>
-                        </div>
-                    </article>
-
-                    <article
-                        class="channel-card scarecrow-field"
-                        data-channel="scarecrow-field"
-                    >
-                        <div class="card-overlay"></div>
-
-                        <div class="channel-icon">
-                            🌽
-                        </div>
-
-                        <div class="channel-content">
-                            <p class="channel-status">
-                                Harvest in progress
-                            </p>
-
-                            <h3>
-                                Scarecrow Field
-                            </h3>
-
-                            <p>
-                                Farm horror, cornfields,
-                                scarecrows, and rural nightmares.
-                            </p>
-
-                            <a
-                                href="player.html?channel=scarecrow-field"
-                                class="watch-btn"
-                            >
-                                <span>Watch Channel</span>
-                                <span aria-hidden="true">▶</span>
-                            </a>
-                        </div>
-                    </article>
-
-                    <article
-                        class="channel-card possession-room"
-                        data-channel="possession-room"
-                    >
-                        <div class="card-overlay"></div>
-
-                        <div class="channel-icon">
-                            😈
-                        </div>
-
-                        <div class="channel-content">
-                            <p class="channel-status">
-                                Ritual underway
-                            </p>
-
-                            <h3>
-                                Possession Room
-                            </h3>
-
-                            <p>
-                                Demons, exorcisms, cursed objects,
-                                and forbidden rituals.
-                            </p>
-
-                            <a
-                                href="player.html?channel=possession-room"
-                                class="watch-btn"
-                            >
-                                <span>Watch Channel</span>
-                                <span aria-hidden="true">▶</span>
-                            </a>
-                        </div>
-                    </article>
-
-                    <article
-                        class="channel-card creeper-road"
-                        data-channel="creeper-road"
-                    >
-                        <div class="card-overlay"></div>
-
-                        <div class="channel-icon">
-                            🚗
-                        </div>
-
-                        <div class="channel-content">
-                            <p class="channel-status">
-                                Do not stop
-                            </p>
-
-                            <h3>
-                                Creeper Road
-                            </h3>
-
-                            <p>
-                                Roadside horror, highways,
-                                truck stops, and things following you home.
-                            </p>
-
-                            <a
-                                href="player.html?channel=creeper-road"
-                                class="watch-btn"
-                            >
-                                <span>Watch Channel</span>
-                                <span aria-hidden="true">▶</span>
-                            </a>
-                        </div>
-                    </article>
-
-                    <article
-                        class="channel-card phantasm"
-                        data-channel="phantasm"
-                    >
-                        <div class="card-overlay"></div>
-
-                        <div class="channel-icon">
-                            ☠️
-                        </div>
-
-                        <div class="channel-content">
-                            <p class="channel-status">
-                                Reality unstable
-                            </p>
-
-                            <h3>
-                                Phantasm
-                            </h3>
-
-                            <p>
-                                Dreamlike horror, mortuaries,
-                                strange worlds, and nightmare logic.
-                            </p>
-
-                            <a
-                                href="player.html?channel=phantasm"
-                                class="watch-btn"
-                            >
-                                <span>Watch Channel</span>
-                                <span aria-hidden="true">▶</span>
-                            </a>
-                        </div>
-                    </article>
-
-                    <article
-                        class="channel-card haddonfield"
-                        data-channel="haddonfield"
-                    >
-                        <div class="card-overlay"></div>
-
-                        <div class="channel-icon">
-                            🎃
-                        </div>
-
-                        <div class="channel-content">
-                            <p class="channel-status">
-                                The night he came home
-                            </p>
-
-                            <h3>
-                                Haddonfield
-                            </h3>
-
-                            <p>
-                                Slasher nights, quiet streets,
-                                masks, shadows, and Halloween atmosphere.
-                            </p>
-
-                            <a
-                                href="player.html?channel=haddonfield"
-                                class="watch-btn"
-                            >
-                                <span>Watch Channel</span>
-                                <span aria-hidden="true">▶</span>
-                            </a>
-                        </div>
-                    </article>
-
-                    <article
-                        class="channel-card graveyard-shift"
-                        data-channel="graveyard-shift"
-                    >
-                        <div class="card-overlay"></div>
-
-                        <div class="channel-icon">
-                            🪦
-                        </div>
-
-                        <div class="channel-content">
-                            <p class="channel-status">
-                                Open after midnight
-                            </p>
-
-                            <h3>
-                                Graveyard Shift
-                            </h3>
-
-                            <p>
-                                Late-night horror for when sleep
-                                has clearly failed humanity.
-                            </p>
-
-                            <a
-                                href="player.html?channel=graveyard-shift"
-                                class="watch-btn"
-                            >
-                                <span>Watch Channel</span>
-                                <span aria-hidden="true">▶</span>
-                            </a>
-                        </div>
-                    </article>
-
-                </div>
-
-            </section>
-
-            <section class="coming-soon">
-
-                <div class="coming-soon-content">
-                    <p class="section-kicker">
-                        The signal is growing
-                    </p>
-
-                    <h2>
-                        More nightmares are coming.
-                    </h2>
-
-                    <p>
-                        HorrorStack will continue expanding with
-                        new themed channels and a Jellyfin-powered library.
-                    </p>
-                </div>
-
-            </section>
-
-        </main>
-
-        <footer class="site-footer">
             <p>
-                HorrorStack TV — Built by Jesse Perez
+              Ghosts, haunted homes, séances,
+              and supernatural terror.
             </p>
 
-            <p class="footer-warning">
-                The broadcast never truly ends.
+            <a
+              href="#"
+              class="watch-btn"
+              data-open-channel="haunted-house"
+            >
+              <span>Watch Channel</span>
+              <span>▶</span>
+            </a>
+          </div>
+        </article>
+
+        <article
+          class="channel-card midnight-hospital"
+          data-channel="midnight-hospital"
+        >
+          <div class="card-overlay"></div>
+          <div class="channel-art"></div>
+          <div class="channel-icon">🏥</div>
+
+          <div class="channel-content">
+            <p class="channel-status">
+              Night shift active
             </p>
-        </footer>
+
+            <h3>
+              Midnight Hospital
+            </h3>
+
+            <p>
+              Medical horror, abandoned wards,
+              dark corridors, and surgical nightmares.
+            </p>
+
+            <a
+              href="#"
+              class="watch-btn"
+              data-open-channel="midnight-hospital"
+            >
+              <span>Watch Channel</span>
+              <span>▶</span>
+            </a>
+          </div>
+        </article>
+
+        <article
+          class="channel-card scarecrow-field"
+          data-channel="scarecrow-field"
+        >
+          <div class="card-overlay"></div>
+          <div class="channel-art"></div>
+          <div class="channel-icon">🌽</div>
+
+          <div class="channel-content">
+            <p class="channel-status">
+              Harvest in progress
+            </p>
+
+            <h3>
+              Scarecrow Field
+            </h3>
+
+            <p>
+              Farm horror, cornfields,
+              scarecrows, and rural nightmares.
+            </p>
+
+            <a
+              href="#"
+              class="watch-btn"
+              data-open-channel="scarecrow-field"
+            >
+              <span>Watch Channel</span>
+              <span>▶</span>
+            </a>
+          </div>
+        </article>
+
+        <article
+          class="channel-card possession-room"
+          data-channel="possession-room"
+        >
+          <div class="card-overlay"></div>
+          <div class="channel-art"></div>
+          <div class="channel-icon">😈</div>
+
+          <div class="channel-content">
+            <p class="channel-status">
+              Ritual underway
+            </p>
+
+            <h3>
+              Possession Room
+            </h3>
+
+            <p>
+              Demons, exorcisms, cursed objects,
+              and forbidden rituals.
+            </p>
+
+            <a
+              href="#"
+              class="watch-btn"
+              data-open-channel="possession-room"
+            >
+              <span>Watch Channel</span>
+              <span>▶</span>
+            </a>
+          </div>
+        </article>
+
+        <article
+          class="channel-card creeper-road"
+          data-channel="creeper-road"
+        >
+          <div class="card-overlay"></div>
+          <div class="channel-art"></div>
+          <div class="channel-icon">🚗</div>
+
+          <div class="channel-content">
+            <p class="channel-status">
+              Do not stop
+            </p>
+
+            <h3>
+              Creeper Road
+            </h3>
+
+            <p>
+              Roadside horror, highways,
+              truck stops, and things following you home.
+            </p>
+
+            <a
+              href="#"
+              class="watch-btn"
+              data-open-channel="creeper-road"
+            >
+              <span>Watch Channel</span>
+              <span>▶</span>
+            </a>
+          </div>
+        </article>
+
+        <article
+          class="channel-card phantasm"
+          data-channel="phantasm"
+        >
+          <div class="card-overlay"></div>
+          <div class="channel-art"></div>
+          <div class="channel-icon">☠️</div>
+
+          <div class="channel-content">
+            <p class="channel-status">
+              Reality unstable
+            </p>
+
+            <h3>
+              Phantasm
+            </h3>
+
+            <p>
+              Dreamlike horror, mortuaries,
+              strange worlds, and nightmare logic.
+            </p>
+
+            <a
+              href="#"
+              class="watch-btn"
+              data-open-channel="phantasm"
+            >
+              <span>Watch Channel</span>
+              <span>▶</span>
+            </a>
+          </div>
+        </article>
+
+        <article
+          class="channel-card haddonfield"
+          data-channel="haddonfield"
+        >
+          <div class="card-overlay"></div>
+          <div class="channel-art"></div>
+          <div class="channel-icon">🎃</div>
+
+          <div class="channel-content">
+            <p class="channel-status">
+              The night he came home
+            </p>
+
+            <h3>
+              Haddonfield
+            </h3>
+
+            <p>
+              Slasher nights, quiet streets,
+              masks, shadows, and Halloween atmosphere.
+            </p>
+
+            <a
+              href="#"
+              class="watch-btn"
+              data-open-channel="haddonfield"
+            >
+              <span>Watch Channel</span>
+              <span>▶</span>
+            </a>
+          </div>
+        </article>
+
+        <article
+          class="channel-card graveyard-shift"
+          data-channel="graveyard-shift"
+        >
+          <div class="card-overlay"></div>
+          <div class="channel-art"></div>
+          <div class="channel-icon">🪦</div>
+
+          <div class="channel-content">
+            <p class="channel-status">
+              Open after midnight
+            </p>
+
+            <h3>
+              Graveyard Shift
+            </h3>
+
+            <p>
+              Late-night horror for when sleep
+              has clearly failed humanity.
+            </p>
+
+            <a
+              href="#"
+              class="watch-btn"
+              data-open-channel="graveyard-shift"
+            >
+              <span>Watch Channel</span>
+              <span>▶</span>
+            </a>
+          </div>
+        </article>
+
+      </div>
+
+    </section>
+
+    <section class="coming-soon">
+
+      <p class="section-kicker">
+        The signal is growing
+      </p>
+
+      <h2>
+        More nightmares are coming.
+      </h2>
+
+      <p>
+        HorrorStack will continue expanding with new themed channels,
+        a personal Jellyfin library, and future legal IPTV connections.
+      </p>
+
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      HorrorStack TV — Built by Jesse Perez
+    </p>
+
+    <p class="footer-warning">
+      The broadcast never truly ends.
+    </p>
+  </footer>
+
+</div>
+
+<div
+  class="static-transition"
+  id="staticTransition"
+  aria-hidden="true"
+></div>
+
+<section
+  class="player-overlay"
+  id="playerOverlay"
+  aria-hidden="true"
+>
+  <div class="player-shell">
+
+    <div class="player-topbar">
+
+      <div class="player-title-wrap">
+        <p>
+          HorrorStack Broadcast
+        </p>
+
+        <h2 id="playerTitle">
+          Channel
+        </h2>
+      </div>
+
+      <button
+        class="back-btn"
+        id="closePlayer"
+        type="button"
+      >
+        ← Back to Channels
+      </button>
 
     </div>
 
-    <!-- Ambient sound files -->
-    <audio
-        id="ambientAudio"
-        preload="metadata"
-        loop
-    >
-        <source
-            src="sounds/haunted-ambience.mp3"
-            type="audio/mpeg"
-        >
-    </audio>
+    <div class="video-frame">
 
-    <audio
-        id="thunderAudio"
-        preload="metadata"
-    >
-        <source
-            src="sounds/thunder.mp3"
-            type="audio/mpeg"
-        >
-    </audio>
+      <div class="signal">
 
-    <audio
-        id="staticAudio"
-        preload="metadata"
-    >
-        <source
-            src="sounds/tv-static.mp3"
-            type="audio/mpeg"
-        >
-    </audio>
+        <div class="signal-icon" id="playerIcon">
+          📺
+        </div>
 
-    <script src="script.js"></script>
+        <h3 id="signalTitle">
+          The signal is waiting...
+        </h3>
+
+        <p id="signalDescription">
+          This channel is ready for a future Jellyfin or legal IPTV stream.
+        </p>
+
+      </div>
+
+    </div>
+
+    <div class="player-info" id="playerInfo">
+      HorrorStack is designed to become the front end for your own
+      media server and verified legal streams.
+    </div>
+
+  </div>
+</section>
+
+<script>
+(() => {
+  "use strict";
+
+  const introScreen =
+    document.getElementById("introScreen");
+
+  const appShell =
+    document.getElementById("appShell");
+
+  const enterButton =
+    document.getElementById("enterButton");
+
+  const enterSilentButton =
+    document.getElementById("enterSilentButton");
+
+  const soundToggle =
+    document.getElementById("soundToggle");
+
+  const effectsToggle =
+    document.getElementById("effectsToggle");
+
+  const lightning =
+    document.getElementById("lightning");
+
+  const staticTransition =
+    document.getElementById("staticTransition");
+
+  const playerOverlay =
+    document.getElementById("playerOverlay");
+
+  const closePlayer =
+    document.getElementById("closePlayer");
+
+  const playerTitle =
+    document.getElementById("playerTitle");
+
+  const playerIcon =
+    document.getElementById("playerIcon");
+
+  const signalTitle =
+    document.getElementById("signalTitle");
+
+  const signalDescription =
+    document.getElementById("signalDescription");
+
+  const playerInfo =
+    document.getElementById("playerInfo");
+
+  const channelData = {
+    "haunted-house": {
+      title: "Haunted House",
+      icon: "🏚️",
+      signal: "The house is listening.",
+      description:
+        "Ghost stories, haunted homes, séances, and supernatural terror.",
+      info:
+        "This channel is prepared for your Haunted House Jellyfin collection."
+    },
+
+    "midnight-hospital": {
+      title: "Midnight Hospital",
+      icon: "🏥",
+      signal: "The night shift has begun.",
+      description:
+        "Medical horror, abandoned wards, dark corridors, and surgical nightmares.",
+      info:
+        "This channel is prepared for your medical and hospital horror collection."
+    },
+
+    "scarecrow-field": {
+      title: "Scarecrow Field",
+      icon: "🌽",
+      signal: "Something is moving in the corn.",
+      description:
+        "Farm horror, cornfields, scarecrows, and rural nightmares.",
+      info:
+        "This channel is prepared for your rural and farm horror collection."
+    },
+
+    "possession-room": {
+      title: "Possession Room",
+      icon: "😈",
+      signal: "The ritual cannot be stopped.",
+      description:
+        "Demons, exorcisms, cursed objects, and forbidden rituals.",
+      info:
+        "This channel is prepared for your demonic and possession horror collection."
+    },
+
+    "creeper-road": {
+      title: "Creeper Road",
+      icon: "🚗",
+      signal: "Do not look in the mirror.",
+      description:
+        "Roadside horror, highways, truck stops, and things following you home.",
+      info:
+        "This channel is prepared for your road and highway horror collection."
+    },
+
+    "phantasm": {
+      title: "Phantasm",
+      icon: "☠️",
+      signal: "Reality has become unstable.",
+      description:
+        "Dreamlike horror, mortuaries, strange worlds, and nightmare logic.",
+      info:
+        "This channel is prepared for your Phantasm collection and surreal horror."
+    },
+
+    "haddonfield": {
+      title: "Haddonfield",
+      icon: "🎃",
+      signal: "The night he came home.",
+      description:
+        "Slasher nights, quiet streets, masks, shadows, and Halloween atmosphere.",
+      info:
+        "This channel is prepared for your Halloween and slasher collection."
+    },
+
+    "graveyard-shift": {
+      title: "Graveyard Shift",
+      icon: "🪦",
+      signal: "The cemetery gates are open.",
+      description:
+        "Late-night horror for when sleep has clearly failed humanity.",
+      info:
+        "This channel is prepared for midnight horror marathons and deep cuts."
+    }
+  };
+
+  let audioContext = null;
+  let masterGain = null;
+  let windSource = null;
+  let windFilter = null;
+  let soundEnabled = false;
+  let lightningTimer = null;
+
+  function createNoiseBuffer(context, seconds = 5) {
+    const length =
+      Math.floor(context.sampleRate * seconds);
+
+    const buffer =
+      context.createBuffer(
+        1,
+        length,
+        context.sampleRate
+      );
+
+    const data =
+      buffer.getChannelData(0);
+
+    for (
+      let index = 0;
+      index < length;
+      index += 1
+    ) {
+      data[index] =
+        Math.random() * 2 - 1;
+    }
+
+    return buffer;
+  }
+
+  function buildAmbientSound() {
+    if (audioContext) {
+      return;
+    }
+
+    const AudioContextClass =
+      window.AudioContext ||
+      window.webkitAudioContext;
+
+    if (!AudioContextClass) {
+      soundToggle.textContent =
+        "🔇 Sound Unsupported";
+
+      soundToggle.disabled =
+        true;
+
+      return;
+    }
+
+    audioContext =
+      new AudioContextClass();
+
+    masterGain =
+      audioContext.createGain();
+
+    masterGain.gain.value =
+      0.0001;
+
+    masterGain.connect(
+      audioContext.destination
+    );
+
+    windSource =
+      audioContext.createBufferSource();
+
+    windSource.buffer =
+      createNoiseBuffer(
+        audioContext,
+        6
+      );
+
+    windSource.loop =
+      true;
+
+    windFilter =
+      audioContext.createBiquadFilter();
+
+    windFilter.type =
+      "lowpass";
+
+    windFilter.frequency.value =
+      620;
+
+    windFilter.Q.value =
+      0.6;
+
+    const windGain =
+      audioContext.createGain();
+
+    windGain.gain.value =
+      0.12;
+
+    windSource.connect(
+      windFilter
+    );
+
+    windFilter.connect(
+      windGain
+    );
+
+    windGain.connect(
+      masterGain
+    );
+
+    windSource.start();
+
+    const lfo =
+      audioContext.createOscillator();
+
+    const lfoGain =
+      audioContext.createGain();
+
+    lfo.frequency.value =
+      0.075;
+
+    lfoGain.gain.value =
+      230;
+
+    lfo.connect(
+      lfoGain
+    );
+
+    lfoGain.connect(
+      windFilter.frequency
+    );
+
+    lfo.start();
+  }
+
+  async function enableSound() {
+    buildAmbientSound();
+
+    if (
+      !audioContext ||
+      !masterGain
+    ) {
+      return;
+    }
+
+    if (
+      audioContext.state ===
+      "suspended"
+    ) {
+      await audioContext.resume();
+    }
+
+    masterGain.gain.cancelScheduledValues(
+      audioContext.currentTime
+    );
+
+    masterGain.gain.exponentialRampToValueAtTime(
+      0.42,
+      audioContext.currentTime + 1.2
+    );
+
+    soundEnabled =
+      true;
+
+    soundToggle.textContent =
+      "🔊 Sound On";
+
+    soundToggle.setAttribute(
+      "aria-pressed",
+      "true"
+    );
+  }
+
+  function disableSound() {
+    if (
+      audioContext &&
+      masterGain
+    ) {
+      masterGain.gain.cancelScheduledValues(
+        audioContext.currentTime
+      );
+
+      masterGain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        audioContext.currentTime + 0.5
+      );
+    }
+
+    soundEnabled =
+      false;
+
+    soundToggle.textContent =
+      "🔇 Sound Off";
+
+    soundToggle.setAttribute(
+      "aria-pressed",
+      "false"
+    );
+  }
+
+  function playThunder() {
+    if (
+      !soundEnabled ||
+      !audioContext ||
+      !masterGain
+    ) {
+      return;
+    }
+
+    const now =
+      audioContext.currentTime;
+
+    const thunder =
+      audioContext.createBufferSource();
+
+    thunder.buffer =
+      createNoiseBuffer(
+        audioContext,
+        2.8
+      );
+
+    const filter =
+      audioContext.createBiquadFilter();
+
+    filter.type =
+      "lowpass";
+
+    filter.frequency.setValueAtTime(
+      190,
+      now
+    );
+
+    filter.frequency.exponentialRampToValueAtTime(
+      52,
+      now + 2.5
+    );
+
+    const gain =
+      audioContext.createGain();
+
+    gain.gain.setValueAtTime(
+      0.0001,
+      now
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      1.05,
+      now + 0.03
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      0.0001,
+      now + 2.7
+    );
+
+    thunder.connect(
+      filter
+    );
+
+    filter.connect(
+      gain
+    );
+
+    gain.connect(
+      masterGain
+    );
+
+    thunder.start(
+      now
+    );
+
+    thunder.stop(
+      now + 2.8
+    );
+  }
+
+  function playStaticBurst() {
+    if (
+      !soundEnabled ||
+      !audioContext ||
+      !masterGain
+    ) {
+      return;
+    }
+
+    const now =
+      audioContext.currentTime;
+
+    const staticSource =
+      audioContext.createBufferSource();
+
+    staticSource.buffer =
+      createNoiseBuffer(
+        audioContext,
+        0.4
+      );
+
+    const staticFilter =
+      audioContext.createBiquadFilter();
+
+    staticFilter.type =
+      "highpass";
+
+    staticFilter.frequency.value =
+      1800;
+
+    const staticGain =
+      audioContext.createGain();
+
+    staticGain.gain.setValueAtTime(
+      0.0001,
+      now
+    );
+
+    staticGain.gain.exponentialRampToValueAtTime(
+      0.26,
+      now + 0.015
+    );
+
+    staticGain.gain.exponentialRampToValueAtTime(
+      0.0001,
+      now + 0.35
+    );
+
+    staticSource.connect(
+      staticFilter
+    );
+
+    staticFilter.connect(
+      staticGain
+    );
+
+    staticGain.connect(
+      masterGain
+    );
+
+    staticSource.start(
+      now
+    );
+
+    staticSource.stop(
+      now + 0.4
+    );
+  }
+
+  function flashLightning() {
+    if (
+      document.body.classList.contains(
+        "effects-off"
+      )
+    ) {
+      return;
+    }
+
+    lightning.classList.remove(
+      "flash"
+    );
+
+    void lightning.offsetWidth;
+
+    lightning.classList.add(
+      "flash"
+    );
+
+    if (
+      Math.random() > 0.3
+    ) {
+      window.setTimeout(
+        playThunder,
+        140 + Math.random() * 360
+      );
+    }
+  }
+
+  function scheduleLightning() {
+    window.clearTimeout(
+      lightningTimer
+    );
+
+    const delay =
+      5200 +
+      Math.random() * 11200;
+
+    lightningTimer =
+      window.setTimeout(
+        () => {
+          flashLightning();
+          scheduleLightning();
+        },
+        delay
+      );
+  }
+
+  function enterHorrorStack(
+    withSound
+  ) {
+    introScreen.classList.add(
+      "hidden"
+    );
+
+    appShell.classList.add(
+      "visible"
+    );
+
+    document.body.classList.remove(
+      "locked"
+    );
+
+    if (withSound) {
+      enableSound();
+    } else {
+      disableSound();
+    }
+
+    flashLightning();
+    scheduleLightning();
+  }
+
+  function triggerStaticTransition(
+    callback
+  ) {
+    staticTransition.classList.remove(
+      "active"
+    );
+
+    void staticTransition.offsetWidth;
+
+    staticTransition.classList.add(
+      "active"
+    );
+
+    playStaticBurst();
+
+    window.setTimeout(
+      callback,
+      230
+    );
+  }
+
+  function openChannel(
+    channelKey
+  ) {
+    const channel =
+      channelData[channelKey];
+
+    if (!channel) {
+      return;
+    }
+
+    triggerStaticTransition(
+      () => {
+        playerTitle.textContent =
+          channel.title;
+
+        playerIcon.textContent =
+          channel.icon;
+
+        signalTitle.textContent =
+          channel.signal;
+
+        signalDescription.textContent =
+          channel.description;
+
+        playerInfo.textContent =
+          channel.info;
+
+        playerOverlay.classList.add(
+          "open"
+        );
+
+        playerOverlay.setAttribute(
+          "aria-hidden",
+          "false"
+        );
+
+        document.body.classList.add(
+          "locked"
+        );
+      }
+    );
+  }
+
+  function closeChannel() {
+    triggerStaticTransition(
+      () => {
+        playerOverlay.classList.remove(
+          "open"
+        );
+
+        playerOverlay.setAttribute(
+          "aria-hidden",
+          "true"
+        );
+
+        document.body.classList.remove(
+          "locked"
+        );
+      }
+    );
+  }
+
+  enterButton.addEventListener(
+    "click",
+    () => {
+      enterHorrorStack(
+        true
+      );
+    }
+  );
+
+  enterSilentButton.addEventListener(
+    "click",
+    () => {
+      enterHorrorStack(
+        false
+      );
+    }
+  );
+
+  soundToggle.addEventListener(
+    "click",
+    async () => {
+      if (soundEnabled) {
+        disableSound();
+      } else {
+        await enableSound();
+      }
+    }
+  );
+
+  effectsToggle.addEventListener(
+    "click",
+    () => {
+      const effectsOff =
+        document.body.classList.toggle(
+          "effects-off"
+        );
+
+      effectsToggle.textContent =
+        effectsOff
+          ? "🌫️ Effects Off"
+          : "🌫️ Effects On";
+
+      effectsToggle.setAttribute(
+        "aria-pressed",
+        String(!effectsOff)
+      );
+    }
+  );
+
+  document
+    .querySelectorAll(
+      "[data-open-channel]"
+    )
+    .forEach(
+      (button) => {
+        button.addEventListener(
+          "click",
+          (event) => {
+            event.preventDefault();
+
+            openChannel(
+              button.dataset.openChannel
+            );
+          }
+        );
+      }
+    );
+
+  closePlayer.addEventListener(
+    "click",
+    closeChannel
+  );
+
+  playerOverlay.addEventListener(
+    "click",
+    (event) => {
+      if (
+        event.target ===
+        playerOverlay
+      ) {
+        closeChannel();
+      }
+    }
+  );
+
+  document.addEventListener(
+    "keydown",
+    (event) => {
+      if (
+        event.key === "Escape" &&
+        playerOverlay.classList.contains(
+          "open"
+        )
+      ) {
+        closeChannel();
+      }
+    }
+  );
+
+  document.addEventListener(
+    "visibilitychange",
+    () => {
+      if (
+        document.hidden &&
+        audioContext &&
+        audioContext.state ===
+        "running"
+      ) {
+        audioContext.suspend();
+      } else if (
+        !document.hidden &&
+        soundEnabled &&
+        audioContext &&
+        audioContext.state ===
+        "suspended"
+      ) {
+        audioContext.resume();
+      }
+    }
+  );
+})();
+</script>
 
 </body>
-    </html>
+</html>
