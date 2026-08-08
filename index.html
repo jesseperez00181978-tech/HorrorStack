@@ -1015,24 +1015,8 @@ input:focus-visible {
             </p>
           </div>
         </article>
-     <article class="channel-card legal-channel-card">
-  <div class="card-overlay"></div>
-  <div class="channel-art"></div>
-  <div class="channel-icon">🔪</div>
-
-  <div class="channel-content">
-    <div class="official-badge">HLS TEST</div>
-    <p class="channel-status">Testing live signal</p>
-    <h3>American Horrors</h3>
-    <p>Temporary HorrorStack playback test.</p>
-
-    <a href="#" class="watch-btn" data-open-channel="american-horrors">
-      <span>Test Channel</span>
-      <span>▶</span>
-    </a>
-  </div>
-     </article>
-      </div>
+     
+     </div>
     </section>
 
     <section class="coming-soon">
@@ -1146,12 +1130,7 @@ input:focus-visible {
     "graveyard-shift": {
       title: "Graveyard Shift",
       info: "Late-night horror marathons and deep cuts."
-    },
-"american-horrors": {
-  title: "American Horrors",
-  info: "Temporary HLS playback test.",
-  url: "https://amhorstream.com/playlist/amhor/playlist.m3u8"
-  }  
+    } 
   };
 
   let currentChannelKey = null;
@@ -1438,7 +1417,7 @@ input:focus-visible {
       playerInfo.textContent = channel.info;
 
       const streams = loadStreams();
-      const savedUrl = streams[channelKey] || channel.url || "";
+      const savedUrl = streams[channelKey] || "";
       streamUrl.value = savedUrl;
 
       playerOverlay.classList.add("open");
