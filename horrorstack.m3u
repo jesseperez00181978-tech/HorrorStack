@@ -24,3 +24,6 @@ https://live.retrostrange.com/hls/stream.m3u8
 
 #EXTINF:-1 tvg-id="PlutoTVTerror.us" tvg-name="Pluto TV Terror" group-title="HorrorStack",Pluto TV Terror
 https://stitcher-ipv4.pluto.tv/v2/stitch/embed/hls/channel/5c6dc88fcd232425a6e0f06e/master.m3u8
+
+#EXTINF:-1 tvg-name="American Horrors" group-title="HorrorStack",American Horrors
+https://amhorstream.com/playlist/amhor/playlist.m3u8
