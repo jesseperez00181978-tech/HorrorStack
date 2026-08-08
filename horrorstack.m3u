@@ -20,7 +20,7 @@ https://stream.ecable.tv/bmovie/index.m3u8
 
 #EXTINF:-1 tvg-id="RetroStrange" tvg-name="RetroStrange TV" group-title="Cult Horror",RetroStrange TV
 https://live.retrostrange.com/hls/stream.m3u8
-#EXTM3U
+
 
 #EXTINF:-1 tvg-id="PlutoTVTerror.us" tvg-name="Pluto TV Terror" group-title="HorrorStack",Pluto TV Terror
 https://stitcher-ipv4.pluto.tv/v2/stitch/embed/hls/channel/5c6dc88fcd232425a6e0f06e/master.m3u8
