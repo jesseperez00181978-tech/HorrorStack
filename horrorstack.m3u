@@ -6,22 +6,13 @@ https://bamca-haunttv-lg.amagi.tv/playlist.m3u8
 #EXTINF:-1 tvg-id="MidnightHospital" tvg-logo="" group-title="HorrorStack TV",Midnight Hospital (Sci-Fi/Horror)
 https://naviofrequency-horrormachine-klowdtv.amagi.tv/playlist.m3u8
 
-#EXTINF:-1 tvg-id="ScarecrowField" tvg-logo="" group-title="HorrorStack TV",Scarecrow Field (Cult Classics)
-https://bofatv.xyz:2020/BofaClassic/index.m3u8
+#EXTINF:-1 tvg-id="ScarecrowField" tvg-logo="" group-title="HorrorStack TV",Scarecrow Field 
 
-#EXTINF:-1 tvg-id="PossessionRoom" tvg-logo="" group-title="HorrorStack TV",Possession Room (Retro Horror)
-http://84.252.144.114:8081/Retro_TV/index.m3u8
+#EXTINF:-1 tvg-id="PossessionRoom" tvg-logo="" group-title="HorrorStack TV",Possession Room 
 
-#EXTINF:-1 tvg-id="CreeperRoad" tvg-logo="" group-title="HorrorStack TV",Creeper Road (Drive-In Horror)
-https://freetv.fun:2020/DriveIn/index.m3u8
+#EXTINF:-1 tvg-id="CreeperRoad" tvg-logo="" group-title="HorrorStack TV",Creeper Road 
+
 
 #EXTINF:-1 tvg-id="Phantasm" tvg-logo="" group-title="HorrorStack TV",Phantasm 
 
-#EXTINF:-1 tvg-name="American Horrors" group-title="HorrorStack",American Horrors
-https://amhorstream.com/playlist/amhor/playlist.m3u8
 
-#EXTINF:-1 tvg-name="Horror by ALTER" group-title="HorrorStack",Horror by ALTER
-https://live-manifest.production-public.tubi.io/live/f6b960bc-57bb-431f-8879-22bb076fbce6/playlist.m3u8
-
-#EXTINF:-1 tvg-name="FilmRise Horror Canada" group-title="HorrorStack",FilmRise Horror Canada
-https://apollo.production-public.tubi.io/live/ac-filmrise-horror-canada.m3u8
