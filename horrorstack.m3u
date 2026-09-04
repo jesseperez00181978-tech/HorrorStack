@@ -15,5 +15,5 @@ https://naviofrequency-horrormachine-klowdtv.amagi.tv/playlist.m3u8
 
 #EXTINF:-1 tvg-id="Phantasm" tvg-logo="" group-title="HorrorStack TV",Phantasm 
 
-#EXTINF:-1 tvg-id="screams-tv-by-trinian" group-title="HorrorStack",Screams TV by Trinian
-https://d35j504z0x2vu2.cloudfront.net/v1/master/0bc8e8376bd8417a1b6761138aa41c26c7309312/screams-tv-by-trinian/manifest.m3u8
+#EXTINF:-1 tvg-id="horror-machine" group-title="HorrorStack",Horror Machine
+https://d35j504z0x2vu2.cloudfront.net/v1/master/0bc8e8376bd8417a1b6761138aa41c26c7309312/horrormachine/playlist.m3u8
