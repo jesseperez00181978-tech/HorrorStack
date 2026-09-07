@@ -16,10 +16,10 @@ https://naviofrequency-horrormachine-klowdtv.amagi.tv/playlist.m3u8
 #EXTINF:-1 tvg-id="Phantasm" tvg-logo="" group-title="HorrorStack TV",Phantasm 
 
 
-#EXTINF:-1 tvg-id="MidnightPulp.us" group-title="HorrorStack",Midnight.m3u8
+#EXTINF:-1 tvg-id="MidnightPulp.us" group-title="HorrorStack TV",Midnight Pulp
+https://d18l78mi5ujmqr.cloudfront.net/playlist.m3u8
 
-#EXTINF:-1 tvg-id="HorrorMachine" group-title="Horror",Horror Machine
-https://d35j504z0x2vu2.cloudfront.net/v1/master/0bc8e8376bd8417a1b6761138aa41c26c7309312/horrormachine/playlist.m3u8
+
 
 #EXTINF:-1 group-title="Horror",LocalNow Horror Stream
 https://linear-82.frequency.stream/dist/localnow/82/hls/master/playlist.m3u8
