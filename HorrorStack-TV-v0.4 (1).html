@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#07040a">
+<title>HorrorStack TV v0.4</title>
+
+<style>
+:root {
+  --black: #050307;
+  --black-soft: #0b0710;
+  --panel: rgba(17, 10, 20, 0.9);
+  --panel-strong: rgba(27, 12, 22, 0.97);
+  --white: #f4eef2;
+  --muted: #bcaeba;
+  --blood: #9f0018;
+  --blood-bright: #ef2140;
+  --purple: #6b2b91;
+  --gold: #c89232;
+  --green: #516b37;
+  --teal: #1b6a6a;
+  --orange: #a84e00;
+  --blue: #536d91;
+  --shadow: 0 24px 70px rgba(0,0,0,.72);
+  --radius: 22px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 50% 12%, rgba(110, 10, 39, .18), transparent 34%),
+    linear-gradient(180deg, #0a0710 0%, #040306 100%);
+  color: var(--white);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+body.locked { overflow: hidden; }
+
+button, a, input { -webkit-tap-highlight-color: transparent; }
+button, input { font: inherit; }
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 3px solid rgba(239, 33, 64, .55);
+  outline-offset: 3px;
+}
+
+.atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 52% 27%, rgba(86, 38, 94, .12), transparent 30%),
+    linear-gradient(180deg, #15101a 0%, #08060b 56%, #030205 100%);
+}
+
+.moon {
+  position: absolute;
+  top: 7vh;
+  right: 8vw;
+  width: min(31vw, 240px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  opacity: .48;
+  background:
+    radial-gradient(circle at 31% 30%, #fffbe4 0 8%, transparent 9%),
+    radial-gradient(circle at 63% 38%, rgba(82,76,73,.35) 0 8%, transparent 9%),
+    radial-gradient(circle at 47% 67%, rgba(74,68,70,.3) 0 11%, transparent 12%),
+    radial-gradient(circle at 35% 35%, #f7f1d8, #c4bcab 52%, #6d6870 76%, #26222a 100%);
+  box-shadow: 0 0 42px rgba(245,239,208,.18), 0 0 100px rgba(162,146,195,.08);
+}
+
+.cloud {
+  position: absolute;
+  width: 62vw;
+  height: 18vh;
+  border-radius: 50%;
+  filter: blur(26px);
+  opacity: .22;
+  background: radial-gradient(ellipse at center, rgba(110,99,123,.6), rgba(36,31,44,.16) 56%, transparent 74%);
+}
+
+.cloud.one { top: 8vh; left: -65vw; animation: cloudMove 38s linear infinite; }
+.cloud.two { top: 22vh; left: -75vw; opacity: .16; animation: cloudMove 52s linear infinite 7s; }
+.cloud.three { top: 34vh; left: -85vw; opacity: .1; animation: cloudMove 66s linear infinite 14s; }
+
+.fog {
+  position: absolute;
+  left: -35%;
+  width: 170%;
+  height: 26vh;
+  border-radius: 50%;
+  filter: blur(30px);
+  background: radial-gradient(ellipse at center, rgba(238,238,241,.48), rgba(146,137,154,.18) 46%, transparent 74%);
+}
+
+.fog.one { bottom: -2vh; opacity: .25; animation: fogDrift 18s ease-in-out infinite alternate; }
+.fog.two { bottom: 15vh; opacity: .17; animation: fogDriftReverse 27s ease-in-out infinite alternate; }
+.fog.three { bottom: 34vh; opacity: .1; animation: fogDrift 36s ease-in-out infinite alternate; }
+
+.lightning {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(circle at 74% 4%, rgba(255,255,255,.96), rgba(178,196,255,.38) 23%, transparent 58%);
+  mix-blend-mode: screen;
+}
+
+.lightning.flash { animation: lightningFlash .9s ease-out; }
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, transparent 32%, rgba(0,0,0,.76) 100%);
+}
+
+.scanlines {
+  position: absolute;
+  inset: 0;
+  opacity: .07;
+  background: repeating-linear-gradient(to bottom, transparent 0, transparent 3px, rgba(255,255,255,.14) 4px);
+}
+
+.bat {
+  position: absolute;
+  top: 14vh;
+  left: -12vw;
+  font-size: 1.6rem;
+  opacity: .35;
+  filter: grayscale(1);
+  animation: batFly 24s linear infinite;
+}
+
+.bat.bat-two { top: 22vh; animation-delay: 8s; animation-duration: 31s; font-size: 1.1rem; }
+.bat.bat-three { top: 31vh; animation-delay: 14s; animation-duration: 37s; font-size: .9rem; }
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(103,0,27,.3), transparent 35%),
+    rgba(2,1,4,.96);
+  transition: opacity .9s ease, visibility .9s ease;
+}
+
+.intro.hidden { opacity: 0; visibility: hidden; }
+
+.intro-content {
+  width: min(820px, 100%);
+  text-align: center;
+}
+
+.intro-warning,
+.eyebrow,
+.section-kicker,
+.channel-status {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: .19em;
+  font-family: Arial, sans-serif;
+  font-size: .72rem;
+}
+
+.intro-warning { color: #9f8d99; margin-bottom: 18px; }
+
+.intro-logo {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-size: clamp(3.2rem, 12vw, 8.5rem);
+  letter-spacing: .055em;
+  color: #eee9e7;
+  text-shadow: 0 0 8px rgba(255,255,255,.18), 4px 4px 0 #6f0013, 8px 8px 0 #1b0005;
+  animation: titleFlicker 4.6s infinite;
+}
+
+.intro-logo::before,
+.intro-logo::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.intro-logo::before {
+  color: rgba(255,0,46,.42);
+  transform: translate(2px,0);
+  clip-path: inset(10% 0 68% 0);
+  animation: glitchTop 2.8s infinite steps(1);
+}
+
+.intro-logo::after {
+  color: rgba(92,55,255,.32);
+  transform: translate(-2px,0);
+  clip-path: inset(67% 0 8% 0);
+  animation: glitchBottom 2.35s infinite steps(1);
+}
+
+.intro-tagline { margin: 18px 0 30px; color: var(--muted); font-size: 1.08rem; }
+
+.intro-actions {
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+}
+
+.enter-btn,
+.enter-silent-btn,
+.control-btn,
+.watch-btn,
+.back-btn,
+.save-stream-btn,
+.clear-stream-btn {
+  border: 1px solid rgba(255,255,255,.15);
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.enter-btn {
+  width: min(360px, 100%);
+  padding: 16px 22px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #b4001d, #4a0010);
+  box-shadow: 0 12px 34px rgba(123,0,20,.38);
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+}
+
+.enter-silent-btn { border: 0; padding: 11px 18px; background: transparent; color: #9d9099; }
+
+.enter-btn:hover,
+.enter-btn:focus-visible,
+.watch-btn:hover,
+.watch-btn:focus-visible,
+.control-btn:hover,
+.control-btn:focus-visible,
+.back-btn:hover,
+.back-btn:focus-visible,
+.save-stream-btn:hover,
+.clear-stream-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,.42);
+}
+
+.app-shell {
+  min-height: 100vh;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .9s ease .15s, transform .9s ease .15s;
+}
+
+.app-shell.visible { opacity: 1; transform: none; }
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 34px clamp(18px, 5vw, 72px) 24px;
+  background: linear-gradient(180deg, rgba(5,4,7,.94), rgba(5,4,7,.35), transparent);
+}
+
+.brand-area { max-width: 800px; }
+.eyebrow, .section-kicker { color: #b78491; margin-bottom: 8px; }
+
+.main-logo {
+  margin: 0;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-size: clamp(2.4rem, 7vw, 5.4rem);
+  letter-spacing: .03em;
+  text-shadow: 0 4px 0 #4f000d, 0 0 30px rgba(180,0,25,.2);
+}
+
+.site-description { margin: 8px 0 0; color: var(--muted); }
+
+.header-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.control-btn {
+  padding: 11px 14px;
+  border-radius: 999px;
+  background: rgba(21,15,25,.84);
+  font-family: Arial, sans-serif;
+  font-weight: 800;
+}
+
+.container {
+  width: min(1180px, calc(100% - 28px));
+  margin: 0 auto;
+}
+
+.featured-section { padding: 18px 0 42px; }
+
+.section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.section-heading h2,
+.coming-soon h2 { margin: 0; font-size: clamp(1.75rem, 4vw, 2.9rem); }
+
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: #cabdc6;
+  font-family: Arial, sans-serif;
+  font-size: .82rem;
+  font-weight: 800;
+}
+
+.live-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ff284a;
+  box-shadow: 0 0 12px rgba(255,40,74,.95);
+  animation: livePulse 1.4s infinite;
+}
+
+.channel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.channel-card {
+  position: relative;
+  min-height: 340px;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  background:
+    linear-gradient(145deg, rgba(41,20,31,.82), rgba(4,4,7,.94)),
+    radial-gradient(circle at 15% 15%, rgba(255,255,255,.07), transparent 28%);
+  transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+
+.channel-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(255,255,255,.3);
+  box-shadow: 0 28px 78px rgba(0,0,0,.75);
+}
+
+.channel-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  opacity: .38;
+  background:
+    radial-gradient(circle at 88% 15%, var(--accent, #a80019), transparent 30%),
+    linear-gradient(130deg, transparent 42%, rgba(255,255,255,.04) 43% 44%, transparent 45%);
+}
+
+.channel-card::after {
+  content: "";
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: -35%;
+  height: 58%;
+  z-index: -1;
+  filter: blur(18px);
+  background: radial-gradient(ellipse, rgba(235,235,235,.22), transparent 70%);
+  animation: cardFog 8s ease-in-out infinite alternate;
+}
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, transparent 0 28%, rgba(0,0,0,.8) 100%);
+}
+
+.channel-icon {
+  position: absolute;
+  top: 20px;
+  right: 22px;
+  font-size: 3.1rem;
+  filter: drop-shadow(0 8px 12px rgba(0,0,0,.6));
+}
+
+.channel-art {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  opacity: .26;
+}
+
+.channel-art::before,
+.channel-art::after {
+  content: "";
+  position: absolute;
+}
+
+.channel-content {
+  position: absolute;
+  left: 24px;
+  right: 24px;
+  bottom: 24px;
+}
+
+.channel-status { color: #dea5b2; margin-bottom: 8px; }
+
+.channel-card h3 {
+  margin: 0 0 10px;
+  font-size: clamp(1.6rem, 4vw, 2.35rem);
+}
+
+.channel-card p:not(.channel-status) {
+  margin: 0 0 18px;
+  color: #cabfc7;
+  line-height: 1.55;
+}
+
+.watch-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-width: 194px;
+  padding: 12px 15px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(168,0,25,.96), rgba(57,0,12,.96));
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+}
+
+.phantasm { --accent: var(--purple); }
+.creeper-road { --accent: #744100; }
+.scarecrow-field { --accent: var(--gold); }
+.haunted-house { --accent: var(--blue); }
+.midnight-hospital { --accent: var(--teal); }
+.possession-room { --accent: var(--blood); }
+.haddonfield { --accent: var(--orange); }
+.graveyard-shift { --accent: var(--green); }
+.legal-horror-section {
+  padding: 4px 0 42px;
+}
+
+.legal-channel-card {
+  --accent: #b58a32;
+}
+
+.legal-channel-card .channel-status {
+  color: #f1cf74;
+}
+
+.legal-channel-card .watch-btn {
+  background: linear-gradient(135deg, #9b6918, #4b2a05);
+}
+
+.official-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 220, 123, .28);
+  border-radius: 999px;
+  color: #f4d783;
+  background: rgba(116, 75, 10, .28);
+  font-family: Arial, sans-serif;
+  font-size: .7rem;
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.external-note {
+  margin-top: 12px !important;
+  color: #a99aa3 !important;
+  font-family: Arial, sans-serif;
+  font-size: .78rem;
+}
+/* Simple channel silhouettes */
+.phantasm .channel-art::before {
+  width: 118px; aspect-ratio: 1; border-radius: 50%; left: 12%; top: 12%;
+  background: radial-gradient(circle at 38% 30%, rgba(255,255,255,.42), rgba(255,255,255,.08) 30%, rgba(0,0,0,.2) 70%);
+  box-shadow: 0 0 34px rgba(255,255,255,.12);
+}
+.phantasm .channel-art::after {
+  left: 28%; top: 9%; width: 2px; height: 160px; background: rgba(255,255,255,.12);
+  transform: rotate(38deg); box-shadow: -26px 0 0 rgba(255,255,255,.08), 26px 0 0 rgba(255,255,255,.08);
+}
+
+.creeper-road .channel-art::before {
+  left: 7%; bottom: 24%; width: 220px; height: 100px;
+  clip-path: polygon(38% 0, 62% 0, 100% 100%, 0 100%);
+  background: linear-gradient(90deg, transparent 47%, rgba(255,255,255,.2) 48% 52%, transparent 53%);
+}
+.creeper-road .channel-art::after {
+  left: 12%; top: 14%; width: 170px; height: 2px; background: rgba(255,255,255,.1);
+  box-shadow: 0 38px 0 rgba(255,255,255,.06), 0 76px 0 rgba(255,255,255,.04);
+}
+
+.scarecrow-field .channel-art::before {
+  left: 16%; top: 8%; width: 5px; height: 190px; background: rgba(255,255,255,.15);
+  box-shadow: 52px 15px 0 rgba(255,255,255,.08), 104px -4px 0 rgba(255,255,255,.06);
+}
+.scarecrow-field .channel-art::after {
+  left: 10%; top: 28%; width: 145px; height: 6px; background: rgba(255,255,255,.12);
+  transform: rotate(-7deg);
+}
+
+.haunted-house .channel-art::before {
+  width: 140px; height: 160px; left: 8%; top: 11%;
+  border: 4px solid rgba(255,255,255,.18); border-bottom: 0; transform: skewY(-4deg);
+  box-shadow: 24px 24px 0 rgba(255,255,255,.03), inset 0 0 35px rgba(255,255,255,.05);
+}
+.haunted-house .channel-art::after {
+  width: 44px; height: 64px; left: 18%; top: 36%;
+  background: rgba(255,255,255,.05); box-shadow: 52px 0 0 rgba(255,255,255,.04);
+}
+
+.midnight-hospital .channel-art::before {
+  width: 58%; height: 55%; left: 5%; top: 10%; border: 3px solid rgba(255,255,255,.12);
+  background: repeating-linear-gradient(90deg, transparent 0 22px, rgba(255,255,255,.05) 23px 26px);
+}
+.midnight-hospital .channel-art::after {
+  width: 56px; height: 56px; left: 19%; top: 23%;
+  background:
+    linear-gradient(rgba(255,255,255,.1), rgba(255,255,255,.1)),
+    linear-gradient(90deg, transparent 38%, rgba(255,255,255,.2) 39% 61%, transparent 62%),
+    linear-gradient(transparent 38%, rgba(255,255,255,.2) 39% 61%, transparent 62%);
+}
+
+.possession-room .channel-art::before {
+  width: 160px; aspect-ratio: 1; border-radius: 50%; left: 10%; top: 9%;
+  border: 3px solid rgba(255,255,255,.12);
+  box-shadow: inset 0 0 0 18px rgba(255,255,255,.02), inset 0 0 0 38px rgba(255,255,255,.02);
+}
+.possession-room .channel-art::after {
+  left: 23%; top: 21%; width: 85px; height: 85px;
+  border: 3px solid rgba(255,255,255,.09); transform: rotate(45deg);
+}
+
+.haddonfield .channel-art::before {
+  left: 8%; top: 8%; width: 170px; height: 160px;
+  background:
+    radial-gradient(circle at 33% 34%, rgba(255,255,255,.13) 0 8%, transparent 9%),
+    radial-gradient(circle at 66% 34%, rgba(255,255,255,.13) 0 8%, transparent 9%),
+    linear-gradient(transparent 0 58%, rgba(255,255,255,.08) 59% 66%, transparent 67%);
+  border-radius: 45% 45% 40% 40%; border: 2px solid rgba(255,255,255,.08);
+}
+.haddonfield .channel-art::after {
+  left: 4%; bottom: 22%; width: 230px; height: 70px;
+  background: repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 12px, transparent 12px 28px);
+  clip-path: polygon(0 100%, 20% 45%, 40% 72%, 63% 25%, 100% 100%);
+}
+
+.graveyard-shift .channel-art::before {
+  left: 9%; top: 12%; width: 92px; height: 150px;
+  border-radius: 50px 50px 8px 8px;
+  border: 4px solid rgba(255,255,255,.1); border-bottom-width: 10px;
+}
+.graveyard-shift .channel-art::after {
+  left: 30%; top: 18%; width: 96px; height: 132px;
+  border-radius: 50px 50px 8px 8px;
+  border: 3px solid rgba(255,255,255,.07);
+}
+
+.coming-soon {
+  margin: 12px 0 50px;
+  padding: 32px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 20px;
+  background: linear-gradient(140deg, rgba(27,13,22,.84), rgba(6,5,8,.92));
+  box-shadow: var(--shadow);
+}
+
+.coming-soon p:last-child { color: var(--muted); line-height: 1.6; }
+
+.site-footer {
+  padding: 26px 18px 34px;
+  text-align: center;
+  color: #8f828b;
+  border-top: 1px solid rgba(255,255,255,.07);
+  background: rgba(4,3,5,.72);
+}
+.site-footer p { margin: 6px 0; }
+.footer-warning { font-style: italic; }
+
+.static-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    repeating-radial-gradient(circle at 20% 30%, #fff 0 1px, #000 1px 3px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.15) 0 1px, transparent 1px 3px);
+  background-size: 5px 5px, 7px 7px;
+  mix-blend-mode: screen;
+}
+.static-transition.active { animation: staticBurst .42s steps(2); }
+
+.player-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: none;
+  place-items: center;
+  padding: 18px;
+  background: radial-gradient(circle at center, rgba(78,0,23,.2), rgba(0,0,0,.94) 64%);
+}
+.player-overlay.open { display: grid; }
+
+.player-shell {
+  width: min(1040px, 100%);
+  max-height: 94vh;
+  overflow-y: auto;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 22px;
+  background: linear-gradient(145deg, rgba(26,12,23,.98), rgba(5,4,7,.99));
+  box-shadow: 0 28px 100px rgba(0,0,0,.9);
+}
+
+.player-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.player-title-wrap p {
+  margin: 0 0 5px;
+  color: #b99eaa;
+  font-size: .76rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  font-family: Arial, sans-serif;
+}
+.player-title-wrap h2 { margin: 0; font-size: clamp(1.5rem, 4vw, 2.5rem); }
+
+.back-btn {
+  padding: 10px 13px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.06);
+  font-family: Arial, sans-serif;
+  font-weight: 800;
+}
+
+.video-wrap {
+  margin: 20px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.1);
+  background: #000;
+}
+
+#horrorVideo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #000;
+}
+
+.player-message {
+  padding: 16px 18px;
+  color: var(--muted);
+  line-height: 1.5;
+  background: rgba(255,255,255,.025);
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.player-message strong { color: var(--white); }
+
+.stream-settings {
+  margin: 0 20px 20px;
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px;
+  background: rgba(255,255,255,.035);
+}
+
+.stream-settings label {
+  display: block;
+  margin-bottom: 8px;
+  font-family: Arial, sans-serif;
+  font-size: .82rem;
+  font-weight: 800;
+  color: #dbcbd4;
+}
+
+.stream-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 9px;
+}
+
+.stream-url {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgba(255,255,255,.18);
+  border-radius: 10px;
+  background: rgba(0,0,0,.45);
+  color: white;
+  padding: 12px;
+}
+
+.save-stream-btn,
+.clear-stream-btn {
+  padding: 0 14px;
+  border-radius: 10px;
+  font-family: Arial, sans-serif;
+  font-weight: 900;
+}
+
+.save-stream-btn { background: linear-gradient(135deg, #a80019, #4a0010); }
+.clear-stream-btn { background: rgba(255,255,255,.06); }
+
+.stream-help {
+  margin: 10px 0 0;
+  color: #9f9199;
+  font-size: .83rem;
+  line-height: 1.45;
+  font-family: Arial, sans-serif;
+}
+
+.player-info {
+  padding: 0 20px 22px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.effects-off .cloud,
+.effects-off .fog,
+.effects-off .bat,
+.effects-off .scanlines,
+.effects-off .moon { animation: none !important; }
+
+.effects-off .fog,
+.effects-off .cloud { opacity: .04; }
+
+@keyframes cloudMove { from { transform: translateX(0); } to { transform: translateX(170vw); } }
+@keyframes fogDrift { from { transform: translateX(-8%) scale(1); } to { transform: translateX(10%) scale(1.08); } }
+@keyframes fogDriftReverse { from { transform: translateX(10%) scale(1.06); } to { transform: translateX(-10%) scale(.98); } }
+@keyframes lightningFlash {
+  0%, 100% { opacity: 0; }
+  8% { opacity: .98; }
+  14% { opacity: .05; }
+  21% { opacity: .74; }
+  28% { opacity: 0; }
+  39% { opacity: .46; }
+  48% { opacity: 0; }
+}
+@keyframes titleFlicker {
+  0%, 18%, 22%, 24%, 53%, 55%, 100% { opacity: 1; }
+  19%, 23%, 54% { opacity: .26; }
+}
+@keyframes glitchTop {
+  0%, 86%, 100% { transform: translate(2px,0); }
+  87% { transform: translate(8px,-2px); }
+  89% { transform: translate(-5px,2px); }
+}
+@keyframes glitchBottom {
+  0%, 78%, 100% { transform: translate(-2px,0); }
+  79% { transform: translate(-8px,2px); }
+  81% { transform: translate(6px,-1px); }
+}
+@keyframes livePulse { 50% { opacity: .35; transform: scale(.8); } }
+@keyframes cardFog {
+  from { transform: translateX(-4%); opacity: .35; }
+  to { transform: translateX(6%); opacity: .62; }
+}
+@keyframes staticBurst {
+  0% { opacity: 0; transform: scale(1); }
+  25% { opacity: .82; transform: scale(1.03); }
+  60% { opacity: .46; transform: scale(.99); }
+  100% { opacity: 0; transform: scale(1); }
+}
+@keyframes batFly {
+  0% { transform: translate(-10vw, 0) rotate(-6deg); }
+  25% { transform: translate(35vw, 7vh) rotate(5deg); }
+  50% { transform: translate(75vw, -3vh) rotate(-4deg); }
+  100% { transform: translate(125vw, 8vh) rotate(7deg); }
+}
+
+@media (max-width: 760px) {
+  .site-header, .section-heading { align-items: flex-start; flex-direction: column; }
+  .header-controls { justify-content: flex-start; }
+  .channel-grid { grid-template-columns: 1fr; }
+  .channel-card { min-height: 315px; }
+  .moon { top: 6vh; right: -9vw; width: 50vw; }
+  .player-topbar { align-items: flex-start; flex-direction: column; }
+  .back-btn { width: 100%; }
+  .video-wrap { margin: 14px; }
+  .stream-settings { margin: 0 14px 16px; }
+  .stream-row { grid-template-columns: 1fr; }
+  .save-stream-btn, .clear-stream-btn { min-height: 44px; }
+  .player-info { padding: 0 14px 18px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.private-playlist-bar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:0 0 24px; }
+.private-playlist-bar p { font-size:1rem; line-height:1.5; flex:1 1 220px; }
+.private-playlist-panel { margin:16px 24px; }
+.private-playlist-panel select { display:block; width:100%; min-width:0; color:#fff; background:#17171d; border:1px solid #666; border-radius:8px; padding:12px; margin:8px 0; font:inherit; font-size:1rem; }
+.private-playlist-panel p, .private-playlist-panel label { font-size:1rem; line-height:1.5; }
+.private-playlist-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+.private-playlist-actions a { text-decoration:none; }
+.private-playlist-panel input[type="checkbox"] { width:20px; height:20px; vertical-align:middle; }
+.private-playlist-bar [hidden], .private-playlist-panel [hidden] { display:none !important; }
+@media (max-width:760px) { .private-playlist-panel { margin:16px 14px; } }
+</style>
+</head>
+
+<body class="locked">
+
+<div class="atmosphere" aria-hidden="true">
+  <div class="moon"></div>
+  <div class="cloud one"></div>
+  <div class="cloud two"></div>
+  <div class="cloud three"></div>
+  <div class="fog one"></div>
+  <div class="fog two"></div>
+  <div class="fog three"></div>
+  <div class="bat">🦇</div>
+  <div class="bat bat-two">🦇</div>
+  <div class="bat bat-three">🦇</div>
+  <div class="lightning" id="lightning"></div>
+  <div class="vignette"></div>
+  <div class="scanlines"></div>
+</div>
+
+<section class="intro" id="introScreen">
+  <div class="intro-content">
+    <p class="intro-warning">Viewer discretion is advised</p>
+    <h1 class="intro-logo" data-text="HORRORSTACK">HORRORSTACK</h1>
+    <p class="intro-tagline">Choose your nightmare.</p>
+
+    <div class="intro-actions">
+      <button class="enter-btn" id="enterButton" type="button">Enter HorrorStack</button>
+      <button class="enter-silent-btn" id="enterSilentButton" type="button">Enter Without Sound</button>
+    </div>
+  </div>
+</section>
+
+<div class="app-shell" id="appShell">
+  <header class="site-header">
+    <div class="brand-area">
+      <p class="eyebrow">Broadcasting from somewhere in the dark</p>
+      <h1 class="main-logo">🎃 HorrorStack TV</h1>
+      <p class="site-description">24/7 horror channels built for sleepless nights.</p>
+    </div>
+
+    <div class="header-controls">
+      <button class="control-btn" id="importPlaylist" type="button">Import playlist</button>
+      <input id="playlistFile" type="file" accept=".m3u,.m3u8,text/plain,audio/x-mpegurl,application/vnd.apple.mpegurl" hidden>
+      <button class="control-btn" id="soundToggle" type="button" aria-pressed="false">🔇 Sound Off</button>
+      <button class="control-btn" id="effectsToggle" type="button" aria-pressed="true">🌫️ Effects On</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="private-playlist-bar">
+      <p id="playlistImportStatus" role="status">Import your M3U file to connect channels on this device.</p>
+      <button class="control-btn" id="removeImportedPlaylists" type="button" hidden>Remove imported playlists</button>
+    </div>
+    <section class="featured-section">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Live nightmares</p>
+          <h2>📺 Featured Channels</h2>
+        </div>
+
+        <div class="live-indicator">
+          <span class="live-dot"></span>
+          Horror Never Sleeps
+        </div>
+      </div>
+
+      <div class="channel-grid">
+
+        <article class="channel-card phantasm">
+          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">☠️</div>
+          <div class="channel-content">
+            <p class="channel-status">Reality unstable</p>
+            <h3>Phantasm</h3>
+            <p>The Phantasm films and the Tall Man. Available movies appear after importing your playlist.</p>
+            <a href="#" class="watch-btn" data-open-channel="phantasm"><span>Watch Channel</span><span>▶</span></a>
+          </div>
+        </article>
+
+        <article class="channel-card creeper-road">
+          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🚗</div>
+          <div class="channel-content">
+            <p class="channel-status">Do not stop</p>
+            <h3>Creeper Road</h3>
+            <p>The Jeepers Creepers films, collected in release order.</p>
+            <a href="#" class="watch-btn" data-open-channel="creeper-road"><span>Watch Channel</span><span>▶</span></a>
+          </div>
+        </article>
+
+        <article class="channel-card scarecrow-field">
+          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🌽</div>
+          <div class="channel-content">
+            <p class="channel-status">Harvest in progress</p>
+            <h3>Scarecrow Field</h3>
+            <p>Farm horror, cornfields, scarecrows, and rural nightmares.</p>
+            <a href="#" class="watch-btn" data-open-channel="scarecrow-field"><span>Watch Channel</span><span>▶</span></a>
+          </div>
+        </article>
+
+        <article class="channel-card haunted-house">
+          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🏚️</div>
+          <div class="channel-content">
+            <p class="channel-status">Now haunting</p>
+            <h3>Haunted House</h3>
+            <p>Ghosts, haunted homes, séances, and supernatural terror.</p>
+            <a href="#" class="watch-btn" data-open-channel="haunted-house"><span>Watch Channel</span><span>▶</span></a>
+          </div>
+        </article>
+
+        <article class="channel-card midnight-hospital">
+          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🏥</div>
+          <div class="channel-content">
+            <p class="channel-status">Night shift active</p>
+            <h3>Midnight Hospital</h3>
+            <p>Medical horror, abandoned wards, dark corridors, and surgical nightmares.</p>
+            <a href="#" class="watch-btn" data-open-channel="midnight-hospital"><span>Watch Channel</span><span>▶</span></a>
+          </div>
+        </article>
+
+        <article class="channel-card possession-room">
+          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">😈</div>
+          <div class="channel-content">
+            <p class="channel-status">Ritual underway</p>
+            <h3>Possession Room</h3>
+            <p>Demons, exorcisms, cursed objects, and forbidden rituals.</p>
+            <a href="#" class="watch-btn" data-open-channel="possession-room"><span>Watch Channel</span><span>▶</span></a>
+          </div>
+        </article>
+
+        <article class="channel-card haddonfield">
+          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🎃</div>
+          <div class="channel-content">
+            <p class="channel-status">The night he came home</p>
+            <h3>Haddonfield</h3>
+            <p>The Halloween films and Michael Myers, together in Haddonfield.</p>
+            <a href="#" class="watch-btn" data-open-channel="haddonfield"><span>Watch Channel</span><span>▶</span></a>
+          </div>
+        </article>
+
+<article class="channel-card haddonfield">
+          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🌙</div>
+          <div class="channel-content"><p class="channel-status">Your playlist</p><h3>Elm Street</h3><p>A Nightmare on Elm Street. Freddy’s movie marathon.</p>
+            <a href="#" class="watch-btn" data-open-channel="elm-street"><span>Watch Channel</span><span>▶</span></a>
+          </div>
+        </article>
+<article class="channel-card creeper-road">
+          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🪚</div>
+          <div class="channel-content"><p class="channel-status">Your playlist</p><h3>Texas Chainsaw Massacre</h3><p>The Texas Chain Saw Massacre films. Leatherface’s movie marathon.</p>
+            <a href="#" class="watch-btn" data-open-channel="texas-chainsaw"><span>Watch Channel</span><span>▶</span></a>
+          </div>
+        </article>
+<article class="channel-card graveyard-shift">
+          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🎞️</div>
+          <div class="channel-content"><p class="channel-status">Your playlist</p><h3>Midnight Pulp</h3><p>The Midnight Pulp live feed from your imported playlist.</p>
+            <a href="#" class="watch-btn" data-open-channel="midnight-pulp"><span>Watch Channel</span><span>▶</span></a>
+          </div>
+        </article>
+        <article class="channel-card graveyard-shift">
+          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🪦</div>
+          <div class="channel-content">
+            <p class="channel-status">Open after midnight</p>
+            <h3>Graveyard Shift</h3>
+            <p>Late-night horror for when sleep has clearly failed humanity.</p>
+            <a href="#" class="watch-btn" data-open-channel="graveyard-shift"><span>Watch Channel</span><span>▶</span></a>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <section class="legal-horror-section">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">Verified destinations</p>
+          <h2>⭐ Featured Legal Horror</h2>
+        </div>
+
+        <div class="live-indicator">
+          <span class="live-dot"></span>
+          Official Services
+        </div>
+      </div>
+
+      <div class="channel-grid">
+        <article class="channel-card legal-channel-card">
+          <div class="card-overlay"></div>
+          <div class="channel-art"></div>
+          <div class="channel-icon">🎞️</div>
+
+          <div class="channel-content">
+            <div class="official-badge">✓ Official FAST Channel</div>
+            <p class="channel-status">Free 24/7 broadcast</p>
+            <h3>BijouTheater</h3>
+            <p>Cult classics, horror, kaiju, B-movies, vintage cinema, and hidden genre gems.</p>
+
+            <a
+              href="https://bijoutheater.tv/live"
+              class="watch-btn"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Watch BijouTheater on its official website"
+            >
+              <span>Watch Official Live</span>
+              <span>↗</span>
+            </a>
+
+            <p class="external-note">
+              Opens the official BijouTheater service. HorrorStack does not host or redistribute this broadcast.
+            </p>
+          </div>
+        </article>
+     
+     </div>
+    </section>
+
+    <section class="coming-soon">
+      <p class="section-kicker">The signal is growing</p>
+      <h2>More nightmares are coming.</h2>
+      <p>HorrorStack v0.4 includes the channel player, saved legal stream URLs, native MP4 and HLS playback, atmospheric effects, and a curated section for verified legal horror services.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>HorrorStack TV v0.4 — Built by Jesse Perez — With assistance from ChatGPT</p>
+    <p class="footer-warning">The broadcast never truly ends.</p>
+  </footer>
+</div>
+
+<div class="static-transition" id="staticTransition" aria-hidden="true"></div>
+
+<section class="player-overlay" id="playerOverlay" aria-hidden="true">
+  <div class="player-shell">
+    <div class="player-topbar">
+      <div class="player-title-wrap">
+        <p>HorrorStack Broadcast</p>
+        <h2 id="playerTitle">Channel</h2>
+      </div>
+      <button class="back-btn" id="closePlayer" type="button">← Back to Channels</button>
+    </div>
+
+    <div class="video-wrap">
+      <video id="horrorVideo" controls playsinline preload="metadata"></video>
+      <div class="player-message" id="playerMessage" role="status">
+        <strong>No signal assigned.</strong> Add a legal MP4 or HLS URL below.
+      </div>
+    </div>
+
+    <div class="private-playlist-panel">
+      <div id="queueControls" hidden>
+        <label for="queueSelection">Movie or feed</label>
+        <select id="queueSelection"></select>
+        <p id="queueDescription"></p>
+        <label id="loopLabel"><input id="loopMovies" type="checkbox"> Loop movies when playing here</label>
+      </div>
+      <div class="private-playlist-actions">
+        <a id="externalPlayer" class="control-btn" href="#" hidden rel="noreferrer">Open in video player</a>
+        <button id="downloadChannelPlaylist" class="control-btn" type="button" hidden>Save channel playlist</button>
+      </div>
+    </div>
+    <div class="stream-settings">
+      <label for="streamUrl">Channel stream URL</label>
+      <div class="stream-row">
+        <input
+          class="stream-url"
+          id="streamUrl"
+          type="url"
+          inputmode="url"
+          placeholder="https://example.com/movie.mp4 or stream.m3u8"
+          autocomplete="off"
+        >
+        <button class="save-stream-btn" id="saveStream" type="button">Save & Play</button>
+        <button class="clear-stream-btn" id="clearStream" type="button">Clear</button>
+      </div>
+      <p class="stream-help">
+        Use only media you own, control, or are legally authorized to stream. Each channel URL is saved on this device.
+      </p>
+    </div>
+
+    <div class="player-info" id="playerInfo"></div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.18/dist/hls.min.js"></script>
+<script>
+(() => {
+  "use strict";
+
+  const introScreen = document.getElementById("introScreen");
+  const appShell = document.getElementById("appShell");
+  const enterButton = document.getElementById("enterButton");
+  const enterSilentButton = document.getElementById("enterSilentButton");
+  const soundToggle = document.getElementById("soundToggle");
+  const effectsToggle = document.getElementById("effectsToggle");
+  const lightning = document.getElementById("lightning");
+  const staticTransition = document.getElementById("staticTransition");
+  const playerOverlay = document.getElementById("playerOverlay");
+  const closePlayer = document.getElementById("closePlayer");
+  const playerTitle = document.getElementById("playerTitle");
+  const playerInfo = document.getElementById("playerInfo");
+  const horrorVideo = document.getElementById("horrorVideo");
+  const playerMessage = document.getElementById("playerMessage");
+  const streamUrl = document.getElementById("streamUrl");
+  const saveStream = document.getElementById("saveStream");
+  const clearStream = document.getElementById("clearStream");
+
+  const PLAYLIST_KEY = "horrorstack-private-playlists-v1";
+  let queueIndex = 0;
+  const STORAGE_KEY = "horrorstack-v02-streams";
+  const channelData = {
+    "phantasm": {
+      title: "Phantasm",
+      info: "The Phantasm films and the Tall Man. Available movies appear after importing your playlist."
+    },
+    "creeper-road": {
+      title: "Creeper Road",
+      info: "The Jeepers Creepers films, collected in release order."
+    },
+    "scarecrow-field": {
+      title: "Scarecrow Field",
+      info: "Farm horror, cornfields, scarecrows, and rural nightmares."
+    },
+    "haunted-house": {
+      title: "Haunted House",
+      info: "Ghost stories, haunted homes, séances, and supernatural terror."
+    },
+    "midnight-hospital": {
+      title: "Midnight Hospital",
+      info: "Medical horror, abandoned wards, dark corridors, and surgical nightmares."
+    },
+    "possession-room": {
+      title: "Possession Room",
+      info: "Demons, exorcisms, cursed objects, and forbidden rituals."
+    },
+    "haddonfield": {
+      title: "Haddonfield",
+      info: "The Halloween films and Michael Myers, together in Haddonfield."
+    },
+    "graveyard-shift": {
+      title: "Graveyard Shift",
+      info: "Late-night horror marathons and deep cuts."
+    } 
+  };
+
+  Object.assign(channelData, {
+    "elm-street": { title: "Elm Street", info: "A Nightmare on Elm Street films." },
+    "texas-chainsaw": { title: "Texas Chainsaw Massacre", info: "The Texas Chain Saw Massacre films." },
+    "midnight-pulp": { title: "Midnight Pulp", info: "Midnight Pulp live broadcast." }
+  });
+  let currentChannelKey = null;
+  let hls = null;
+  let audioContext = null;
+  let masterGain = null;
+  let windSource = null;
+  let windFilter = null;
+  let soundEnabled = false;
+  let lightningTimer = null;
+
+  function loadStreams() {
+    try {
+      const value = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      return value && typeof value === "object" ? value : {};
+    } catch (error) {
+      console.warn("Could not load stream URLs.", error);
+      return {};
+    }
+  }
+
+  function saveStreams(streams) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(streams));
+  }
+
+  function createNoiseBuffer(context, seconds = 5) {
+    const length = Math.floor(context.sampleRate * seconds);
+    const buffer = context.createBuffer(1, length, context.sampleRate);
+    const data = buffer.getChannelData(0);
+
+    for (let index = 0; index < length; index += 1) {
+      data[index] = Math.random() * 2 - 1;
+    }
+
+    return buffer;
+  }
+
+  function buildAmbientSound() {
+    if (audioContext) return;
+
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+
+    if (!AudioContextClass) {
+      soundToggle.textContent = "🔇 Sound Unsupported";
+      soundToggle.disabled = true;
+      return;
+    }
+
+    audioContext = new AudioContextClass();
+    masterGain = audioContext.createGain();
+    masterGain.gain.value = 0.0001;
+    masterGain.connect(audioContext.destination);
+
+    windSource = audioContext.createBufferSource();
+    windSource.buffer = createNoiseBuffer(audioContext, 6);
+    windSource.loop = true;
+
+    windFilter = audioContext.createBiquadFilter();
+    windFilter.type = "lowpass";
+    windFilter.frequency.value = 620;
+    windFilter.Q.value = 0.6;
+
+    const windGain = audioContext.createGain();
+    windGain.gain.value = 0.12;
+
+    windSource.connect(windFilter);
+    windFilter.connect(windGain);
+    windGain.connect(masterGain);
+    windSource.start();
+
+    const lfo = audioContext.createOscillator();
+    const lfoGain = audioContext.createGain();
+
+    lfo.frequency.value = 0.075;
+    lfoGain.gain.value = 230;
+    lfo.connect(lfoGain);
+    lfoGain.connect(windFilter.frequency);
+    lfo.start();
+  }
+
+  async function enableSound() {
+    buildAmbientSound();
+    if (!audioContext || !masterGain) return;
+
+    if (audioContext.state === "suspended") {
+      await audioContext.resume();
+    }
+
+    masterGain.gain.cancelScheduledValues(audioContext.currentTime);
+    masterGain.gain.exponentialRampToValueAtTime(0.42, audioContext.currentTime + 1.2);
+
+    soundEnabled = true;
+    soundToggle.textContent = "🔊 Sound On";
+    soundToggle.setAttribute("aria-pressed", "true");
+  }
+
+  function disableSound() {
+    if (audioContext && masterGain) {
+      masterGain.gain.cancelScheduledValues(audioContext.currentTime);
+      masterGain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + 0.5);
+    }
+
+    soundEnabled = false;
+    soundToggle.textContent = "🔇 Sound Off";
+    soundToggle.setAttribute("aria-pressed", "false");
+  }
+
+  function playThunder() {
+    if (!soundEnabled || !audioContext || !masterGain) return;
+
+    const now = audioContext.currentTime;
+    const thunder = audioContext.createBufferSource();
+    thunder.buffer = createNoiseBuffer(audioContext, 2.8);
+
+    const filter = audioContext.createBiquadFilter();
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(190, now);
+    filter.frequency.exponentialRampToValueAtTime(52, now + 2.5);
+
+    const gain = audioContext.createGain();
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(1.05, now + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 2.7);
+
+    thunder.connect(filter);
+    filter.connect(gain);
+    gain.connect(masterGain);
+    thunder.start(now);
+    thunder.stop(now + 2.8);
+  }
+
+  function playStaticBurst() {
+    if (!soundEnabled || !audioContext || !masterGain) return;
+
+    const now = audioContext.currentTime;
+    const staticSource = audioContext.createBufferSource();
+    staticSource.buffer = createNoiseBuffer(audioContext, 0.4);
+
+    const staticFilter = audioContext.createBiquadFilter();
+    staticFilter.type = "highpass";
+    staticFilter.frequency.value = 1800;
+
+    const staticGain = audioContext.createGain();
+    staticGain.gain.setValueAtTime(0.0001, now);
+    staticGain.gain.exponentialRampToValueAtTime(0.26, now + 0.015);
+    staticGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+
+    staticSource.connect(staticFilter);
+    staticFilter.connect(staticGain);
+    staticGain.connect(masterGain);
+    staticSource.start(now);
+    staticSource.stop(now + 0.4);
+  }
+
+  function flashLightning() {
+    if (document.body.classList.contains("effects-off")) return;
+
+    lightning.classList.remove("flash");
+    void lightning.offsetWidth;
+    lightning.classList.add("flash");
+
+    if (Math.random() > 0.3) {
+      window.setTimeout(playThunder, 140 + Math.random() * 360);
+    }
+  }
+
+  function scheduleLightning() {
+    window.clearTimeout(lightningTimer);
+    const delay = 5200 + Math.random() * 11200;
+
+    lightningTimer = window.setTimeout(() => {
+      flashLightning();
+      scheduleLightning();
+    }, delay);
+  }
+
+  function enterHorrorStack(withSound) {
+    introScreen.classList.add("hidden");
+    appShell.classList.add("visible");
+    document.body.classList.remove("locked");
+
+    if (withSound) enableSound();
+    else disableSound();
+
+    flashLightning();
+    scheduleLightning();
+  }
+
+  function triggerStaticTransition(callback) {
+    staticTransition.classList.remove("active");
+    void staticTransition.offsetWidth;
+    staticTransition.classList.add("active");
+    playStaticBurst();
+    window.setTimeout(callback, 230);
+  }
+
+  function destroyHls() {
+    if (hls) {
+      hls.destroy();
+      hls = null;
+    }
+  }
+
+  function stopVideo() {
+    horrorVideo.pause();
+    horrorVideo.removeAttribute("src");
+    horrorVideo.load();
+    destroyHls();
+  }
+
+  function showMessage(text, isError = false) {
+    playerMessage.innerHTML = isError
+      ? `<strong>Signal error.</strong> ${text}`
+      : text;
+  }
+
+  function looksLikeHls(url) {
+    try {
+      const u = new URL(url);
+      const haystack = `${u.pathname} ${u.search}`.toLowerCase();
+      if (haystack.includes('.m3u8')) return true;
+      if (/\/(hls|live)\//i.test(u.pathname)) return true;
+      for (const [key, value] of u.searchParams) {
+        const pair = `${key}=${value}`.toLowerCase();
+        if (/\b(hls|m3u8)\b/.test(pair)) return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  }
+
+  function playStream(url) {
+    stopVideo();
+
+    const cleanUrl = safeStreamUrl(url);
+    updatePlayerLinks(cleanUrl);
+
+    if (!cleanUrl) {
+      showMessage("<strong>No signal assigned.</strong> Add a legal MP4 or HLS URL below.");
+      return;
+    }
+
+    if (location.protocol === "https:" && cleanUrl.startsWith("http:")) {
+      showMessage("<strong>Blocked mixed-content stream.</strong> HorrorStack is running over HTTPS, but this feed uses HTTP. The browser will not allow that connection.", true);
+      return;
+    }
+
+    if (/\.(ts|mkv)(?:[?#]|$)/i.test(cleanUrl)) {
+      showMessage("<strong>Unsupported browser container.</strong> This source cannot be played reliably inside the web player. The external-player button remains available as a fallback.", true);
+      return;
+    }
+
+    showMessage("<strong>Connecting...</strong> Tuning the HorrorStack signal.");
+
+    const isHls = looksLikeHls(cleanUrl);
+
+    if (isHls && window.Hls && Hls.isSupported()) {
+      let networkRecoveries = 0;
+      let mediaRecoveries = 0;
+
+      hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: false,
+        backBufferLength: 30,
+        maxBufferLength: 30
+      });
+
+      hls.loadSource(cleanUrl);
+      hls.attachMedia(horrorVideo);
+
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        networkRecoveries = 0;
+        mediaRecoveries = 0;
+        showMessage("<strong>Signal found.</strong> HorrorStack connected to the HLS stream.");
+        horrorVideo.play().catch(() => {
+          showMessage("<strong>Signal found.</strong> Press play to begin.");
+        });
+      });
+
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        if (!data.fatal) return;
+
+        if (data.type === Hls.ErrorTypes.NETWORK_ERROR && networkRecoveries < 2) {
+          networkRecoveries += 1;
+          showMessage(`Network interruption. HorrorStack is retrying (${networkRecoveries}/2).`, true);
+          hls.startLoad();
+          return;
+        }
+
+        if (data.type === Hls.ErrorTypes.MEDIA_ERROR && mediaRecoveries < 2) {
+          mediaRecoveries += 1;
+          showMessage(`Playback interruption. HorrorStack is recovering (${mediaRecoveries}/2).`, true);
+          hls.recoverMediaError();
+          return;
+        }
+
+        showMessage("The HLS stream could not be recovered. The feed may be offline, blocked by CORS, expired, or incompatible with this browser.", true);
+        destroyHls();
+      });
+
+      return;
+    }
+
+    if (isHls) {
+      const nativeHls = horrorVideo.canPlayType("application/vnd.apple.mpegurl") || horrorVideo.canPlayType("application/x-mpegURL");
+      if (!nativeHls) {
+        showMessage("This browser cannot play HLS here because HLS.js is unavailable and native HLS is not supported.", true);
+        return;
+      }
+    }
+
+    horrorVideo.src = cleanUrl;
+    horrorVideo.load();
+    horrorVideo.play().catch(() => {
+      showMessage("<strong>Signal loaded.</strong> Press play to begin.");
+    });
+  }
+
+  function openChannel(channelKey) {
+    const channel = channelData[channelKey];
+    if (!channel) return;
+
+    currentChannelKey = channelKey;
+
+    triggerStaticTransition(() => {
+      playerTitle.textContent = channel.title;
+      playerInfo.textContent = channel.info;
+
+      const streams = loadStreams();
+      queueIndex = 0;
+      const queue = currentQueue();
+      const savedUrl = queue[0]?.url || streams[channelKey] || "";
+      renderQueue();
+      streamUrl.value = savedUrl;
+
+      playerOverlay.classList.add("open");
+      playerOverlay.setAttribute("aria-hidden", "false");
+      document.body.classList.add("locked");
+
+      playStream(savedUrl);
+      closePlayer.focus();
+    });
+  }
+
+  function closeChannel() {
+    triggerStaticTransition(() => {
+      stopVideo();
+      playerOverlay.classList.remove("open");
+      playerOverlay.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("locked");
+      currentChannelKey = null;
+    });
+  }
+
+  function saveCurrentStream() {
+    if (!currentChannelKey) return;
+
+    const value = streamUrl.value.trim();
+
+    try {
+      if (value && !safeStreamUrl(value)) throw new Error("Unsupported URL");
+    } catch (error) {
+      showMessage("That does not look like a complete web address.", true);
+      return;
+    }
+
+    const streams = loadStreams();
+
+    if (value) streams[currentChannelKey] = value;
+    else delete streams[currentChannelKey];
+
+    saveStreams(streams);
+    removeCurrentImportedQueue();
+    renderQueue();
+    playStream(value);
+  }
+
+  function clearCurrentStream() {
+    if (!currentChannelKey) return;
+
+    const streams = loadStreams();
+    delete streams[currentChannelKey];
+    saveStreams(streams);
+
+    removeCurrentImportedQueue();
+    renderQueue();
+    streamUrl.value = "";
+    updatePlayerLinks("");
+    stopVideo();
+    showMessage("<strong>Channel cleared.</strong> Add a new legal stream URL whenever you are ready.");
+  }
+
+  function safeStreamUrl(value) {
+    try {
+      const u = new URL(String(value || '').trim());
+      return ['http:', 'https:'].includes(u.protocol) ? u.href : '';
+    } catch { return ''; }
+  }
+
+  function parsePrivateM3u(text) {
+    if (!String(text).replace(/^\uFEFF/, '').trimStart().startsWith('#EXTM3U')) throw new Error('Choose an M3U playlist file.');
+    const groups = Object.create(null);
+    let pending = null, ignored = 0, count = 0;
+    const aliases = {
+      hauntedhouse: 'haunted-house', midnighthospital: 'midnight-hospital',
+      scarecrowfield: 'scarecrow-field', possessionroom: 'possession-room',
+      creeperroad: 'creeper-road', phantasm: 'phantasm', haddonfield: 'haddonfield',
+      graveyardshift: 'graveyard-shift', elmstreet: 'elm-street',
+      texaschainsaw: 'texas-chainsaw', texaschainsawmassacre: 'texas-chainsaw',
+      midnightpulp: 'midnight-pulp', midnightpulpus: 'midnight-pulp'
+    };
+    for (const raw of String(text).split(/\r?\n/)) {
+      const line = raw.trim();
+      if (line.startsWith('#EXTINF:')) {
+        if (pending) ignored++;
+        let quoted = false, comma = -1;
+        for (let i = 0; i < line.length; i++) {
+          if (line[i] === '"') quoted = !quoted;
+          if (line[i] === ',' && !quoted) { comma = i; break; }
+        }
+        if (comma < 0) { pending = null; ignored++; continue; }
+        const attrs = Object.create(null);
+        for (const m of line.slice(0, comma).matchAll(/([\w-]+)="([^"]*)"/g)) attrs[m[1]] = m[2];
+        pending = { attrs, name: line.slice(comma + 1).trim() };
+      } else if (line && !line.startsWith('#') && pending) {
+        const { attrs, name } = pending;
+        pending = null;
+        const normalize = value => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        const key = attrs['horrorstack-channel'] || aliases[normalize(attrs['tvg-id'])] || aliases[normalize(name)];
+        const url = safeStreamUrl(line);
+        if (!Object.hasOwn(channelData, key || '') || !url || !name) { ignored++; continue; }
+        const kind = attrs['horrorstack-kind'] === 'movie' || /\.(mp4|mkv|webm|mov)(?:[?#]|$)/i.test(url) ? 'movie' : 'live';
+        groups[key] ||= [];
+        if (!groups[key].some(item => item.url === url)) { groups[key].push({ name, url, kind }); count++; }
+      }
+    }
+    if (pending) ignored++;
+    return { groups, ignored, count };
+  }
+
+  function loadImportedQueues() {
+    try {
+      const data = JSON.parse(localStorage.getItem(PLAYLIST_KEY) || '{}');
+      const clean = Object.create(null);
+      for (const key of Object.keys(channelData)) {
+        if (!Array.isArray(data?.[key])) continue;
+        const valid = data[key].filter(item => item && typeof item.name === 'string' && safeStreamUrl(item.url) && ['movie', 'live'].includes(item.kind));
+        if (valid.length) clean[key] = valid;
+      }
+      return clean;
+    } catch { return Object.create(null); }
+  }
+
+  function currentQueue() { return loadImportedQueues()[currentChannelKey] || []; }
+
+  function updateImportStatus(message) {
+    const data = loadImportedQueues();
+    const n = Object.keys(data).length;
+    document.getElementById('playlistImportStatus').textContent = message || (n ? `${n} channel playlists saved on this device. Account links stay on this device.` : 'Import your M3U file to connect channels on this device.');
+    document.getElementById('removeImportedPlaylists').hidden = !n;
+    document.querySelectorAll('[data-open-channel]').forEach(link => {
+      const items = data[link.dataset.openChannel] || [];
+      const label = link.querySelector('span');
+      if (label) label.textContent = items.length && items.every(x => x.kind === 'movie') ? `Choose movie (${items.length})` : 'Watch Channel';
+    });
+  }
+
+  function removeCurrentImportedQueue() {
+    const data = loadImportedQueues();
+    delete data[currentChannelKey];
+    localStorage.setItem(PLAYLIST_KEY, JSON.stringify(data));
+    queueIndex = 0;
+    updateImportStatus();
+  }
+
+  function renderQueue() {
+    const items = currentQueue();
+    document.getElementById('queueControls').hidden = !items.length;
+    const select = document.getElementById('queueSelection');
+    select.replaceChildren();
+    items.forEach((item, i) => { const option = document.createElement('option'); option.value = String(i); option.textContent = item.name; select.append(option); });
+    select.value = String(queueIndex);
+    const movies = items.length > 0 && items.every(item => item.kind === 'movie');
+    document.getElementById('loopLabel').hidden = !movies;
+    document.getElementById('queueDescription').textContent = movies ? 'On-demand movies. Looping applies while this page plays the videos; it does not create a 24/7 broadcast.' : 'Live feed. The provider controls the movie schedule.';
+  }
+
+  function updatePlayerLinks(url) {
+    const anchor = document.getElementById('externalPlayer');
+    const download = document.getElementById('downloadChannelPlaylist');
+    const safe = safeStreamUrl(url);
+    anchor.hidden = !safe;
+    download.hidden = !safe;
+    if (!safe) { anchor.removeAttribute('href'); return; }
+    const u = new URL(safe);
+    if (/Android/i.test(navigator.userAgent)) {
+      const path = u.href.slice(u.protocol.length).replace(/#/g, '%23').replace(/;/g, '%3B');
+      anchor.href = `intent:${path}#Intent;scheme=${u.protocol.slice(0,-1)};action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;type=video/*;end`;
+      anchor.removeAttribute('target');
+    } else { anchor.href = safe; anchor.target = '_blank'; }
+  }
+
+  function downloadM3u(items, key) {
+    const clean = value => String(value).replace(/[\r\n"]/g, ' ');
+    let text = '#EXTM3U\n# Private account playlist. Do not publish.\n';
+    for (const item of items) text += `#EXTINF:-1 horrorstack-channel="${clean(key)}" horrorstack-kind="${item.kind}" group-title="${clean(channelData[key].title)}",${clean(item.name)}\n${safeStreamUrl(item.url)}\n`;
+    const blobUrl = URL.createObjectURL(new Blob([text], { type: 'audio/x-mpegurl' }));
+    const a = document.createElement('a'); a.href = blobUrl; a.download = `HorrorStack-${key}-private.m3u`; a.click();
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+  }
+
+  document.getElementById('importPlaylist').addEventListener('click', () => document.getElementById('playlistFile').click());
+  document.getElementById('playlistFile').addEventListener('change', async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      if (file.size > 10 * 1024 * 1024) throw new Error('Choose a playlist smaller than 10 MB.');
+      const result = parsePrivateM3u(await file.text());
+      if (!result.count) throw new Error('No recognized HorrorStack channels with valid stream links were found.');
+      const merged = Object.assign(loadImportedQueues(), result.groups);
+      localStorage.setItem(PLAYLIST_KEY, JSON.stringify(merged));
+      updateImportStatus(`Imported ${result.count} feeds or movies into ${Object.keys(result.groups).length} channels on this device.${result.ignored ? ` Skipped ${result.ignored} incomplete or unrecognized entries.` : ''}`);
+      if (currentChannelKey) { queueIndex = 0; renderQueue(); const url = currentQueue()[0]?.url || ''; streamUrl.value = url; playStream(url); }
+    } catch (error) { updateImportStatus(error.name === 'QuotaExceededError' ? 'The device could not save the playlist. Free some browser storage and try again.' : error.message); }
+    finally { event.target.value = ''; }
+  });
+  document.getElementById('removeImportedPlaylists').addEventListener('click', () => {
+    try { localStorage.removeItem(PLAYLIST_KEY); updateImportStatus(); if (currentChannelKey) { queueIndex = 0; renderQueue(); const url = loadStreams()[currentChannelKey] || ''; streamUrl.value = url; playStream(url); } }
+    catch { updateImportStatus('The device could not remove the imported playlists.'); }
+  });
+  document.getElementById('queueSelection').addEventListener('change', event => {
+    queueIndex = Number(event.target.value);
+    const item = currentQueue()[queueIndex];
+    if (item) { streamUrl.value = item.url; playStream(item.url); }
+  });
+  document.getElementById('downloadChannelPlaylist').addEventListener('click', () => {
+    if (!currentChannelKey) return;
+    const queue = currentQueue();
+    const url = safeStreamUrl(streamUrl.value);
+    if (queue.length) downloadM3u(queue, currentChannelKey);
+    else if (url) downloadM3u([{ name: channelData[currentChannelKey].title, url, kind: /\.(mp4|mkv|webm)(?:[?#]|$)/i.test(url) ? 'movie' : 'live' }], currentChannelKey);
+  });
+  horrorVideo.addEventListener('ended', () => {
+    const items = currentQueue();
+    if (!items.length || !items.every(item => item.kind === 'movie')) return;
+    if (queueIndex + 1 < items.length) queueIndex++;
+    else if (document.getElementById('loopMovies').checked) queueIndex = 0;
+    else { showMessage('<strong>Playlist finished.</strong> Choose a movie to watch again.'); return; }
+    document.getElementById('queueSelection').value = String(queueIndex);
+    streamUrl.value = items[queueIndex].url;
+    playStream(items[queueIndex].url);
+  });
+  updateImportStatus();
+
+  enterButton.addEventListener("click", () => enterHorrorStack(true));
+  enterSilentButton.addEventListener("click", () => enterHorrorStack(false));
+
+  soundToggle.addEventListener("click", async () => {
+    if (soundEnabled) disableSound();
+    else await enableSound();
+  });
+
+  effectsToggle.addEventListener("click", () => {
+    const effectsOff = document.body.classList.toggle("effects-off");
+    effectsToggle.textContent = effectsOff ? "🌫️ Effects Off" : "🌫️ Effects On";
+    effectsToggle.setAttribute("aria-pressed", String(!effectsOff));
+  });
+
+  document.querySelectorAll("[data-open-channel]").forEach((button) => {
+    button.addEventListener("click", (event) => {
+      event.preventDefault();
+      openChannel(button.dataset.openChannel);
+    });
+  });
+
+  saveStream.addEventListener("click", saveCurrentStream);
+  clearStream.addEventListener("click", clearCurrentStream);
+
+  streamUrl.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") saveCurrentStream();
+  });
+
+  closePlayer.addEventListener("click", closeChannel);
+
+  playerOverlay.addEventListener("click", (event) => {
+    if (event.target === playerOverlay) closeChannel();
+  });
+
+  horrorVideo.addEventListener("playing", () => {
+    showMessage("<strong>Now playing.</strong> HorrorStack signal locked.");
+  });
+
+  horrorVideo.addEventListener("waiting", () => {
+    showMessage("<strong>Buffering...</strong> The signal is crossing through the dark.");
+  });
+
+  horrorVideo.addEventListener("error", () => {
+    if (!horrorVideo.currentSrc) return;
+    showMessage("The browser could not play this source. Check the format, source permissions, or URL.", true);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && playerOverlay.classList.contains("open")) {
+      closeChannel();
+    }
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      horrorVideo.pause();
+      if (audioContext && audioContext.state === "running") audioContext.suspend();
+    } else if (soundEnabled && audioContext && audioContext.state === "suspended") {
+      audioContext.resume();
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
