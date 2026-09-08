@@ -43,5 +43,17 @@ http://line.dndnscloud.ru/movie/735409f473/8a964ce3bd44/795141.mp4
 #EXTINF:-1 tvg-id="Phantasm" horrorstack-channel="phantasm" horrorstack-kind="movie" group-title="HorrorStack TV",Phantasm - Phantasm: Ravager (2016) [On demand]
 http://line.dndnscloud.ru/movie/735409f473/8a964ce3bd44/402740.mkv
 
+#EXTINF:-1 tvg-id="Phantasm1979" horrorstack-channel="phantasm" horrorstack-kind="movie" group-title="HorrorStack TV",Phantasm (1979) [On demand]
+http://line.dndnscloud.ru/movie/735409f473/8a964ce3bd44/800839.mkv
+
+#EXTINF:-1 tvg-id="PhantasmII" horrorstack-channel="phantasm" horrorstack-kind="movie" group-title="HorrorStack TV",Phantasm II (1988) [On demand]
+http://line.dndnscloud.ru/movie/735409f473/8a964ce3bd44/818643.mkv
+
+#EXTINF:-1 tvg-id="PhantasmIII" horrorstack-channel="phantasm" horrorstack-kind="movie" group-title="HorrorStack TV",Phantasm III: Lord of the Dead (1994) [On demand]
+http://line.dndnscloud.ru/movie/735409f473/8a964ce3bd44/818644.mkv
+
+#EXTINF:-1 tvg-id="PhantasmIV" horrorstack-channel="phantasm" horrorstack-kind="movie" group-title="HorrorStack TV",Phantasm IV: Oblivion (1998) [On demand]
+http://line.dndnscloud.ru/movie/735409f473/8a964ce3bd44/818645.mkv
+
 #EXTINF:-1 group-title="Horror",LocalNow Horror Stream
 https://linear-82.frequency.stream/dist/localnow/82/hls/master/playlist.m3u8
