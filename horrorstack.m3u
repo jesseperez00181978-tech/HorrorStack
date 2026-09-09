@@ -57,3 +57,9 @@ http://line.dndnscloud.ru/movie/735409f473/8a964ce3bd44/818645.mkv
 
 #EXTINF:-1 group-title="Horror",LocalNow Horror Stream
 https://linear-82.frequency.stream/dist/localnow/82/hls/master/playlist.m3u8
+
+#EXTINF:-1 tvg-id="EnglishHorror247" group-title="HorrorStack TV",English 24/7 Horror Movies
+http://line.dndnscloud.ru/live/735409f473/8a964ce3bd44/617145.ts
+
+#EXTINF:-1 tvg-id="UKHorrorChannel" group-title="HorrorStack TV",UK - Horror Channel
+http://line.dndnscloud.ru/live/735409f473/8a964ce3bd44/577347.ts
