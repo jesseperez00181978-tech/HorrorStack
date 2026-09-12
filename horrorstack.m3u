@@ -63,3 +63,6 @@ http://line.dndnscloud.ru/live/735409f473/8a964ce3bd44/617145.ts
 
 #EXTINF:-1 tvg-id="UKHorrorChannel" group-title="HorrorStack TV",UK - Horror Channel
 http://line.dndnscloud.ru/live/735409f473/8a964ce3bd44/577347.ts
+
+#EXTINF:-1 tvg-id="ENHorrorChannel" group-title="HorrorStack TV",EN - HORROR CHANNEL
+http://line.dndnscloud.ru/live/735409f473/8a964ce3bd44/882223.ts
