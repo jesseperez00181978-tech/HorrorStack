@@ -1445,9 +1445,9 @@ input:focus-visible {
 
     // Android HorrorStack wrapper: hand playback to Media3/ExoPlayer.
     // The normal web/HLS.js player remains unchanged everywhere else.
-    if (cleanUrl && window.HorrorStackAndroid && typeof window.HorrorStackAndroid.play === "function") {
+    if (cleanUrl && window.AndroidPlayer && typeof window.AndroidPlayer.play === "function") {
       showMessage("<strong>Opening HorrorStack player...</strong> Tuning the native signal.");
-      window.HorrorStackAndroid.play(cleanUrl, playerTitle.textContent || "HorrorStack");
+      window.AndroidPlayer.play(cleanUrl, playerTitle.textContent || "HorrorStack");
       return;
     }
 
