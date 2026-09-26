@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         s.setAllowFileAccess(true);
         s.setAllowContentAccess(true);
         webView.setWebChromeClient(new WebChromeClient());
-        webView.addJavascriptInterface(new NativeBridge(), "HorrorStackAndroid");
+        webView.addJavascriptInterface(new NativeBridge(), "AndroidPlayer");
         webView.loadUrl("file:///android_asset/index.html");
     }
 
