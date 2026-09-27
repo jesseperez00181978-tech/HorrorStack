@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
         webView = findViewById(R.id.webView);
         inlineView = findViewById(R.id.inlinePlayerView);
+        inlineView.setFullscreenButtonClickListener(isFullscreen -> openInlineFullscreen());
 
         WebSettings s = webView.getSettings();
         s.setJavaScriptEnabled(true);
@@ -197,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
 
         inlineView.setPlayer(inlinePlayer);
         inlineView.setCustomErrorMessage(null);
+        inlineView.showController();
 
         inlinePlayer.addListener(new Player.Listener() {
             @Override public void onIsPlayingChanged(boolean isPlaying) {
@@ -216,12 +218,7 @@ public class MainActivity extends AppCompatActivity {
                     String fallbackUrl = inlineUrl;
                     updatePageMessage("<strong>Switching decoder...</strong> Opening HorrorStack software playback.");
                     releaseInlineEngine(true);
-                    if (fallbackUrl != null) {
-                        Intent fallback = new Intent(MainActivity.this, SoftwarePlayerActivity.class);
-                        fallback.putExtra("url", fallbackUrl);
-                        fallback.putExtra("position", position);
-                        startActivity(fallback);
-                    }
+                    if (fallbackUrl != null) openSoftwareFullscreen(fallbackUrl, position);
                     return;
                 }
                 inlineView.setCustomErrorMessage("This channel could not play (" + error.getErrorCodeName()
@@ -243,6 +240,26 @@ public class MainActivity extends AppCompatActivity {
         inlinePlayer.prepare();
         inlinePlayer.setPlayWhenReady(inlinePlayWhenReady);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    private void openInlineFullscreen() {
+        if (inlineUrl == null || !isWebStream(inlineUrl)) return;
+        long position = inlinePlayer == null ? inlinePosition : inlinePlayer.getCurrentPosition();
+        boolean play = inlinePlayer == null ? inlinePlayWhenReady : inlinePlayer.getPlayWhenReady();
+        Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
+        intent.putExtra("url", inlineUrl);
+        intent.putExtra("title", inlineTitle);
+        intent.putExtra("position", position);
+        intent.putExtra("playWhenReady", play);
+        startActivity(intent);
+    }
+
+    private void openSoftwareFullscreen(String url, long position) {
+        Intent fallback = new Intent(MainActivity.this, SoftwarePlayerActivity.class);
+        fallback.putExtra("url", url);
+        fallback.putExtra("position", Math.max(0, position));
+        fallback.putExtra("title", inlineTitle);
+        startActivity(fallback);
     }
 
     private void releaseInlineEngine(boolean clearSource) {
