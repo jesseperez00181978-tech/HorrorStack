@@ -1426,7 +1426,8 @@ input:focus-visible {
       const u = new URL(url);
       const haystack = `${u.pathname} ${u.search}`.toLowerCase();
       if (haystack.includes('.m3u8')) return true;
-      if (/\/(hls|live)\//i.test(u.pathname)) return true;
+      if (/\.(ts|mp4|mkv|webm|mov|m4v)$/i.test(u.pathname)) return false;
+      if (/\/hls\//i.test(u.pathname)) return true;
       for (const [key, value] of u.searchParams) {
         const pair = `${key}=${value}`.toLowerCase();
         if (/\b(hls|m3u8)\b/.test(pair)) return true;
@@ -1448,6 +1449,16 @@ input:focus-visible {
       return;
     }
 
+    if (window.AndroidPlayer && typeof window.AndroidPlayer.play === "function") {
+      try {
+        window.AndroidPlayer.play(cleanUrl, playerTitle.textContent || "HorrorStack");
+        showMessage("<strong>Opened in HorrorStack.</strong> Return here to choose another channel.");
+      } catch (error) {
+        showMessage("The internal player could not open. Please retry the channel.", true);
+      }
+      return;
+    }
+
     if (location.protocol === "https:" && cleanUrl.startsWith("http:")) {
       showMessage("<strong>Blocked mixed-content stream.</strong> This feed uses HTTP while HorrorStack is running over HTTPS. Use the external-player fallback for this feed until HorrorStack has a native Android player.", true);
       return;
@@ -1459,7 +1470,7 @@ input:focus-visible {
     const explicitMovie = queueItem?.kind === "movie";
     const explicitLive = queueItem?.kind === "live";
     const obviousDirectFile = /\.(mp4|webm|mov|m4v)(?:[?#]|$)/i.test(cleanUrl);
-    const shouldTryHls = looksLikeHls(cleanUrl) || (explicitLive && !obviousDirectFile);
+    const shouldTryHls = looksLikeHls(cleanUrl) || (explicitLive && !obviousDirectFile && !/\.(ts|mkv)(?:[?#]|$)/i.test(cleanUrl));
 
     function playNative() {
       destroyHls();

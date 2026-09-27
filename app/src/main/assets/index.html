@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#07040a">
-<title>HorrorStack TV v0.4.1</title>
+<title>HorrorStack TV v0.4.2</title>
 
 <style>
 :root {
@@ -1075,12 +1075,12 @@ input:focus-visible {
     <section class="coming-soon">
       <p class="section-kicker">The signal is growing</p>
       <h2>More nightmares are coming.</h2>
-      <p>HorrorStack v0.4.1 includes the channel player, saved legal stream URLs, native MP4 and HLS playback, atmospheric effects, and a curated section for verified legal horror services.</p>
+      <p>HorrorStack v0.4.2 includes the channel player, saved legal stream URLs, native MP4 and HLS playback, atmospheric effects, and a curated section for verified legal horror services.</p>
     </section>
   </main>
 
   <footer class="site-footer">
-    <p>HorrorStack TV v0.4.1 — Built by Jesse Perez — With assistance from ChatGPT</p>
+    <p>HorrorStack TV v0.4.2 — Built by Jesse Perez — With assistance from ChatGPT</p>
     <p class="footer-warning">The broadcast never truly ends.</p>
   </footer>
 </div>
@@ -1426,7 +1426,8 @@ input:focus-visible {
       const u = new URL(url);
       const haystack = `${u.pathname} ${u.search}`.toLowerCase();
       if (haystack.includes('.m3u8')) return true;
-      if (/\/(hls|live)\//i.test(u.pathname)) return true;
+      if (/\.(ts|mp4|mkv|webm|mov|m4v)$/i.test(u.pathname)) return false;
+      if (/\/hls\//i.test(u.pathname)) return true;
       for (const [key, value] of u.searchParams) {
         const pair = `${key}=${value}`.toLowerCase();
         if (/\b(hls|m3u8)\b/.test(pair)) return true;
@@ -1443,51 +1444,70 @@ input:focus-visible {
     const cleanUrl = safeStreamUrl(url);
     updatePlayerLinks(cleanUrl);
 
-    // Android HorrorStack wrapper: hand playback to Media3/ExoPlayer.
-    // The normal web/HLS.js player remains unchanged everywhere else.
-    if (cleanUrl && window.AndroidPlayer && typeof window.AndroidPlayer.play === "function") {
-      showMessage("<strong>Opening HorrorStack player...</strong> Tuning the native signal.");
-      window.AndroidPlayer.play(cleanUrl, playerTitle.textContent || "HorrorStack");
-      return;
-    }
-
     if (!cleanUrl) {
       showMessage("<strong>No signal assigned.</strong> Add a legal MP4 or HLS URL below.");
       return;
     }
 
-    if (location.protocol === "https:" && cleanUrl.startsWith("http:")) {
-      showMessage("<strong>Blocked mixed-content stream.</strong> HorrorStack is running over HTTPS, but this feed uses HTTP. The browser will not allow that connection.", true);
+    if (window.AndroidPlayer && typeof window.AndroidPlayer.play === "function") {
+      try {
+        window.AndroidPlayer.play(cleanUrl, playerTitle.textContent || "HorrorStack");
+        showMessage("<strong>Opened in HorrorStack.</strong> Return here to choose another channel.");
+      } catch (error) {
+        showMessage("The internal player could not open. Please retry the channel.", true);
+      }
       return;
     }
 
-    if (/\.(ts|mkv)(?:[?#]|$)/i.test(cleanUrl)) {
-      showMessage("<strong>Unsupported browser container.</strong> This source cannot be played reliably inside the web player. The external-player button remains available as a fallback.", true);
+    if (location.protocol === "https:" && cleanUrl.startsWith("http:")) {
+      showMessage("<strong>Blocked mixed-content stream.</strong> This feed uses HTTP while HorrorStack is running over HTTPS. Use the external-player fallback for this feed until HorrorStack has a native Android player.", true);
       return;
     }
 
     showMessage("<strong>Connecting...</strong> Tuning the HorrorStack signal.");
 
-    const isHls = looksLikeHls(cleanUrl);
+    const queueItem = currentQueue()[queueIndex] || null;
+    const explicitMovie = queueItem?.kind === "movie";
+    const explicitLive = queueItem?.kind === "live";
+    const obviousDirectFile = /\.(mp4|webm|mov|m4v)(?:[?#]|$)/i.test(cleanUrl);
+    const shouldTryHls = looksLikeHls(cleanUrl) || (explicitLive && !obviousDirectFile && !/\.(ts|mkv)(?:[?#]|$)/i.test(cleanUrl));
 
-    if (isHls && window.Hls && Hls.isSupported()) {
+    function playNative() {
+      destroyHls();
+      horrorVideo.src = cleanUrl;
+      horrorVideo.load();
+
+      const onPlaying = () => {
+        showMessage("<strong>Signal found.</strong> HorrorStack is playing the stream.");
+        horrorVideo.removeEventListener("playing", onPlaying);
+      };
+      horrorVideo.addEventListener("playing", onPlaying);
+
+      horrorVideo.play().catch(() => {
+        showMessage("<strong>Signal loaded.</strong> Press play to begin.");
+      });
+    }
+
+    if (shouldTryHls && window.Hls && Hls.isSupported()) {
       let networkRecoveries = 0;
       let mediaRecoveries = 0;
+      let manifestLoaded = false;
 
       hls = new Hls({
         enableWorker: true,
         lowLatencyMode: false,
         backBufferLength: 30,
-        maxBufferLength: 30
+        maxBufferLength: 30,
+        manifestLoadingMaxRetry: 2,
+        levelLoadingMaxRetry: 2,
+        fragLoadingMaxRetry: 3
       });
 
-      hls.loadSource(cleanUrl);
-      hls.attachMedia(horrorVideo);
-
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        manifestLoaded = true;
         networkRecoveries = 0;
         mediaRecoveries = 0;
-        showMessage("<strong>Signal found.</strong> HorrorStack connected to the HLS stream.");
+        showMessage("<strong>Signal found.</strong> HorrorStack connected to the live stream.");
         horrorVideo.play().catch(() => {
           showMessage("<strong>Signal found.</strong> Press play to begin.");
         });
@@ -1510,26 +1530,34 @@ input:focus-visible {
           return;
         }
 
-        showMessage("The HLS stream could not be recovered. The feed may be offline, blocked by CORS, expired, or incompatible with this browser.", true);
+        // Some IPTV URLs do not reveal their media type in the URL. If HLS.js
+        // cannot parse one as HLS, let the browser try the URL directly.
+        if (!manifestLoaded && !looksLikeHls(cleanUrl)) {
+          showMessage("<strong>Trying direct playback...</strong> The feed is not an HLS manifest.");
+          playNative();
+          return;
+        }
+
+        showMessage("The stream could not be recovered. It may be offline, blocked by CORS, expired, or use a codec/container this browser cannot decode.", true);
         destroyHls();
       });
 
+      hls.loadSource(cleanUrl);
+      hls.attachMedia(horrorVideo);
       return;
     }
 
-    if (isHls) {
+    if (looksLikeHls(cleanUrl)) {
       const nativeHls = horrorVideo.canPlayType("application/vnd.apple.mpegurl") || horrorVideo.canPlayType("application/x-mpegURL");
       if (!nativeHls) {
-        showMessage("This browser cannot play HLS here because HLS.js is unavailable and native HLS is not supported.", true);
+        showMessage("This browser cannot play this HLS feed because HLS.js is unavailable and native HLS is not supported.", true);
         return;
       }
     }
 
-    horrorVideo.src = cleanUrl;
-    horrorVideo.load();
-    horrorVideo.play().catch(() => {
-      showMessage("<strong>Signal loaded.</strong> Press play to begin.");
-    });
+    // Direct movie/file playback. Do not reject .ts/.mkv in advance; let the
+    // browser report whether its actual codec/container is playable.
+    playNative();
   }
 
   function openChannel(channelKey) {

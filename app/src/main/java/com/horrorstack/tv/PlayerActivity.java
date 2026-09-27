@@ -43,9 +43,12 @@ public class PlayerActivity extends AppCompatActivity {
         super.onStart();
         if (uri == null || isFinishing()) return;
         DefaultHttpDataSource.Factory http = new DefaultHttpDataSource.Factory()
-                .setUserAgent("HorrorStack/0.4.1")
+                .setUserAgent("HorrorStack/1.0.1")
+                .setAllowCrossProtocolRedirects(true)
                 .setConnectTimeoutMs(15000).setReadTimeoutMs(20000);
         player = new ExoPlayer.Builder(this)
+                .setRenderersFactory(new androidx.media3.exoplayer.DefaultRenderersFactory(this)
+                        .setEnableDecoderFallback(true))
                 .setMediaSourceFactory(new DefaultMediaSourceFactory(this).setDataSourceFactory(http)).build();
         view.setPlayer(player);
         view.setCustomErrorMessage(null);
