@@ -1,7 +1,10 @@
 package com.horrorstack.tv;
 
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.view.WindowManager;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.media3.common.MediaItem;
@@ -24,8 +27,19 @@ public class PlayerActivity extends AppCompatActivity {
 
     @Override protected void onCreate(Bundle state) {
         super.onCreate(state);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         setContentView(R.layout.activity_player);
         view = findViewById(R.id.playerView);
+        view.setFullscreenButtonClickListener(isFullscreen -> finish());
+
         String url = getIntent().getStringExtra("url");
         if (url == null) { finish(); return; }
         uri = Uri.parse(url.trim());
@@ -35,15 +49,17 @@ public class PlayerActivity extends AppCompatActivity {
         if (state != null) {
             position = state.getLong("position", 0);
             playWhenReady = state.getBoolean("playWhenReady", true);
+        } else {
+            position = getIntent().getLongExtra("position", 0);
+            playWhenReady = getIntent().getBooleanExtra("playWhenReady", true);
         }
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     @Override protected void onStart() {
         super.onStart();
         if (uri == null || isFinishing()) return;
         DefaultHttpDataSource.Factory http = new DefaultHttpDataSource.Factory()
-                .setUserAgent("HorrorStack/1.0.1")
+                .setUserAgent("HorrorStack/1.0.3")
                 .setAllowCrossProtocolRedirects(true)
                 .setConnectTimeoutMs(15000).setReadTimeoutMs(20000);
         player = new ExoPlayer.Builder(this)
@@ -52,17 +68,17 @@ public class PlayerActivity extends AppCompatActivity {
                 .setMediaSourceFactory(new DefaultMediaSourceFactory(this).setDataSourceFactory(http)).build();
         view.setPlayer(player);
         view.setCustomErrorMessage(null);
+        view.showController();
         player.addListener(new Player.Listener() {
             @Override public void onPlayerError(PlaybackException error) {
                 if (error.errorCode >= 4000 && error.errorCode < 5000) {
-                    android.content.Intent fallback = new android.content.Intent(PlayerActivity.this, SoftwarePlayerActivity.class);
+                    Intent fallback = new Intent(PlayerActivity.this, SoftwarePlayerActivity.class);
                     fallback.putExtra("url", uri.toString());
                     fallback.putExtra("position", player == null ? position : player.getCurrentPosition());
                     startActivity(fallback);
                     finish();
                     return;
                 }
-                // Never display the private stream URL or provider credentials.
                 view.setCustomErrorMessage("This channel could not play (" + error.getErrorCodeName()
                         + "). Check the connection or try another channel.");
                 view.showController();
