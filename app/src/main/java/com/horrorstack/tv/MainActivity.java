@@ -163,13 +163,17 @@ public class MainActivity extends AppCompatActivity {
                 + org.json.JSONObject.quote(inlineTitle) + ");return;}"
                 + "video.style.visibility='hidden';"
                 + "if(window.__hsInlineScrollHandler){window.removeEventListener('scroll',window.__hsInlineScrollHandler,true);window.removeEventListener('resize',window.__hsInlineScrollHandler,true);}"
+                + "if(window.__hsInlineWatch){clearInterval(window.__hsInlineWatch);window.__hsInlineWatch=null;}"
                 + "window.__hsInlinePosition=function(){"
                 + "const r=video.getBoundingClientRect();const d=window.devicePixelRatio||1;"
-                + "const visible=!!(video.offsetParent&&r.width>2&&r.height>2&&r.bottom>0&&r.top<window.innerHeight);"
+                + "const present=!!video.offsetParent;"
+                + "const visible=!!(present&&r.width>2&&r.height>2&&r.bottom>0&&r.top<window.innerHeight);"
                 + "AndroidPlayer.positionInline(r.left,r.top,r.width,r.height,d,visible);"
+                + "return present;"
                 + "};"
                 + "window.__hsInlineScrollHandler=function(){if(window.__hsInlineRaf)return;window.__hsInlineRaf=requestAnimationFrame(function(){window.__hsInlineRaf=0;window.__hsInlinePosition();});};"
                 + "window.addEventListener('scroll',window.__hsInlineScrollHandler,true);window.addEventListener('resize',window.__hsInlineScrollHandler,true);"
+                + "window.__hsInlineWatch=setInterval(function(){if(!window.__hsInlinePosition()){clearInterval(window.__hsInlineWatch);window.__hsInlineWatch=null;AndroidPlayer.stopInline();}},400);"
                 + "window.__hsInlinePosition();"
                 + "})();";
         webView.evaluateJavascript(js, null);
@@ -264,6 +268,7 @@ public class MainActivity extends AppCompatActivity {
         String js = "(function(){"
                 + "const video=document.getElementById('horrorVideo');if(video)video.style.visibility='';"
                 + "if(window.__hsInlineScrollHandler){window.removeEventListener('scroll',window.__hsInlineScrollHandler,true);window.removeEventListener('resize',window.__hsInlineScrollHandler,true);}"
+                + "if(window.__hsInlineWatch){clearInterval(window.__hsInlineWatch);window.__hsInlineWatch=null;}"
                 + "window.__hsInlineScrollHandler=null;window.__hsInlinePosition=null;"
                 + "})();";
         webView.evaluateJavascript(js, null);
