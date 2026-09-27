@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<WebView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/webView"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" />
+    android:layout_height="match_parent">
+
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/inlinePlayerView"
+        android:layout_width="1px"
+        android:layout_height="1px"
+        android:visibility="gone"
+        android:background="#000000"
+        android:elevation="12dp"
+        app:resize_mode="fit"
+        app:show_buffering="when_playing"
+        app:use_controller="true" />
+
+</FrameLayout>
