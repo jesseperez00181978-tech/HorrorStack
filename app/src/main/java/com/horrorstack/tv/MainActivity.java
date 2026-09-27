@@ -192,15 +192,10 @@ public class MainActivity extends AppCompatActivity {
             runOnUiThread(() -> openExternal(url));
         }
 
-        // HTTP cannot play in the WebView top player when the page is HTTPS.
-        // Send those feeds straight to the existing native player. HTTPS still
-        // tries the visible top player first and falls back natively on failure.
+        // Every feed gets one attempt in the visible top player first.
+        // If WebView/HLS.js cannot load or decode it, playInTopPlayer falls
+        // back to the existing native HorrorStack player automatically.
         @JavascriptInterface public void play(String url, String title) {
-            Uri uri = Uri.parse(url == null ? "" : url.trim());
-            if ("http".equalsIgnoreCase(uri.getScheme())) {
-                runOnUiThread(() -> openNativePlayer(url, title));
-                return;
-            }
             playInTopPlayer(url, title);
         }
 
