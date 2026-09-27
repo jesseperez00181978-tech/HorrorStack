@@ -12,6 +12,18 @@ android {
         targetSdk = 35
         versionCode = 4
         versionName = "1.0.3"
+        manifestPlaceholders["appLabel"] = "HorrorStack TV"
+    }
+
+    buildTypes {
+        create("sandbox") {
+            initWith(getByName("debug"))
+            applicationIdSuffix = ".test"
+            versionNameSuffix = "-test"
+            isDebuggable = true
+            signingConfig = signingConfigs.getByName("debug")
+            manifestPlaceholders["appLabel"] = "HorrorStack Test"
+        }
     }
 }
 
