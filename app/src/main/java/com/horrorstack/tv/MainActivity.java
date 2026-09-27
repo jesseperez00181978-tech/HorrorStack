@@ -99,6 +99,76 @@ public class MainActivity extends AppCompatActivity {
         }).start();
     }
 
+    private boolean isWebStream(String url) {
+        if (url == null) return false;
+        Uri uri = Uri.parse(url.trim());
+        return "http".equalsIgnoreCase(uri.getScheme()) || "https".equalsIgnoreCase(uri.getScheme());
+    }
+
+    private void playInTopPlayer(String url, String title) {
+        if (!isWebStream(url)) return;
+        final String cleanUrl = url.trim();
+        final String cleanTitle = title == null || title.trim().isEmpty() ? "HorrorStack" : title.trim();
+
+        runOnUiThread(() -> {
+            String qUrl = org.json.JSONObject.quote(cleanUrl);
+            String qTitle = org.json.JSONObject.quote(cleanTitle);
+            String js =
+                    "(function(){"
+                    + "const url=" + qUrl + ";"
+                    + "const title=" + qTitle + ";"
+                    + "const video=document.getElementById('horrorVideo');"
+                    + "const msg=document.getElementById('playerMessage');"
+                    + "if(!video){AndroidPlayer.playNative(url,title);return;}"
+                    + "if(window.__hsTopErrorHandler){video.removeEventListener('error',window.__hsTopErrorHandler);}"
+                    + "if(window.__hsTopLoadedHandler){video.removeEventListener('loadedmetadata',window.__hsTopLoadedHandler);}"
+                    + "if(window.__hsTopPlayingHandler){video.removeEventListener('playing',window.__hsTopPlayingHandler);}"
+                    + "if(window.__hsTopFallbackTimer){clearTimeout(window.__hsTopFallbackTimer);window.__hsTopFallbackTimer=null;}"
+                    + "if(window.__hsBridgeHls){try{window.__hsBridgeHls.destroy();}catch(e){}window.__hsBridgeHls=null;}"
+                    + "let fallbackStarted=false;"
+                    + "const setMsg=(text)=>{if(msg)msg.innerHTML=text;};"
+                    + "const clearTimer=()=>{if(window.__hsTopFallbackTimer){clearTimeout(window.__hsTopFallbackTimer);window.__hsTopFallbackTimer=null;}};"
+                    + "const fallback=()=>{"
+                    + "if(fallbackStarted)return;"
+                    + "fallbackStarted=true;"
+                    + "clearTimer();"
+                    + "if(window.__hsBridgeHls){try{window.__hsBridgeHls.destroy();}catch(e){}window.__hsBridgeHls=null;}"
+                    + "try{video.pause();video.removeAttribute('src');video.load();}catch(e){}"
+                    + "setMsg('<strong>Internal player could not decode this feed.</strong> Opening the HorrorStack player...');"
+                    + "AndroidPlayer.playNative(url,title);"
+                    + "};"
+                    + "window.__hsTopErrorHandler=()=>fallback();"
+                    + "window.__hsTopLoadedHandler=()=>{clearTimer();setMsg('<strong>Signal loaded.</strong> Press play if playback does not start automatically.');};"
+                    + "window.__hsTopPlayingHandler=()=>{clearTimer();setMsg('<strong>Now playing.</strong> HorrorStack internal player is active.');};"
+                    + "video.addEventListener('error',window.__hsTopErrorHandler);"
+                    + "video.addEventListener('loadedmetadata',window.__hsTopLoadedHandler);"
+                    + "video.addEventListener('playing',window.__hsTopPlayingHandler);"
+                    + "try{video.pause();video.removeAttribute('src');video.load();}catch(e){}"
+                    + "setMsg('<strong>Connecting...</strong> Trying the HorrorStack internal player first.');"
+                    + "const isHls=/\\.m3u8(?:[?#]|$)/i.test(url);"
+                    + "if(isHls&&window.Hls&&Hls.isSupported()){"
+                    + "const hls=new Hls();window.__hsBridgeHls=hls;"
+                    + "hls.on(Hls.Events.MANIFEST_PARSED,()=>{const p=video.play();if(p&&p.catch)p.catch(err=>{if(!err||err.name!=='NotAllowedError')fallback();});});"
+                    + "hls.on(Hls.Events.ERROR,(event,data)=>{if(data&&data.fatal)fallback();});"
+                    + "try{hls.loadSource(url);hls.attachMedia(video);}catch(e){fallback();}"
+                    + "}else{"
+                    + "video.src=url;video.load();"
+                    + "try{const p=video.play();if(p&&p.catch)p.catch(err=>{if(!err||err.name!=='NotAllowedError')fallback();});}catch(e){fallback();}"
+                    + "}"
+                    + "window.__hsTopFallbackTimer=setTimeout(()=>{if(video.readyState===0&&!fallbackStarted)fallback();},15000);"
+                    + "})();";
+            webView.evaluateJavascript(js, null);
+        });
+    }
+
+    private void openNativePlayer(String url, String title) {
+        if (!isWebStream(url)) return;
+        Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
+        intent.putExtra("url", url.trim());
+        intent.putExtra("title", title == null ? "HorrorStack" : title);
+        startActivity(intent);
+    }
+
     private void openExternal(String url) {
         Uri uri = Uri.parse(url);
         if (!"http".equals(uri.getScheme()) && !"https".equals(uri.getScheme())) return;
@@ -117,18 +187,20 @@ public class MainActivity extends AppCompatActivity {
                 playlistPicker.launch(new String[]{"*/*"});
             });
         }
+
         @JavascriptInterface public void playExternal(String url) {
             runOnUiThread(() -> openExternal(url));
         }
 
-        @JavascriptInterface
-        public void play(String url, String title) {
-            runOnUiThread(() -> {
-                Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
-                intent.putExtra("url", url);
-                intent.putExtra("title", title);
-                startActivity(intent);
-            });
+        // The existing page calls AndroidPlayer.play(...) for every selected channel/movie.
+        // Route that call into the visible top player first. The injected JS calls playNative
+        // only when WebView/HLS.js cannot load or decode the stream.
+        @JavascriptInterface public void play(String url, String title) {
+            playInTopPlayer(url, title);
+        }
+
+        @JavascriptInterface public void playNative(String url, String title) {
+            runOnUiThread(() -> openNativePlayer(url, title));
         }
     }
 }
