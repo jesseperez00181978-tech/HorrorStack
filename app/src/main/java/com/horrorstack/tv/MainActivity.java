@@ -1,23 +1,47 @@
 package com.horrorstack.tv;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.net.Uri;
-import android.webkit.ValueCallback;
-import android.webkit.WebViewClient;
-import android.webkit.WebResourceRequest;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
+import android.os.Bundle;
+import android.view.View;
+import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import androidx.appcompat.app.AppCompatActivity;
+import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.media3.common.MediaItem;
+import androidx.media3.common.MimeTypes;
+import androidx.media3.common.PlaybackException;
+import androidx.media3.common.Player;
+import androidx.media3.datasource.DefaultHttpDataSource;
+import androidx.media3.exoplayer.DefaultRenderersFactory;
+import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
+import androidx.media3.ui.PlayerView;
+
+import java.util.Locale;
+
+@androidx.annotation.OptIn(markerClass = androidx.media3.common.util.UnstableApi.class)
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
+    private PlayerView inlineView;
+    private ExoPlayer inlinePlayer;
+    private String inlineUrl;
+    private String inlineTitle = "HorrorStack";
+    private long inlinePosition;
+    private boolean inlinePlayWhenReady = true;
+    private boolean inlineVisible;
     private boolean nativeImport;
     private ValueCallback<Uri[]> fileCallback;
+
     private final ActivityResultLauncher<String[]> playlistPicker = registerForActivityResult(
             new ActivityResultContracts.OpenDocument(), uri -> {
                 if (nativeImport) {
@@ -36,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         webView = findViewById(R.id.webView);
+        inlineView = findViewById(R.id.inlinePlayerView);
+
         WebSettings s = webView.getSettings();
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);
@@ -44,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         s.setMediaPlaybackRequiresUserGesture(false);
         s.setAllowFileAccess(true);
         s.setAllowContentAccess(true);
+
         webView.setWebChromeClient(new WebChromeClient() {
             @Override public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback,
                     FileChooserParams params) {
@@ -53,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-        // Keep the native bridge confined to our bundled page.
+
         webView.setWebViewClient(new WebViewClient() {
             @Override public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri target = request.getUrl();
@@ -73,8 +100,19 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
         webView.addJavascriptInterface(new NativeBridge(), "AndroidPlayer");
         webView.loadUrl("file:///android_asset/index.html");
+    }
+
+    @Override protected void onStart() {
+        super.onStart();
+        if (inlineUrl != null && inlineVisible && inlinePlayer == null) startInlineEngine();
+    }
+
+    @Override protected void onStop() {
+        releaseInlineEngine(false);
+        super.onStop();
     }
 
     private void readPlaylist(Uri uri) {
@@ -105,59 +143,154 @@ public class MainActivity extends AppCompatActivity {
         return "http".equalsIgnoreCase(uri.getScheme()) || "https".equalsIgnoreCase(uri.getScheme());
     }
 
-    private void playInTopPlayer(String url, String title) {
+    private void playInlinePlayer(String url, String title) {
         if (!isWebStream(url)) return;
-        final String cleanUrl = url.trim();
-        final String cleanTitle = title == null || title.trim().isEmpty() ? "HorrorStack" : title.trim();
+        inlineUrl = url.trim();
+        inlineTitle = title == null || title.trim().isEmpty() ? "HorrorStack" : title.trim();
+        inlinePosition = 0;
+        inlinePlayWhenReady = true;
 
         runOnUiThread(() -> {
-            String qUrl = org.json.JSONObject.quote(cleanUrl);
-            String qTitle = org.json.JSONObject.quote(cleanTitle);
-            String js =
-                    "(function(){"
-                    + "const url=" + qUrl + ";"
-                    + "const title=" + qTitle + ";"
-                    + "const video=document.getElementById('horrorVideo');"
-                    + "const msg=document.getElementById('playerMessage');"
-                    + "if(!video){AndroidPlayer.playNative(url,title);return;}"
-                    + "if(window.__hsTopErrorHandler){video.removeEventListener('error',window.__hsTopErrorHandler);}"
-                    + "if(window.__hsTopLoadedHandler){video.removeEventListener('loadedmetadata',window.__hsTopLoadedHandler);}"
-                    + "if(window.__hsTopPlayingHandler){video.removeEventListener('playing',window.__hsTopPlayingHandler);}"
-                    + "if(window.__hsTopFallbackTimer){clearTimeout(window.__hsTopFallbackTimer);window.__hsTopFallbackTimer=null;}"
-                    + "if(window.__hsBridgeHls){try{window.__hsBridgeHls.destroy();}catch(e){}window.__hsBridgeHls=null;}"
-                    + "let fallbackStarted=false;"
-                    + "const setMsg=(text)=>{if(msg)msg.innerHTML=text;};"
-                    + "const clearTimer=()=>{if(window.__hsTopFallbackTimer){clearTimeout(window.__hsTopFallbackTimer);window.__hsTopFallbackTimer=null;}};"
-                    + "const fallback=()=>{"
-                    + "if(fallbackStarted)return;"
-                    + "fallbackStarted=true;"
-                    + "clearTimer();"
-                    + "if(window.__hsBridgeHls){try{window.__hsBridgeHls.destroy();}catch(e){}window.__hsBridgeHls=null;}"
-                    + "try{video.pause();video.removeAttribute('src');video.load();}catch(e){}"
-                    + "setMsg('<strong>Internal player could not decode this feed.</strong> Opening the HorrorStack player...');"
-                    + "AndroidPlayer.playNative(url,title);"
-                    + "};"
-                    + "window.__hsTopErrorHandler=()=>fallback();"
-                    + "window.__hsTopLoadedHandler=()=>{clearTimer();setMsg('<strong>Signal loaded.</strong> Press play if playback does not start automatically.');};"
-                    + "window.__hsTopPlayingHandler=()=>{clearTimer();setMsg('<strong>Now playing.</strong> HorrorStack internal player is active.');};"
-                    + "video.addEventListener('error',window.__hsTopErrorHandler);"
-                    + "video.addEventListener('loadedmetadata',window.__hsTopLoadedHandler);"
-                    + "video.addEventListener('playing',window.__hsTopPlayingHandler);"
-                    + "try{video.pause();video.removeAttribute('src');video.load();}catch(e){}"
-                    + "setMsg('<strong>Connecting...</strong> Trying the HorrorStack internal player first.');"
-                    + "const isHls=/\\.m3u8(?:[?#]|$)/i.test(url);"
-                    + "if(isHls&&window.Hls&&Hls.isSupported()){"
-                    + "const hls=new Hls();window.__hsBridgeHls=hls;"
-                    + "hls.on(Hls.Events.MANIFEST_PARSED,()=>{const p=video.play();if(p&&p.catch)p.catch(err=>{if(!err||err.name!=='NotAllowedError')fallback();});});"
-                    + "hls.on(Hls.Events.ERROR,(event,data)=>{if(data&&data.fatal)fallback();});"
-                    + "try{hls.loadSource(url);hls.attachMedia(video);}catch(e){fallback();}"
-                    + "}else{"
-                    + "video.src=url;video.load();"
-                    + "try{const p=video.play();if(p&&p.catch)p.catch(err=>{if(!err||err.name!=='NotAllowedError')fallback();});}catch(e){fallback();}"
-                    + "}"
-                    + "window.__hsTopFallbackTimer=setTimeout(()=>{if(video.readyState===0&&!fallbackStarted)fallback();},15000);"
-                    + "})();";
-            webView.evaluateJavascript(js, null);
+            installInlinePositionBridge();
+            startInlineEngine();
+        });
+    }
+
+    private void installInlinePositionBridge() {
+        String js = "(function(){"
+                + "const video=document.getElementById('horrorVideo');"
+                + "if(!video){AndroidPlayer.playNative(" + org.json.JSONObject.quote(inlineUrl) + ","
+                + org.json.JSONObject.quote(inlineTitle) + ");return;}"
+                + "video.style.visibility='hidden';"
+                + "if(window.__hsInlineScrollHandler){window.removeEventListener('scroll',window.__hsInlineScrollHandler,true);window.removeEventListener('resize',window.__hsInlineScrollHandler,true);}"
+                + "window.__hsInlinePosition=function(){"
+                + "const r=video.getBoundingClientRect();const d=window.devicePixelRatio||1;"
+                + "const visible=!!(video.offsetParent&&r.width>2&&r.height>2&&r.bottom>0&&r.top<window.innerHeight);"
+                + "AndroidPlayer.positionInline(r.left,r.top,r.width,r.height,d,visible);"
+                + "};"
+                + "window.__hsInlineScrollHandler=function(){if(window.__hsInlineRaf)return;window.__hsInlineRaf=requestAnimationFrame(function(){window.__hsInlineRaf=0;window.__hsInlinePosition();});};"
+                + "window.addEventListener('scroll',window.__hsInlineScrollHandler,true);window.addEventListener('resize',window.__hsInlineScrollHandler,true);"
+                + "window.__hsInlinePosition();"
+                + "})();";
+        webView.evaluateJavascript(js, null);
+        updatePageMessage("<strong>Connecting...</strong> HorrorStack native internal player is starting.");
+    }
+
+    private void startInlineEngine() {
+        if (inlineUrl == null || !isWebStream(inlineUrl)) return;
+        releaseInlineEngine(false);
+
+        DefaultHttpDataSource.Factory http = new DefaultHttpDataSource.Factory()
+                .setUserAgent("HorrorStack/1.0.3")
+                .setAllowCrossProtocolRedirects(true)
+                .setConnectTimeoutMs(15000)
+                .setReadTimeoutMs(20000);
+
+        inlinePlayer = new ExoPlayer.Builder(this)
+                .setRenderersFactory(new DefaultRenderersFactory(this).setEnableDecoderFallback(true))
+                .setMediaSourceFactory(new DefaultMediaSourceFactory(this).setDataSourceFactory(http))
+                .build();
+
+        inlineView.setPlayer(inlinePlayer);
+        inlineView.setCustomErrorMessage(null);
+
+        inlinePlayer.addListener(new Player.Listener() {
+            @Override public void onIsPlayingChanged(boolean isPlaying) {
+                if (isPlaying) updatePageMessage("<strong>Now playing.</strong> HorrorStack native internal player is active.");
+            }
+
+            @Override public void onPlaybackStateChanged(int state) {
+                if (state == Player.STATE_BUFFERING)
+                    updatePageMessage("<strong>Buffering...</strong> HorrorStack is locking onto the stream.");
+                else if (state == Player.STATE_ENDED)
+                    webView.evaluateJavascript("document.getElementById('horrorVideo')?.dispatchEvent(new Event('ended'));", null);
+            }
+
+            @Override public void onPlayerError(PlaybackException error) {
+                if (error.errorCode >= 4000 && error.errorCode < 5000) {
+                    long position = inlinePlayer == null ? inlinePosition : inlinePlayer.getCurrentPosition();
+                    String fallbackUrl = inlineUrl;
+                    updatePageMessage("<strong>Switching decoder...</strong> Opening HorrorStack software playback.");
+                    releaseInlineEngine(true);
+                    if (fallbackUrl != null) {
+                        Intent fallback = new Intent(MainActivity.this, SoftwarePlayerActivity.class);
+                        fallback.putExtra("url", fallbackUrl);
+                        fallback.putExtra("position", position);
+                        startActivity(fallback);
+                    }
+                    return;
+                }
+                inlineView.setCustomErrorMessage("This channel could not play (" + error.getErrorCodeName()
+                        + "). Check the connection or try another channel.");
+                inlineView.showController();
+                updatePageMessage("The native player could not open this source. Check the connection or try another channel.");
+            }
+        });
+
+        Uri uri = Uri.parse(inlineUrl);
+        MediaItem.Builder item = new MediaItem.Builder().setUri(uri);
+        String path = uri.getPath() == null ? "" : uri.getPath().toLowerCase(Locale.ROOT);
+        String output = uri.getQueryParameter("output");
+        if (path.endsWith(".m3u8") || "m3u8".equalsIgnoreCase(output)) item.setMimeType(MimeTypes.APPLICATION_M3U8);
+        else if (path.endsWith(".mpd")) item.setMimeType(MimeTypes.APPLICATION_MPD);
+
+        inlinePlayer.setMediaItem(item.build());
+        inlinePlayer.seekTo(inlinePosition);
+        inlinePlayer.prepare();
+        inlinePlayer.setPlayWhenReady(inlinePlayWhenReady);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    private void releaseInlineEngine(boolean clearSource) {
+        if (inlinePlayer != null) {
+            inlinePosition = inlinePlayer.isCurrentMediaItemLive() ? 0 : inlinePlayer.getCurrentPosition();
+            inlinePlayWhenReady = inlinePlayer.getPlayWhenReady();
+            inlineView.setPlayer(null);
+            inlinePlayer.release();
+            inlinePlayer = null;
+        }
+        if (clearSource) {
+            inlineUrl = null;
+            inlinePosition = 0;
+            inlinePlayWhenReady = true;
+            inlineVisible = false;
+            inlineView.setVisibility(View.GONE);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            restoreHtmlVideo();
+        }
+    }
+
+    private void restoreHtmlVideo() {
+        String js = "(function(){"
+                + "const video=document.getElementById('horrorVideo');if(video)video.style.visibility='';"
+                + "if(window.__hsInlineScrollHandler){window.removeEventListener('scroll',window.__hsInlineScrollHandler,true);window.removeEventListener('resize',window.__hsInlineScrollHandler,true);}"
+                + "window.__hsInlineScrollHandler=null;window.__hsInlinePosition=null;"
+                + "})();";
+        webView.evaluateJavascript(js, null);
+    }
+
+    private void updatePageMessage(String html) {
+        runOnUiThread(() -> webView.evaluateJavascript(
+                "(function(){const m=document.getElementById('playerMessage');if(m)m.innerHTML="
+                        + org.json.JSONObject.quote(html) + ";})();", null));
+    }
+
+    private void positionInline(double left, double top, double width, double height, double ratio, boolean visible) {
+        runOnUiThread(() -> {
+            if (!visible || width <= 2 || height <= 2) {
+                inlineView.setVisibility(View.GONE);
+                inlineVisible = false;
+                return;
+            }
+            double scale = ratio > 0 ? ratio : getResources().getDisplayMetrics().density;
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                    Math.max(1, (int)Math.round(width * scale)),
+                    Math.max(1, (int)Math.round(height * scale)));
+            params.leftMargin = (int)Math.round(left * scale);
+            params.topMargin = (int)Math.round(top * scale);
+            inlineView.setLayoutParams(params);
+            inlineView.setVisibility(View.VISIBLE);
+            inlineVisible = true;
         });
     }
 
@@ -192,15 +325,21 @@ public class MainActivity extends AppCompatActivity {
             runOnUiThread(() -> openExternal(url));
         }
 
-        // Every feed gets one attempt in the visible top player first.
-        // If WebView/HLS.js cannot load or decode it, playInTopPlayer falls
-        // back to the existing native HorrorStack player automatically.
         @JavascriptInterface public void play(String url, String title) {
-            playInTopPlayer(url, title);
+            playInlinePlayer(url, title);
         }
 
         @JavascriptInterface public void playNative(String url, String title) {
             runOnUiThread(() -> openNativePlayer(url, title));
+        }
+
+        @JavascriptInterface public void stopInline() {
+            runOnUiThread(() -> releaseInlineEngine(true));
+        }
+
+        @JavascriptInterface public void positionInline(double left, double top, double width,
+                double height, double ratio, boolean visible) {
+            MainActivity.this.positionInline(left, top, width, height, ratio, visible);
         }
     }
 }
