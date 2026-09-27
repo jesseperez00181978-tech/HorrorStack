@@ -10,12 +10,13 @@ android {
         applicationId = "com.horrorstack.tv"
         minSdk = 24
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.0.2"
+        versionCode = 4
+        versionName = "1.0.3"
     }
 }
 
 dependencies {
+    implementation("org.videolan.android:libvlc-all:3.6.5")
     implementation("androidx.appcompat:appcompat:1.7.1")
 
     implementation("androidx.media3:media3-exoplayer:1.10.1")

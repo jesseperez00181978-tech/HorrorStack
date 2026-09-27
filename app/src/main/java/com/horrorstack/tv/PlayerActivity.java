@@ -54,6 +54,14 @@ public class PlayerActivity extends AppCompatActivity {
         view.setCustomErrorMessage(null);
         player.addListener(new Player.Listener() {
             @Override public void onPlayerError(PlaybackException error) {
+                if (error.errorCode >= 4000 && error.errorCode < 5000) {
+                    android.content.Intent fallback = new android.content.Intent(PlayerActivity.this, SoftwarePlayerActivity.class);
+                    fallback.putExtra("url", uri.toString());
+                    fallback.putExtra("position", player == null ? position : player.getCurrentPosition());
+                    startActivity(fallback);
+                    finish();
+                    return;
+                }
                 // Never display the private stream URL or provider credentials.
                 view.setCustomErrorMessage("This channel could not play (" + error.getErrorCodeName()
                         + "). Check the connection or try another channel.");
