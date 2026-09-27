@@ -634,6 +634,8 @@ input:focus-visible {
 
 .player-shell {
   width: min(1040px, 100%);
+  min-width: 0;
+  overflow-wrap: anywhere;
   max-height: 94vh;
   overflow-y: auto;
   border: 1px solid rgba(255,255,255,.12);
@@ -876,7 +878,7 @@ input:focus-visible {
   <header class="site-header">
     <div class="brand-area">
       <p class="eyebrow">Broadcasting from somewhere in the dark</p>
-      <h1 class="main-logo">🎃 HorrorStack TV</h1>
+      <h1 class="main-logo">🎃 HorrorStack TV</h1><p>Player repair · 1.0.2</p>
       <p class="site-description">24/7 horror channels built for sleepless nights.</p>
     </div>
 
@@ -893,6 +895,11 @@ input:focus-visible {
       <p id="playlistImportStatus" role="status">Import your M3U file to connect channels on this device.</p>
       <button class="control-btn" id="removeImportedPlaylists" type="button" hidden>Remove imported playlists</button>
     </div>
+    <details class="private-playlist-bar" id="pastePlaylistPanel">
+      <summary>Paste M3U text</summary>
+      <textarea id="playlistText" rows="6" style="width:100%;max-width:100%;color:#fff;background:#171017" placeholder="Paste your #EXTM3U playlist here"></textarea>
+      <button class="control-btn" id="importPlaylistText" type="button">Import pasted playlist</button>
+    </details>
     <section class="featured-section">
       <div class="section-heading">
         <div>
@@ -1112,6 +1119,8 @@ input:focus-visible {
         <label id="loopLabel"><input id="loopMovies" type="checkbox" checked> 24/7 marathon loop</label>
       </div>
       <div class="private-playlist-actions">
+        <button class="control-btn" id="importFromPlayer" type="button">Import playlist</button>
+        <button class="control-btn" id="retryInternal" type="button">Play inside HorrorStack</button>
         <a id="externalPlayer" class="control-btn" href="#" hidden rel="noreferrer">Open in video player</a>
         <button id="downloadChannelPlaylist" class="control-btn" type="button" hidden>Save channel playlist</button>
       </div>
@@ -1737,9 +1746,9 @@ input:focus-visible {
     const anchor = document.getElementById('externalPlayer');
     const download = document.getElementById('downloadChannelPlaylist');
     const safe = safeStreamUrl(url);
-    anchor.hidden = !safe;
+    anchor.hidden = false;
     download.hidden = !safe;
-    if (!safe) { anchor.removeAttribute('href'); return; }
+    if (!safe) { anchor.href = '#'; return; }
     const u = new URL(safe);
     if (/Android/i.test(navigator.userAgent)) {
       const path = u.href.slice(u.protocol.length).replace(/#/g, '%23').replace(/;/g, '%3B');
@@ -1761,20 +1770,51 @@ input:focus-visible {
     setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
   }
 
-  document.getElementById('importPlaylist').addEventListener('click', () => document.getElementById('playlistFile').click());
+  function importPlaylistText(text) {
+    try {
+      if (text.length > 10 * 1024 * 1024) throw new Error('Choose a playlist smaller than 10 MB.');
+      const result = parsePrivateM3u(text);
+      if (!result.count) throw new Error('No recognized HorrorStack channels found. Choose your horrorstack.m3u file.');
+      localStorage.setItem(PLAYLIST_KEY, JSON.stringify(Object.assign(loadImportedQueues(), result.groups)));
+      updateImportStatus(`Imported ${result.count} feeds or movies into ${Object.keys(result.groups).length} channels.`);
+      if (currentChannelKey) {
+        queueIndex = 0; renderQueue();
+        const url = currentQueue()[0]?.url || loadStreams()[currentChannelKey] || '';
+        streamUrl.value = url; playStream(url);
+      }
+      return true;
+    } catch (error) {
+      updateImportStatus(error.message);
+      if (currentChannelKey) showMessage('Playlist import failed. Return to channels for details.', true);
+      return false;
+    }
+  }
+  window.importHorrorPlaylist = importPlaylistText;
+  function choosePlaylist() {
+    if (window.AndroidPlayer && typeof window.AndroidPlayer.importPlaylist === 'function') {
+      window.AndroidPlayer.importPlaylist();
+    } else document.getElementById('playlistFile').click();
+  }
+  document.getElementById('importPlaylist').addEventListener('click', choosePlaylist);
+  document.getElementById('importFromPlayer').addEventListener('click', choosePlaylist);
+  document.getElementById('importPlaylistText').addEventListener('click', () => {
+    const input = document.getElementById('playlistText');
+    if (importPlaylistText(input.value)) input.value = '';
+  });
   document.getElementById('playlistFile').addEventListener('change', async event => {
     const file = event.target.files?.[0];
     if (!file) return;
-    try {
-      if (file.size > 10 * 1024 * 1024) throw new Error('Choose a playlist smaller than 10 MB.');
-      const result = parsePrivateM3u(await file.text());
-      if (!result.count) throw new Error('No recognized HorrorStack channels with valid stream links were found.');
-      const merged = Object.assign(loadImportedQueues(), result.groups);
-      localStorage.setItem(PLAYLIST_KEY, JSON.stringify(merged));
-      updateImportStatus(`Imported ${result.count} feeds or movies into ${Object.keys(result.groups).length} channels on this device.${result.ignored ? ` Skipped ${result.ignored} incomplete or unrecognized entries.` : ''}`);
-      if (currentChannelKey) { queueIndex = 0; renderQueue(); const url = currentQueue()[0]?.url || ''; streamUrl.value = url; playStream(url); }
-    } catch (error) { updateImportStatus(error.name === 'QuotaExceededError' ? 'The device could not save the playlist. Free some browser storage and try again.' : error.message); }
+    try { importPlaylistText(await file.text()); }
+    catch { updateImportStatus('Could not read that file. Use Paste M3U text.'); }
     finally { event.target.value = ''; }
+  });
+  document.getElementById('retryInternal').addEventListener('click', () => playStream(streamUrl.value));
+  document.getElementById('externalPlayer').addEventListener('click', event => {
+    const url = safeStreamUrl(streamUrl.value);
+    if (!url) { event.preventDefault(); showMessage('Import your playlist or enter a stream URL first.'); return; }
+    if (window.AndroidPlayer && typeof window.AndroidPlayer.playExternal === 'function') {
+      event.preventDefault(); window.AndroidPlayer.playExternal(url);
+    }
   });
   document.getElementById('removeImportedPlaylists').addEventListener('click', () => {
     try { localStorage.removeItem(PLAYLIST_KEY); updateImportStatus(); if (currentChannelKey) { queueIndex = 0; renderQueue(); const url = loadStreams()[currentChannelKey] || ''; streamUrl.value = url; playStream(url); } }
@@ -1842,6 +1882,7 @@ input:focus-visible {
   });
 
   horrorVideo.addEventListener("waiting", () => {
+    if (!horrorVideo.getAttribute("src") && !hls) return;
     showMessage("<strong>Buffering...</strong> The signal is crossing through the dark.");
   });
 
