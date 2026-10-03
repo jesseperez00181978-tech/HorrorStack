@@ -78,3 +78,15 @@ https://bloodydisgusting-ingest-roku-us.cinedigm.com/playlist.m3u8
 #EXTINF:-1 group-title="HorrorStack Test",Horror TV
 #EXTVLCOPT:http-user-agent=YuppTV/7.18.1 (Linux;Android 16) ExoPlayerLib/2.19.1
 https://streams2.sofast.tv/ptnr-yupptv/title-HORROR-TV-ENG_yupptv/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/93dc292b-cbcf-4988-ab97-94feced4c14b/master.m3u8
+
+#EXTINF:-1 tvg-id="ChildrenOfTheCornII" horrorstack-channel="scarecrow-field" horrorstack-kind="movie" group-title="HorrorStack TV",Children of the Corn II: The Final Sacrifice [On demand - English]
+http://line.dndnscloud.ru/movie/735409f473/8a964ce3bd44/1025218.mkv
+
+#EXTINF:-1 tvg-id="ChildrenOfTheCornIII" horrorstack-channel="scarecrow-field" horrorstack-kind="movie" group-title="HorrorStack TV",Children of the Corn III: Urban Harvest (1995) [On demand - English]
+http://line.dndnscloud.ru/movie/735409f473/8a964ce3bd44/1025219.mkv
+
+#EXTINF:-1 tvg-id="ChildrenOfTheCornRunaway" horrorstack-channel="scarecrow-field" horrorstack-kind="movie" group-title="HorrorStack TV",Children of the Corn: Runaway (2018) [On demand - English]
+http://line.dndnscloud.ru/movie/735409f473/8a964ce3bd44/402062.mkv
+
+#EXTINF:-1 tvg-id="ChildrenOfTheCornRemake" horrorstack-channel="scarecrow-field" horrorstack-kind="movie" group-title="HorrorStack TV",Children of the Corn (2020 remake) [On demand - English]
+http://line.dndnscloud.ru/movie/735409f473/8a964ce3bd44/1025220.mkv
