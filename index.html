@@ -939,22 +939,11 @@ input:focus-visible {
           <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🌽</div>
           <div class="channel-content">
             <p class="channel-status">Harvest in progress</p>
-            <h3>Scarecrow Field</h3>
-            <p>Farm horror, cornfields, scarecrows, and rural nightmares.</p>
+            <h3>Gatlin Road</h3>
+            <p>Children of the Corn, scarecrows, cornfields, and rural nightmares.</p>
             <a href="#" class="watch-btn" data-open-channel="scarecrow-field"><span>Watch Channel</span><span>▶</span></a>
           </div>
         </article>
-
-        <article class="channel-card scarecrow-field children-of-the-corn">
-          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🌽</div>
-          <div class="channel-content">
-            <p class="channel-status">He Who Walks Behind the Rows</p>
-            <h3>Children of the Corn</h3>
-            <p>All 11 films, from the 1984 original through the 2020 reboot. Import your authorized/private playlist to connect them.</p>
-            <a href="#" class="watch-btn" data-open-channel="children-of-the-corn"><span>Watch Channel</span><span>▶</span></a>
-          </div>
-        </article>
-
         <article class="channel-card haunted-house">
           <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🏚️</div>
           <div class="channel-content">
@@ -964,17 +953,6 @@ input:focus-visible {
             <a href="#" class="watch-btn" data-open-channel="haunted-house"><span>Watch Channel</span><span>▶</span></a>
           </div>
         </article>
-
-        <article class="channel-card possession-room night-of-the-demons">
-          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">😈</div>
-          <div class="channel-content">
-            <p class="channel-status">Hull House is open</p>
-            <h3>Night of the Demons</h3>
-            <p>The original trilogy plus the 2009 remake. Import your authorized/private playlist to connect all four films.</p>
-            <a href="#" class="watch-btn" data-open-channel="night-of-the-demons"><span>Watch Channel</span><span>▶</span></a>
-          </div>
-        </article>
-
         <article class="channel-card midnight-hospital">
           <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🏥</div>
           <div class="channel-content">
@@ -1204,12 +1182,8 @@ input:focus-visible {
       info: "The Jeepers Creepers films, collected in release order."
     },
     "scarecrow-field": {
-      title: "Scarecrow Field",
-      info: "Farm horror, cornfields, scarecrows, and rural nightmares."
-    },
-    "children-of-the-corn": {
-      title: "Children of the Corn",
-      info: "11-film franchise marathon. Import your authorized/private playlist to connect the movies.",
+      title: "Gatlin Road",
+      info: "Children of the Corn, scarecrows, cornfields, and rural nightmares.",
       catalog: [
         "Children of the Corn (1984)",
         "Children of the Corn II: The Final Sacrifice (1993)",
@@ -1226,11 +1200,7 @@ input:focus-visible {
     },
     "haunted-house": {
       title: "Haunted House",
-      info: "Ghost stories, haunted homes, séances, and supernatural terror."
-    },
-    "night-of-the-demons": {
-      title: "Night of the Demons",
-      info: "Four-film Hull House marathon. Import your authorized/private playlist to connect the movies.",
+      info: "Ghost stories, haunted homes, séances, supernatural terror, and the Night of the Demons films.",
       catalog: [
         "Night of the Demons (1988)",
         "Night of the Demons 2 (1994)",
@@ -1705,19 +1675,19 @@ input:focus-visible {
     let pending = null, ignored = 0, count = 0;
     const aliases = {
       hauntedhouse: 'haunted-house', midnighthospital: 'midnight-hospital',
-      scarecrowfield: 'scarecrow-field', possessionroom: 'possession-room',
-      childrenofthecorn: 'children-of-the-corn', childrenofthecorn1984: 'children-of-the-corn',
-      childrenofthecorniithefinalsacrifice: 'children-of-the-corn', childrenofthecorn2thefinalsacrifice: 'children-of-the-corn',
-      childrenofthecorniiiurbanharvest: 'children-of-the-corn', childrenofthecorn3urbanharvest: 'children-of-the-corn',
-      childrenofthecornivthegathering: 'children-of-the-corn', childrenofthecorn4thegathering: 'children-of-the-corn',
-      childrenofthecornvfieldsofterror: 'children-of-the-corn', childrenofthecorn5fieldsofterror: 'children-of-the-corn',
-      childrenofthecorn666isaacsreturn: 'children-of-the-corn', childrenofthecornrevelation: 'children-of-the-corn',
-      childrenofthecorn2009: 'children-of-the-corn', childrenofthecorngenesis: 'children-of-the-corn',
-      childrenofthecornrunaway: 'children-of-the-corn', childrenofthecorn2020: 'children-of-the-corn',
-      nightofthedemons: 'night-of-the-demons', nightofthedemons1988: 'night-of-the-demons',
-      nightofthedemons2: 'night-of-the-demons', nightofthedemonsii: 'night-of-the-demons',
-      nightofthedemons3: 'night-of-the-demons', nightofthedemonsiii: 'night-of-the-demons',
-      nightofthedemonsdemonhouse: 'night-of-the-demons', nightofthedemons2009: 'night-of-the-demons',
+      scarecrowfield: 'scarecrow-field', gatlinroad: 'scarecrow-field', possessionroom: 'possession-room',
+      childrenofthecorn: 'scarecrow-field', childrenofthecorn1984: 'scarecrow-field',
+      childrenofthecorniithefinalsacrifice: 'scarecrow-field', childrenofthecorn2thefinalsacrifice: 'scarecrow-field',
+      childrenofthecorniiiurbanharvest: 'scarecrow-field', childrenofthecorn3urbanharvest: 'scarecrow-field',
+      childrenofthecornivthegathering: 'scarecrow-field', childrenofthecorn4thegathering: 'scarecrow-field',
+      childrenofthecornvfieldsofterror: 'scarecrow-field', childrenofthecorn5fieldsofterror: 'scarecrow-field',
+      childrenofthecorn666isaacsreturn: 'scarecrow-field', childrenofthecornrevelation: 'scarecrow-field',
+      childrenofthecorn2009: 'scarecrow-field', childrenofthecorngenesis: 'scarecrow-field',
+      childrenofthecornrunaway: 'scarecrow-field', childrenofthecorn2020: 'scarecrow-field',
+      nightofthedemons: 'haunted-house', nightofthedemons1988: 'haunted-house',
+      nightofthedemons2: 'haunted-house', nightofthedemonsii: 'haunted-house',
+      nightofthedemons3: 'haunted-house', nightofthedemonsiii: 'haunted-house',
+      nightofthedemonsdemonhouse: 'haunted-house', nightofthedemons2009: 'haunted-house',
       creeperroad: 'creeper-road', phantasm: 'phantasm', haddonfield: 'haddonfield',
       graveyardshift: 'graveyard-shift', localnowhorrorstream: 'graveyard-shift', elmstreet: 'elm-street',
       texaschainsaw: 'texas-chainsaw', texaschainsawmassacre: 'texas-chainsaw',
