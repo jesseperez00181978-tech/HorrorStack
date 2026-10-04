@@ -12,9 +12,6 @@ on:
       - "settings.gradle.kts"
       - ".github/workflows/android.yml"
 
-permissions:
-  contents: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -44,12 +41,3 @@ jobs:
           name: HorrorStack-test
           path: app/build/outputs/apk/sandbox/app-sandbox.apk
           if-no-files-found: error
-
-      - name: Publish latest install APK
-        if: github.event_name == 'push'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          cp app/build/outputs/apk/sandbox/app-sandbox.apk HorrorStack.apk
-          gh release delete horrorstack-latest --yes --cleanup-tag || true
-          gh release create horrorstack-latest HorrorStack.apk             --title "HorrorStack Latest"             --notes "Latest successful HorrorStack Android build."             --target "${{ github.sha }}"             --latest
