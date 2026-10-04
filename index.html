@@ -1148,6 +1148,7 @@ input:focus-visible {
         <button class="control-btn" id="importFromPlayer" type="button">Import playlist</button>
         <button class="control-btn" id="retryInternal" type="button">Play inside HorrorStack</button>
         <a id="externalPlayer" class="control-btn" href="#" hidden rel="noreferrer">Open in video player</a>
+        <a id="officialWatch" class="control-btn" href="#" hidden rel="noreferrer">Official watch option</a>
         <button id="downloadChannelPlaylist" class="control-btn" type="button" hidden>Save channel playlist</button>
       </div>
     </div>
@@ -1196,6 +1197,23 @@ input:focus-visible {
   const streamUrl = document.getElementById("streamUrl");
   const saveStream = document.getElementById("saveStream");
   const clearStream = document.getElementById("clearStream");
+  const officialWatch = document.getElementById("officialWatch");
+
+  const OFFICIAL_WATCH_LINKS = {
+    "Phantasm - Phantasm: Ravager (2016) [On demand]": "https://tubitv.com/movies/505789/phantasm-ravager",
+    "Phantasm (1979) [On demand]": "https://tubitv.com/movies/505785/phantasm-remastered",
+    "Phantasm II (1988) [On demand]": "https://tv.apple.com/us/movie/phantasm-ii/umc.cmc.3uit5dohslarsh0kw3l62ivgm",
+    "Phantasm III: Lord of the Dead (1994) [On demand]": "https://tubitv.com/movies/505791/phantasm-iii-lord-of-the-dead",
+    "Phantasm IV: Oblivion (1998) [On demand]": "https://tubitv.com/movies/505793/phantasm-iv-oblivion",
+    "Creeper Road - Jeepers Creepers (2001) [On demand]": "https://tv.apple.com/us/movie/jeepers-creepers/umc.cmc.796j17v519pnxpmwnx1wlt2as",
+    "Creeper Road - Jeepers Creepers 2 (2003) [On demand]": "https://tv.apple.com/us/movie/jeepers-creepers-2/umc.cmc.4q9viu810avkcohlmol8m4zko",
+    "Creeper Road - Jeepers Creepers 3 (2017) [On demand]": "https://tv.apple.com/us/movie/jeepers-creepers-3/umc.cmc.44b9t6ejij6ncjoenmivmzc0r",
+    "Creeper Road - Jeepers Creepers: Reborn (2022) [On demand]": "https://tv.apple.com/us/movie/jeepers-creepers-reborn/umc.cmc.4cqrxmz9zixmwp0zvnp0jk75b",
+    "Children of the Corn II: The Final Sacrifice [On demand - English]": "https://tv.apple.com/us/movie/children-of-the-corn-ii-the-final-sacrifice/umc.cmc.3fglypv13656jy1dvi3gdp8u2",
+    "Children of the Corn III: Urban Harvest (1995) [On demand - English]": "https://tv.apple.com/us/movie/children-of-the-corn-iii-urban-harvest/umc.cmc.3oa99b6x6pyb55p1fv0u97pz7",
+    "Children of the Corn: Runaway (2018) [On demand - English]": "https://tv.apple.com/us/movie/children-of-the-corn-runaway/umc.cmc.42o7us95gm5q6w8ucmvtvqoo6",
+    "Children of the Corn (2020 remake) [On demand - English]": "https://tv.apple.com/us/movie/children-of-the-corn/umc.cmc.30763nu94fjmlyn3vvraow42f"
+  };
 
   const PLAYLIST_KEY = "horrorstack-private-playlists-v1";
   let queueIndex = 0;
@@ -1788,6 +1806,14 @@ input:focus-visible {
     updateImportStatus();
   }
 
+  function updateOfficialWatch() {
+    const item = currentQueue()[queueIndex] || null;
+    const url = item ? OFFICIAL_WATCH_LINKS[item.name] : "";
+    officialWatch.hidden = !url;
+    officialWatch.href = url || "#";
+    officialWatch.textContent = url ? "Official watch option" : "Official watch option";
+  }
+
   function renderQueue() {
     const items = currentQueue();
     document.getElementById('queueControls').hidden = !items.length;
@@ -1799,6 +1825,7 @@ input:focus-visible {
     document.getElementById('loopLabel').hidden = !movies;
     if (movies) document.getElementById('loopMovies').checked = true;
     document.getElementById('queueDescription').textContent = movies ? '24/7 marathon mode: movies play in order and restart automatically after the last title.' : 'Live feed. The provider controls the movie schedule.';
+    updateOfficialWatch();
   }
 
   function updatePlayerLinks(url) {
@@ -1875,6 +1902,15 @@ input:focus-visible {
       event.preventDefault(); window.AndroidPlayer.playExternal(url);
     }
   });
+  officialWatch.addEventListener('click', event => {
+    const item = currentQueue()[queueIndex] || null;
+    const url = item ? OFFICIAL_WATCH_LINKS[item.name] : "";
+    if (!url) {
+      event.preventDefault();
+      showMessage('No current official watch option is saved for this title.', true);
+      return;
+    }
+  });
   document.getElementById('removeImportedPlaylists').addEventListener('click', () => {
     try { localStorage.removeItem(PLAYLIST_KEY); updateImportStatus(); if (currentChannelKey) { queueIndex = 0; renderQueue(); const url = loadStreams()[currentChannelKey] || ''; streamUrl.value = url; playStream(url); } }
     catch { updateImportStatus('The device could not remove the imported playlists.'); }
@@ -1882,6 +1918,7 @@ input:focus-visible {
   document.getElementById('queueSelection').addEventListener('change', event => {
     queueIndex = Number(event.target.value);
     const item = currentQueue()[queueIndex];
+    updateOfficialWatch();
     if (item) { streamUrl.value = item.url; playStream(item.url); }
   });
   document.getElementById('downloadChannelPlaylist').addEventListener('click', () => {
