@@ -1201,7 +1201,7 @@ input:focus-visible {
 
   const OFFICIAL_WATCH_LINKS = {
     "Phantasm - Phantasm: Ravager (2016) [On demand]": "https://tubitv.com/movies/505789/phantasm-ravager",
-    "Phantasm (1979) [On demand]": "https://tubitv.com/movies/505785/phantasm-remastered",
+    "Phantasm (1979) [On demand]": "https://pluto.tv/us/movies/5fb34a8a8bff97001a641a5d/",
     "Phantasm II (1988) [On demand]": "https://tv.apple.com/us/movie/phantasm-ii/umc.cmc.3uit5dohslarsh0kw3l62ivgm",
     "Phantasm III: Lord of the Dead (1994) [On demand]": "https://tubitv.com/movies/505791/phantasm-iii-lord-of-the-dead",
     "Phantasm IV: Oblivion (1998) [On demand]": "https://tubitv.com/movies/505793/phantasm-iv-oblivion",
@@ -1521,6 +1521,20 @@ input:focus-visible {
       return;
     }
 
+    const queueItem = currentQueue()[queueIndex] || null;
+    const officialUrl = queueItem ? OFFICIAL_WATCH_LINKS[queueItem.name] : "";
+    let sourceHost = "";
+    try { sourceHost = new URL(cleanUrl).hostname.toLowerCase(); } catch {}
+
+    // The old direct movie backend can expire independently of HorrorStack.
+    // Never let those dead movie URLs take the whole movie channel down.
+    if (queueItem?.kind === "movie" && sourceHost === "line.dndnscloud.ru" && officialUrl) {
+      officialWatch.hidden = false;
+      officialWatch.href = officialUrl;
+      showMessage("<strong>Direct movie source expired.</strong> Use Official watch option for this title.");
+      return;
+    }
+
     if (window.AndroidPlayer && typeof window.AndroidPlayer.play === "function") {
       try {
         window.AndroidPlayer.play(cleanUrl, playerTitle.textContent || "HorrorStack");
@@ -1538,7 +1552,6 @@ input:focus-visible {
 
     showMessage("<strong>Connecting...</strong> Tuning the HorrorStack signal.");
 
-    const queueItem = currentQueue()[queueIndex] || null;
     const explicitMovie = queueItem?.kind === "movie";
     const explicitLive = queueItem?.kind === "live";
     const obviousDirectFile = /\.(mp4|webm|mov|m4v)(?:[?#]|$)/i.test(cleanUrl);
