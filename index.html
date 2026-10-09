@@ -896,15 +896,15 @@ input:focus-visible {
       <button class="control-btn" id="removeImportedPlaylists" type="button" hidden>Remove imported playlists</button>
     </div>
     <div class="private-playlist-bar">
-      <label><input id="replaceImportedPlaylist" type="checkbox" checked> Replace old provider feeds when importing</label>
-      <p>Replacement happens only after a playlist contains matching HorrorStack channels or movies.</p>
+      <label><input id="replaceImportedPlaylist" type="checkbox" checked> Play newly imported feeds first (keep saved backups)</label>
+      <p>Only matching movie groups are imported. Previously saved streams and public entries are preserved.</p>
     </div>
     <details class="private-playlist-bar" id="pastePlaylistPanel">
       <summary>Import M3U text or URL</summary>
       <label for="remotePlaylistUrl">Private M3U playlist URL (kept on this device, not sent to GitHub)</label>
       <input id="remotePlaylistUrl" type="url" autocomplete="off" spellcheck="false" placeholder="https://provider.example/get.php?..." style="width:100%;color:#fff;background:#171017;padding:12px;border:1px solid #666;border-radius:8px">
       <button class="control-btn" id="importPlaylistUrl" type="button">Load playlist URL</button>
-      <p>Some IPTV providers block browser imports (CORS). If loading fails, download the M3U file from your provider and use Import playlist instead.</p>
+      <p>On Android, the app loads provider URLs directly on your device. Browser imports may be blocked by HTTPS/CORS; in that case download the M3U file and use Import playlist.</p>
       <textarea id="playlistText" rows="6" style="width:100%;max-width:100%;color:#fff;background:#171017" placeholder="Paste your #EXTM3U playlist here"></textarea>
       <button class="control-btn" id="importPlaylistText" type="button">Import pasted playlist</button>
     </details>
@@ -1811,7 +1811,7 @@ input:focus-visible {
         if (!Object.hasOwn(channelData, key || '') || !url || !name) { ignored++; continue; }
         const kind = attrs['horrorstack-kind'] === 'movie' || /\/movie\//i.test(new URL(url).pathname) || /\.(mp4|mkv|webm|mov|m4v|avi)(?:[?#]|$)/i.test(url) ? 'movie' : 'live';
         groups[key] ||= [];
-        if (!groups[key].some(item => item.url === url)) { groups[key].push({ name, url, kind }); count++; }
+        if (!groups[key].some(item => item.url === url)) { if (groups[key].length < 400) { groups[key].push({ name, url, kind }); count++; } else ignored++; }
       }
     }
     if (pending) ignored++;
@@ -1908,19 +1908,31 @@ input:focus-visible {
       if (text.length > 10 * 1024 * 1024) throw new Error('Choose a playlist smaller than 10 MB.');
       const result = parsePrivateM3u(text);
       if (!result.count) throw new Error('No matching horror channels or movies found. Your existing feeds have not changed.');
-      const replace = document.getElementById('replaceImportedPlaylist').checked;
+      const newFirst = document.getElementById('replaceImportedPlaylist').checked;
       const previousQueues = localStorage.getItem(PLAYLIST_KEY);
-      const previousStreams = localStorage.getItem(STORAGE_KEY);
+      const existing = loadImportedQueues();
+      const combined = Object.assign(Object.create(null), existing);
+      // Never replace the entire local collection for a partial provider playlist.
+      // The official public M3U and manually saved URLs are separate and untouched.
+      for (const [key, incoming] of Object.entries(result.groups)) {
+        const oldItems = existing[key] || [];
+        const ordered = newFirst ? [...incoming, ...oldItems] : [...oldItems, ...incoming];
+        const seen = new Set();
+        combined[key] = ordered.filter(item => {
+          if (seen.has(item.url)) return false;
+          seen.add(item.url);
+          return true;
+        });
+      }
       try {
-        localStorage.setItem(PLAYLIST_KEY, JSON.stringify(replace ? result.groups : Object.assign(loadImportedQueues(), result.groups)));
-        if (replace) localStorage.removeItem(STORAGE_KEY);
+        localStorage.setItem(PLAYLIST_KEY, JSON.stringify(combined));
       } catch (error) {
         if (previousQueues === null) localStorage.removeItem(PLAYLIST_KEY);
         else localStorage.setItem(PLAYLIST_KEY, previousQueues);
-        if (previousStreams !== null) localStorage.setItem(STORAGE_KEY, previousStreams);
         throw new Error('Could not save this playlist. Free some device storage and try again.');
       }
-      updateImportStatus(`${replace ? 'Replaced old feeds with' : 'Imported'} ${result.count} feeds or movies in ${Object.keys(result.groups).length} channels. ${result.ignored} unmatched entries skipped. Playback has not yet been checked.`);
+      const retained = Object.keys(existing).filter(key => !Object.hasOwn(result.groups, key)).length;
+      updateImportStatus(`Imported ${result.count} feeds or movies into ${Object.keys(result.groups).length} groups. ${retained} other saved groups preserved, prior sources kept as backups. ${result.ignored} unrelated or excess entries skipped. Playback has not yet been checked.`);
       if (currentChannelKey) {
         queueIndex = 0; renderQueue();
         const url = currentQueue()[0]?.url || loadStreams()[currentChannelKey] || '';
@@ -1934,6 +1946,7 @@ input:focus-visible {
     }
   }
   window.importHorrorPlaylist = importPlaylistText;
+  window.horrorstackIptvStatus = updateImportStatus;
   function choosePlaylist() {
     if (window.AndroidPlayer && typeof window.AndroidPlayer.importPlaylist === 'function') {
       window.AndroidPlayer.importPlaylist();
@@ -1947,9 +1960,15 @@ input:focus-visible {
     try {
       const parsed = new URL(url);
       if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('Use an HTTP(S) playlist URL.');
+      if (window.AndroidPlayer && typeof window.AndroidPlayer.importPlaylistUrl === 'function') {
+        field.value = '';
+        updateImportStatus('Loading private playlist directly on this Android device...');
+        window.AndroidPlayer.importPlaylistUrl(url);
+        return;
+      }
       if (location.protocol === 'https:' && parsed.protocol === 'http:') throw new Error('This provider uses HTTP. Download the M3U using your provider’s link, then use Import playlist.');
       updateImportStatus('Loading private playlist...');
-      const response = await fetch(url, { credentials: 'omit', redirect: 'follow' });
+      const response = await fetch(url, { credentials: 'omit', redirect: 'follow', referrerPolicy: 'no-referrer' });
       if (!response.ok) throw new Error('Provider returned HTTP ' + response.status);
       const content = await response.text();
       if (!content.trimStart().startsWith('#EXTM3U')) throw new Error('Provider did not return an M3U playlist.');
