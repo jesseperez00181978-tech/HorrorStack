@@ -896,7 +896,11 @@ input:focus-visible {
       <button class="control-btn" id="removeImportedPlaylists" type="button" hidden>Remove imported playlists</button>
     </div>
     <details class="private-playlist-bar" id="pastePlaylistPanel">
-      <summary>Paste M3U text</summary>
+      <summary>Import M3U text or URL</summary>
+      <label for="remotePlaylistUrl">Private M3U playlist URL (kept on this device, not sent to GitHub)</label>
+      <input id="remotePlaylistUrl" type="url" autocomplete="off" spellcheck="false" placeholder="https://provider.example/get.php?..." style="width:100%;color:#fff;background:#171017;padding:12px;border:1px solid #666;border-radius:8px">
+      <button class="control-btn" id="importPlaylistUrl" type="button">Load playlist URL</button>
+      <p>Some IPTV providers block browser imports (CORS). If loading fails, download the M3U file from your provider and use Import playlist instead.</p>
       <textarea id="playlistText" rows="6" style="width:100%;max-width:100%;color:#fff;background:#171017" placeholder="Paste your #EXTM3U playlist here"></textarea>
       <button class="control-btn" id="importPlaylistText" type="button">Import pasted playlist</button>
     </details>
@@ -1896,6 +1900,22 @@ input:focus-visible {
   }
   document.getElementById('importPlaylist').addEventListener('click', choosePlaylist);
   document.getElementById('importFromPlayer').addEventListener('click', choosePlaylist);
+  document.getElementById('importPlaylistUrl').addEventListener('click', async () => {
+    const field = document.getElementById('remotePlaylistUrl');
+    const url = field.value.trim();
+    try {
+      const parsed = new URL(url);
+      if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('Use an HTTP(S) playlist URL.');
+      updateImportStatus('Loading private playlist...');
+      const response = await fetch(url, { credentials: 'omit', redirect: 'follow' });
+      if (!response.ok) throw new Error('Provider returned HTTP ' + response.status);
+      const content = await response.text();
+      if (!content.trimStart().startsWith('#EXTM3U')) throw new Error('Provider did not return an M3U playlist.');
+      if (importPlaylistText(content)) field.value = '';
+    } catch (error) {
+      updateImportStatus('Could not import URL: ' + (error instanceof TypeError ? 'provider may block browser requests (CORS). Download the M3U file and import it instead.' : error.message));
+    }
+  });
   document.getElementById('importPlaylistText').addEventListener('click', () => {
     const input = document.getElementById('playlistText');
     if (importPlaylistText(input.value)) input.value = '';
