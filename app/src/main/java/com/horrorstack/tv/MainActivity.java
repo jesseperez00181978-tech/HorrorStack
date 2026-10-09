@@ -106,6 +106,63 @@ public class MainActivity extends AppCompatActivity {
         webView.loadUrl("file:///android_asset/index.html");
     }
 
+    // Fetch a user-supplied provider URL locally in Android, avoiding WebView file:// CORS.
+    // Never write the URL or account credentials to source control, logs, or analytics.
+    private void importPlaylistFromUrl(String url) {
+        if (!isWebStream(url)) {
+            showImportStatus("Enter a valid HTTP(S) M3U playlist link.");
+            return;
+        }
+        showImportStatus("Loading private provider playlist on this device...");
+        new Thread(() -> {
+            java.net.HttpURLConnection connection = null;
+            try {
+                connection = (java.net.HttpURLConnection) new java.net.URL(url.trim()).openConnection();
+                connection.setConnectTimeout(18000);
+                connection.setReadTimeout(30000);
+                connection.setRequestProperty("Accept", "audio/x-mpegurl, application/vnd.apple.mpegurl, text/plain, */*");
+                if (connection.getResponseCode() != 200) throw new java.io.IOException("HTTP status");
+                StringBuilder selected = new StringBuilder("#EXTM3U\n");
+                String pending = null;
+                int processed = 0;
+                int selectedCount = 0;
+                try (java.io.BufferedReader reader = new java.io.BufferedReader(
+                        new java.io.InputStreamReader(connection.getInputStream(), java.nio.charset.StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        processed += line.length() + 1;
+                        if (processed > 40 * 1024 * 1024) throw new java.io.IOException("Playlist exceeds 40 MB");
+                        if (line.startsWith("#EXTINF:")) {
+                            pending = line;
+                        } else if ((line.startsWith("https://") || line.startsWith("http://")) && pending != null) {
+                            String label = pending.toLowerCase(Locale.ROOT);
+                            if (label.matches("(?s).*(horror|halloween|haddonfield|nightmare|elm.street|freddy|chainsaw|leatherface|phantasm|jeepers.creepers|children.of.the.corn|gatlin|night.of.the.demons|scarecrow|possession|haunted|midnight.pulp|insidious|hellraiser).*")) {
+                                int extra = pending.length() + line.length() + 2;
+                                if (selected.length() + extra > 9 * 1024 * 1024) throw new java.io.IOException("Matched playlist exceeds 9 MB");
+                                selected.append(pending).append('\n').append(line).append('\n');
+                                selectedCount++;
+                            }
+                            pending = null;
+                        }
+                    }
+                }
+                if (selectedCount == 0) throw new java.io.IOException("No matching horror entries");
+                String filtered = selected.toString();
+                runOnUiThread(() -> webView.evaluateJavascript(
+                        "window.importHorrorPlaylist(" + org.json.JSONObject.quote(filtered) + ")", null));
+            } catch (Exception ignored) {
+                showImportStatus("Provider download failed or no supported horror entries found. Import an M3U file instead; saved channels are unchanged.");
+            } finally {
+                if (connection != null) connection.disconnect();
+            }
+        }).start();
+    }
+
+    private void showImportStatus(String message) {
+        runOnUiThread(() -> webView.evaluateJavascript(
+                "window.horrorstackIptvStatus(" + org.json.JSONObject.quote(message) + ")", null));
+    }
+
     @Override protected void onStart() {
         super.onStart();
         if (inlineUrl != null && inlineVisible && inlinePlayer == null) startInlineEngine();
@@ -341,6 +398,10 @@ public class MainActivity extends AppCompatActivity {
                 nativeImport = true;
                 playlistPicker.launch(new String[]{"*/*"});
             });
+        }
+
+        @JavascriptInterface public void importPlaylistUrl(String url) {
+            importPlaylistFromUrl(url);
         }
 
         @JavascriptInterface public void playExternal(String url) {
