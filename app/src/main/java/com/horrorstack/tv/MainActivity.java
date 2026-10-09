@@ -106,6 +106,60 @@ public class MainActivity extends AppCompatActivity {
         webView.loadUrl("file:///android_asset/index.html");
     }
 
+    private void importPlaylistFromUrl(String url) {
+        if (!isWebStream(url)) {
+            showImportStatus("Enter a valid http:// or https:// M3U URL.");
+            return;
+        }
+        showImportStatus("Downloading private playlist...");
+        new Thread(() -> {
+            java.net.HttpURLConnection connection = null;
+            try {
+                connection = (java.net.HttpURLConnection) new java.net.URL(url.trim()).openConnection();
+                connection.setConnectTimeout(18000);
+                connection.setReadTimeout(30000);
+                connection.setRequestProperty("Accept", "audio/x-mpegurl, application/vnd.apple.mpegurl, text/plain, */*");
+                int code = connection.getResponseCode();
+                if (code != 200) throw new java.io.IOException("Provider HTTP error");
+                StringBuilder selected = new StringBuilder("#EXTM3U\n");
+                int processed = 0, selectedCount = 0;
+                String pending = null;
+                try (java.io.BufferedReader reader = new java.io.BufferedReader(
+                        new java.io.InputStreamReader(connection.getInputStream(), java.nio.charset.StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        processed += line.length() + 1;
+                        if (processed > 40 * 1024 * 1024) throw new java.io.IOException("Playlist too large");
+                        if (line.startsWith("#EXTINF:")) pending = line;
+                        else if ((line.startsWith("http://") || line.startsWith("https://")) && pending != null) {
+                            String metadata = pending.toLowerCase(Locale.ROOT);
+                            if (metadata.matches(".*(horror|halloween|haddonfield|nightmare|elm.street|freddy|chainsaw|phantasm|jeepers|children.of.the.corn|gatlin|demon|slasher|haunt|shudder|fear|thriller|creepy|scary|midnight.pulp|24.7).*")) {
+                                if (selected.length() + pending.length() + line.length() > 6 * 1024 * 1024)
+                                    throw new java.io.IOException("Too many horror feeds");
+                                selected.append(pending).append('\n').append(line).append('\n');
+                                selectedCount++;
+                            }
+                            pending = null;
+                        }
+                    }
+                }
+                if (selectedCount == 0) throw new java.io.IOException("No matching horror feeds");
+                String playlist = selected.toString();
+                runOnUiThread(() -> webView.evaluateJavascript(
+                        "window.importHorrorPlaylist(" + org.json.JSONObject.quote(playlist) + ")", null));
+            } catch (Exception exception) {
+                showImportStatus("Could not load that IPTV playlist. Confirm your subscription and link, then try again.");
+            } finally {
+                if (connection != null) connection.disconnect();
+            }
+        }).start();
+    }
+
+    private void showImportStatus(String message) {
+        runOnUiThread(() -> webView.evaluateJavascript(
+                "window.horrorstackIptvStatus(" + org.json.JSONObject.quote(message) + ")", null));
+    }
+
     @Override protected void onStart() {
         super.onStart();
         if (inlineUrl != null && inlineVisible && inlinePlayer == null) startInlineEngine();
@@ -341,6 +395,10 @@ public class MainActivity extends AppCompatActivity {
                 nativeImport = true;
                 playlistPicker.launch(new String[]{"*/*"});
             });
+        }
+
+        @JavascriptInterface public void importPlaylistUrl(String url) {
+            importPlaylistFromUrl(url);
         }
 
         @JavascriptInterface public void playExternal(String url) {
