@@ -900,6 +900,15 @@ input:focus-visible {
       <textarea id="playlistText" rows="6" style="width:100%;max-width:100%;color:#fff;background:#171017" placeholder="Paste your #EXTM3U playlist here"></textarea>
       <button class="control-btn" id="importPlaylistText" type="button">Import pasted playlist</button>
     </details>
+    <details class="private-playlist-bar" id="providerPlaylistPanel">
+      <summary>Connect IPTV (private M3U link)</summary>
+      <label for="providerPlaylistUrl">Paste the M3U playlist link from your provider's activation email.</label>
+      <div class="stream-row">
+        <input id="providerPlaylistUrl" class="stream-url" type="url" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://provider.example/get.php?..." aria-label="Private IPTV M3U playlist URL">
+        <button class="control-btn" id="connectProviderPlaylist" type="button">Connect channels</button>
+      </div>
+      <p class="stream-help">Use only channels you may lawfully watch. Playlist links are stored only on this device, never in GitHub. Do not share a link that contains your password.</p>
+    </details>
     <section class="featured-section">
       <div class="section-heading">
         <div>
@@ -914,6 +923,15 @@ input:focus-visible {
       </div>
 
       <div class="channel-grid">
+
+        <article class="channel-card haunted-house">
+          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">📡</div>
+          <div class="channel-content">
+            <p class="channel-status">Private IPTV playlist</p><h3>More Horror Channels</h3>
+            <p>Additional horror and 24/7 channels from your own provider.</p>
+            <a href="#" class="watch-btn" data-open-channel="provider-horror"><span>Watch Channel</span><span>▶</span></a>
+          </div>
+        </article>
 
         <article class="channel-card phantasm">
           <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">☠️</div>
@@ -1277,7 +1295,8 @@ input:focus-visible {
     "texas-chainsaw": { title: "Texas Chainsaw Massacre", info: "The Texas Chain Saw Massacre films." },
     "midnight-pulp": { title: "Midnight Pulp", info: "Midnight Pulp live broadcast." },
     "english-horror-247": { title: "English 24/7 Horror Movies", info: "Continuous horror movies. The provider controls the schedule." },
-    "uk-horror": { title: "UK Horror Channel", info: "UK Horror Channel live broadcast. The provider controls the schedule." }
+    "uk-horror": { title: "UK Horror Channel", info: "UK Horror Channel live broadcast. The provider controls the schedule." },
+    "provider-horror": { title: "More Horror Channels", info: "Additional horror and 24/7 channels from your private IPTV playlist." }
   });
   let currentChannelKey = null;
   let hls = null;
@@ -1772,7 +1791,18 @@ input:focus-visible {
         const { attrs, name } = pending;
         pending = null;
         const normalize = value => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-        const key = attrs['horrorstack-channel'] || aliases[normalize(attrs['tvg-id'])] || aliases[normalize(name)];
+        const label = normalize(name + ' ' + (attrs['tvg-id'] || ''));
+        const category = normalize(attrs['group-title'] || '');
+        const inferred = /halloween|haddonfield|michaelmyers/.test(label) ? 'haddonfield'
+          : /nightmareonelm|elmstreet|freddykrueger/.test(label) ? 'elm-street'
+          : /texaschainsaw|leatherface/.test(label) ? 'texas-chainsaw'
+          : /phantasm/.test(label) ? 'phantasm'
+          : /jeeperscreepers/.test(label) ? 'creeper-road'
+          : /childrenofthecorn|gatlin/.test(label) ? 'scarecrow-field'
+          : /nightofthedemons/.test(label) ? 'haunted-house'
+          : /midnightpulp/.test(label) ? 'midnight-pulp'
+          : /horror|slasher|terror|haunt|thriller|shudder|fear|creepy|scary|demon|macabre/.test(label + category) ? 'provider-horror' : null;
+        const key = attrs['horrorstack-channel'] || aliases[normalize(attrs['tvg-id'])] || aliases[normalize(name)] || inferred;
         const url = safeStreamUrl(line);
         if (!Object.hasOwn(channelData, key || '') || !url || !name) { ignored++; continue; }
         const kind = attrs['horrorstack-kind'] === 'movie' || /\.(mp4|mkv|webm|mov)(?:[?#]|$)/i.test(url) ? 'movie' : 'live';
@@ -1889,6 +1919,25 @@ input:focus-visible {
     }
   }
   window.importHorrorPlaylist = importPlaylistText;
+  window.horrorstackIptvStatus = function(message) { updateImportStatus(String(message || 'Provider playlist import failed.')); };
+  document.getElementById('connectProviderPlaylist').addEventListener('click', async () => {
+    const field = document.getElementById('providerPlaylistUrl');
+    const url = safeStreamUrl(field.value.trim());
+    if (!url) { updateImportStatus('Paste the complete private M3U URL from your activation email.'); return; }
+    field.value = '';
+    updateImportStatus('Connecting to your private IPTV playlist...');
+    if (window.AndroidPlayer && typeof window.AndroidPlayer.importPlaylistUrl === 'function') {
+      window.AndroidPlayer.importPlaylistUrl(url);
+      return;
+    }
+    try {
+      const response = await fetch(url, { cache: 'no-store' });
+      if (!response.ok) throw new Error('Provider unavailable');
+      importPlaylistText(await response.text());
+    } catch {
+      updateImportStatus('Provider blocked browser access or is offline. Import a downloaded M3U file, or use the HorrorStack Android app.');
+    }
+  });
   function choosePlaylist() {
     if (window.AndroidPlayer && typeof window.AndroidPlayer.importPlaylist === 'function') {
       window.AndroidPlayer.importPlaylist();
