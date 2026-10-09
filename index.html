@@ -1739,6 +1739,8 @@ input:focus-visible {
   function matchProviderChannel(name, group) {
     const title = String(name || '').toLowerCase().replace(/[_|:–—-]+/g, ' ').replace(/\s+/g, ' ').trim();
     const franchiseRules = [
+      [/\bhaddonfield\b/, 'haddonfield'],
+      [/\b(?:horror by alter|bloody disgusting|horror tv)\b/, 'graveyard-shift'],
       [/\bphantasm\b/, 'phantasm'],
       [/\bjeepers creepers\b/, 'creeper-road'],
       [/\bchildren of the corn\b|\bscarecrow\b/, 'scarecrow-field'],
