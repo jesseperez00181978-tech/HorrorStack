@@ -990,6 +990,13 @@ input:focus-visible {
             <a href="#" class="watch-btn" data-open-channel="haddonfield"><span>Watch Channel</span><span>▶</span></a>
           </div>
         </article>
+        <article class="channel-card haddonfield">
+          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🎃</div>
+          <div class="channel-content"><p class="channel-status">Your 24/7 stream or movie loop</p>
+            <h3>Haddonfield 24/7</h3><p>Halloween movies nonstop, using your authorized stream or looping your saved Haddonfield films.</p>
+            <a href="#" class="watch-btn" data-open-channel="haddonfield-247"><span>Connect 24/7</span><span>▶</span></a>
+          </div>
+        </article>
 
 <article class="channel-card haddonfield">
           <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🌙</div>
@@ -1001,6 +1008,13 @@ input:focus-visible {
           <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🪚</div>
           <div class="channel-content"><p class="channel-status">Your playlist</p><h3>Texas Chainsaw Massacre</h3><p>The Texas Chain Saw Massacre films. Leatherface’s movie marathon.</p>
             <a href="#" class="watch-btn" data-open-channel="texas-chainsaw"><span>Watch Channel</span><span>▶</span></a>
+          </div>
+        </article>
+        <article class="channel-card creeper-road">
+          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🪚</div>
+          <div class="channel-content"><p class="channel-status">Your 24/7 stream or movie loop</p>
+            <h3>TCM 24/7</h3><p>Leatherface movies nonstop, using your authorized stream or looping your saved Texas Chainsaw films.</p>
+            <a href="#" class="watch-btn" data-open-channel="texas-chainsaw-247"><span>Connect 24/7</span><span>▶</span></a>
           </div>
         </article>
 <article class="channel-card graveyard-shift">
@@ -1283,6 +1297,8 @@ input:focus-visible {
   Object.assign(channelData, {
     "elm-street": { title: "Elm Street", info: "A Nightmare on Elm Street films." },
     "texas-chainsaw": { title: "Texas Chainsaw Massacre", info: "The Texas Chain Saw Massacre films." },
+    "haddonfield-247": { title: "Haddonfield 24/7", info: "Your authorized Halloween 24/7 broadcast, or a nonstop loop of your saved playable Halloween movies." },
+    "texas-chainsaw-247": { title: "TCM 24/7", info: "Your authorized Texas Chainsaw 24/7 broadcast, or a nonstop loop of your saved playable TCM movies." },
     "midnight-pulp": { title: "Midnight Pulp", info: "Midnight Pulp live broadcast." },
     "english-horror-247": { title: "English 24/7 Horror Movies", info: "Continuous horror movies. The provider controls the schedule." },
     "uk-horror": { title: "UK Horror Channel", info: "UK Horror Channel live broadcast. The provider controls the schedule." }
@@ -1738,6 +1754,15 @@ input:focus-visible {
 
   function matchProviderChannel(name, group) {
     const title = String(name || '').toLowerCase().replace(/[_|:–—-]+/g, ' ').replace(/\s+/g, ' ').trim();
+    const categoryName = String(group || '').toLowerCase().replace(/[_|:–—-]+/g, ' ').replace(/\s+/g, ' ').trim();
+    // A 24/7 broadcast is distinct from an individual franchise film.
+    const broadcastTitle = /\b(?:24\/7|24 7|247|marathon|nonstop|continuous)\b/.test(title);
+    const broadcastGroup = /\b(?:24\/7|24 7|247)\b/.test(categoryName) &&
+      /^(?:haddonfield|halloween|tcm|texas chainsaw(?: massacre)?)$/.test(title);
+    if (broadcastTitle || broadcastGroup) {
+      if (/\b(?:haddonfield|halloween|michael myers)\b/.test(title)) return 'haddonfield-247';
+      if (/\b(?:tcm|texas chain\s*saw|leatherface)\b/.test(title)) return 'texas-chainsaw-247';
+    }
     const franchiseRules = [
       [/\bhaddonfield\b/, 'haddonfield'],
       [/\b(?:horror by alter|bloody disgusting|horror tv)\b/, 'graveyard-shift'],
@@ -1784,6 +1809,8 @@ input:focus-visible {
       nightofthedemons3: 'haunted-house', nightofthedemonsiii: 'haunted-house',
       nightofthedemonsdemonhouse: 'haunted-house', nightofthedemons2009: 'haunted-house',
       creeperroad: 'creeper-road', phantasm: 'phantasm', haddonfield: 'haddonfield',
+      haddonfield247: 'haddonfield-247', halloween247: 'haddonfield-247', halloweenmarathon: 'haddonfield-247',
+      tcm247: 'texas-chainsaw-247', texaschainsaw247: 'texas-chainsaw-247', texaschainsawmassacre247: 'texas-chainsaw-247',
       graveyardshift: 'graveyard-shift', localnowhorrorstream: 'graveyard-shift', elmstreet: 'elm-street',
       texaschainsaw: 'texas-chainsaw', texaschainsawmassacre: 'texas-chainsaw',
       midnightpulp: 'midnight-pulp', midnightpulpus: 'midnight-pulp',
@@ -1808,7 +1835,9 @@ input:focus-visible {
         const { attrs, name } = pending;
         pending = null;
         const normalize = value => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-        const key = attrs['horrorstack-channel'] || aliases[normalize(attrs['tvg-id'])] || aliases[normalize(name)] || matchProviderChannel(name, attrs['group-title']) || aliases[normalize(attrs['group-title'])];
+        const inferred = matchProviderChannel(name, attrs['group-title']);
+        const marathonKey = (inferred === 'haddonfield-247' || inferred === 'texas-chainsaw-247') ? inferred : '';
+        const key = attrs['horrorstack-channel'] || marathonKey || aliases[normalize(attrs['tvg-id'])] || aliases[normalize(name)] || inferred || aliases[normalize(attrs['group-title'])];
         const url = safeStreamUrl(line);
         if (!Object.hasOwn(channelData, key || '') || !url || !name) { ignored++; continue; }
         const kind = attrs['horrorstack-kind'] === 'movie' || /\/movie\//i.test(new URL(url).pathname) || /\.(mp4|mkv|webm|mov|m4v|avi)(?:[?#]|$)/i.test(url) ? 'movie' : 'live';
@@ -1833,7 +1862,17 @@ input:focus-visible {
     } catch { return Object.create(null); }
   }
 
-  function currentQueue() { return loadImportedQueues()[currentChannelKey] || []; }
+  const MARATHON_SOURCE = Object.freeze({ 'haddonfield-247': 'haddonfield', 'texas-chainsaw-247': 'texas-chainsaw' });
+  function queueForChannel(key) {
+    const saved = loadImportedQueues();
+    if (saved[key]?.length) return saved[key];
+    const original = MARATHON_SOURCE[key];
+    if (!original || loadStreams()[key]) return [];
+    // No stream was supplied for 24/7. Reuse playable franchise movies without
+    // modifying the original on-demand collection or copying its private URLs.
+    return (saved[original] || []).filter(item => item.kind === 'movie');
+  }
+  function currentQueue() { return queueForChannel(currentChannelKey); }
 
   function updateImportStatus(message) {
     const data = loadImportedQueues();
@@ -1841,9 +1880,13 @@ input:focus-visible {
     document.getElementById('playlistImportStatus').textContent = message || (n ? `${n} channel playlists saved on this device. Account links stay on this device.` : 'Import your provider’s M3U file to connect channels on this device.');
     document.getElementById('removeImportedPlaylists').hidden = !n;
     document.querySelectorAll('[data-open-channel]').forEach(link => {
-      const items = data[link.dataset.openChannel] || [];
+      const key = link.dataset.openChannel;
+      const items = queueForChannel(key);
       const label = link.querySelector('span');
-      if (label) label.textContent = items.length && items.every(x => x.kind === 'movie') ? `Choose movie (${items.length})` : 'Watch Channel';
+      if (label) {
+        if (Object.hasOwn(MARATHON_SOURCE, key)) label.textContent = (items.length || loadStreams()[key]) ? 'Watch 24/7' : 'Connect 24/7';
+        else label.textContent = items.length && items.every(x => x.kind === 'movie') ? `Choose movie (${items.length})` : 'Watch Channel';
+      }
     });
   }
 
@@ -1873,7 +1916,10 @@ input:focus-visible {
     const movies = items.length > 0 && items.every(item => item.kind === 'movie');
     document.getElementById('loopLabel').hidden = !movies;
     if (movies) document.getElementById('loopMovies').checked = true;
-    document.getElementById('queueDescription').textContent = movies ? '24/7 marathon mode: movies play in order and restart automatically after the last title.' : 'Live feed. The provider controls the movie schedule.';
+    document.getElementById('queueDescription').textContent = movies
+      ? '24/7 marathon: your playable movies advance automatically and restart when Loop is enabled.'
+      : items.length ? 'Live feed. The provider controls the movie schedule.'
+      : 'No movie queue loaded. Import an authorized 24/7 feed or playable franchise films.';
     updateOfficialWatch();
   }
 
@@ -2028,7 +2074,8 @@ input:focus-visible {
     const items = currentQueue();
     if (!items.length || !items.every(item => item.kind === 'movie')) return;
     if (queueIndex + 1 < items.length) queueIndex++;
-    else queueIndex = 0;
+    else if (document.getElementById('loopMovies').checked) queueIndex = 0;
+    else { showMessage('Marathon ended. Enable 24/7 marathon loop to restart.'); return; }
     document.getElementById('queueSelection').value = String(queueIndex);
     streamUrl.value = items[queueIndex].url;
     playStream(items[queueIndex].url);
