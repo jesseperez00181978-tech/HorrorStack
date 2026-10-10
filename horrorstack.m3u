@@ -1,5 +1,5 @@
 #EXTM3U
-
+#PLAYLIST:HorrorStack - Televizo Restored
 #EXTINF:-1 tvg-id="HauntedHouse" tvg-logo="" group-title="HorrorStack TV",Haunted House
 https://bamca-haunttv-lg.amagi.tv/playlist.m3u8
 
@@ -9,23 +9,8 @@ https://naviofrequency-horrormachine-klowdtv.amagi.tv/playlist.m3u8
 #EXTINF:-1 tvg-id="MidnightPulp.us" group-title="HorrorStack TV",Midnight Pulp
 https://d18l78mi5ujmqr.cloudfront.net/playlist.m3u8
 
-
-
-
-
-
-
-
-
-
-
-
-
 #EXTINF:-1 group-title="Horror",LocalNow Horror Stream
 https://linear-82.frequency.stream/dist/localnow/82/hls/master/playlist.m3u8
-
-
-
 
 #EXTINF:-1 group-title="HorrorStack Test",Horror by ALTER
 https://live-manifest.production-public.tubi.io/live/c12f35bf-6465-4e44-b5f7-04ec645689c7/playlist.m3u8
@@ -37,6 +22,191 @@ https://bloodydisgusting-ingest-roku-us.cinedigm.com/playlist.m3u8
 #EXTVLCOPT:http-user-agent=YuppTV/7.18.1 (Linux;Android 16) ExoPlayerLib/2.19.1
 https://streams2.sofast.tv/ptnr-yupptv/title-HORROR-TV-ENG_yupptv/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/93dc292b-cbcf-4988-ab97-94feced4c14b/master.m3u8
 
+#EXTINF:-1 group-title="HorrorStack 24/7",Haddonfield - Halloween 24/7
+http://line.tellyshow.cc/live/1fe83793ef/2018d1e3b275/1655508.ts
 
+#EXTINF:-1 group-title="HorrorStack 24/7",Texas Chainsaw Massacre - 24/7
+http://line.tellyshow.cc/live/1fe83793ef/2018d1e3b275/558779.ts
 
+#EXTINF:-1 group-title="English Horror",EN - HORROR CHANNEL
+http://line.tellyshow.cc/live/1fe83793ef/2018d1e3b275/1187710.ts
 
+#EXTINF:-1 horrorstack-channel="phantasm" horrorstack-kind="movie" group-title="Phantasm",Phantasm (1979) [English audio available]
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/964898.mkv
+
+#EXTINF:-1 horrorstack-channel="phantasm" horrorstack-kind="movie" group-title="Phantasm",Phantasm II (1988) [English audio available]
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1066228.mkv
+
+#EXTINF:-1 horrorstack-channel="phantasm" horrorstack-kind="movie" group-title="Phantasm",Phantasm III: Lord of the Dead (1994) [English audio available]
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1066229.mkv
+
+#EXTINF:-1 horrorstack-channel="phantasm" horrorstack-kind="movie" group-title="Phantasm",Phantasm IV: Oblivion (1998) [English audio available]
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1066230.mkv
+
+#EXTINF:-1 horrorstack-channel="phantasm" horrorstack-kind="movie" group-title="Phantasm",Phantasm: Ravager (2016)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/39746.mkv
+
+#EXTINF:-1 horrorstack-channel="creeper-road" horrorstack-kind="movie" group-title="Creeper Road",Jeepers Creepers (2001)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1177886.mp4
+
+#EXTINF:-1 horrorstack-channel="creeper-road" horrorstack-kind="movie" group-title="Creeper Road",Jeepers Creepers 2 (2003)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1177887.mp4
+
+#EXTINF:-1 horrorstack-channel="creeper-road" horrorstack-kind="movie" group-title="Creeper Road",Jeepers Creepers 3 (2017)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1177888.mp4
+
+#EXTINF:-1 horrorstack-channel="creeper-road" horrorstack-kind="movie" group-title="Creeper Road",Jeepers Creepers: Reborn (2022)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1028934.mp4
+
+#EXTINF:-1 horrorstack-channel="scarecrow-field" horrorstack-kind="movie" group-title="Gatlin Road",Pumpkinhead (1988)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/2151241.mkv
+
+#EXTINF:-1 horrorstack-channel="scarecrow-field" horrorstack-kind="movie" group-title="Gatlin Road",Pumpkinhead II: Blood Wings (1995)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/2018141.mkv
+
+#EXTINF:-1 horrorstack-channel="scarecrow-field" horrorstack-kind="movie" group-title="Gatlin Road",Curse of the Scarecrow (2018)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/155012.mkv
+
+#EXTINF:-1 horrorstack-channel="scarecrow-field" horrorstack-kind="movie" group-title="Gatlin Road",Scarecrow Rising, Bride Of Scarecrow (2018)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/138036.mkv
+
+#EXTINF:-1 horrorstack-channel="scarecrow-field" horrorstack-kind="movie" group-title="Gatlin Road",Children Of The Corn (2020)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1144313.mp4
+
+#EXTINF:-1 horrorstack-channel="haunted-house" horrorstack-kind="movie" group-title="Haunted House",Night Of The Demons 2 (1994)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/2155985.mkv
+
+#EXTINF:-1 horrorstack-channel="haunted-house" horrorstack-kind="movie" group-title="Haunted House",Insidious (2011)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/2140556.mkv
+
+#EXTINF:-1 horrorstack-channel="haunted-house" horrorstack-kind="movie" group-title="Haunted House",Insidious 1 (2011)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1139639.mp4
+
+#EXTINF:-1 horrorstack-channel="haunted-house" horrorstack-kind="movie" group-title="Haunted House",Insidious 2 (2013)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1139640.mp4
+
+#EXTINF:-1 horrorstack-channel="haunted-house" horrorstack-kind="movie" group-title="Haunted House",The Conjuring 1 (2013)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1285721.mp4
+
+#EXTINF:-1 horrorstack-channel="haunted-house" horrorstack-kind="movie" group-title="Haunted House",Insidious 3 (2015)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1139641.mp4
+
+#EXTINF:-1 horrorstack-channel="haunted-house" horrorstack-kind="movie" group-title="Haunted House",The Conjuring 2 (2016)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1285722.mp4
+
+#EXTINF:-1 horrorstack-channel="haunted-house" horrorstack-kind="movie" group-title="Haunted House",Insidious 4 The Last Key (2018)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1139642.mp4
+
+#EXTINF:-1 horrorstack-channel="haunted-house" horrorstack-kind="movie" group-title="Haunted House",The Conjuring 3 The Devil Made Me Do It (2021)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1285724.mp4
+
+#EXTINF:-1 horrorstack-channel="haunted-house" horrorstack-kind="movie" group-title="Haunted House",Insidious: The Red Door (2023)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1308552.mp4
+
+#EXTINF:-1 horrorstack-channel="haunted-house" horrorstack-kind="movie" group-title="Haunted House",The Conjuring Last Rites (2025)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1939904.mkv
+
+#EXTINF:-1 horrorstack-channel="haunted-house" horrorstack-kind="movie" group-title="Haunted House",Insidious Out Of The Further (2026) (MULTI SUB)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/2163684.mkv
+
+#EXTINF:-1 horrorstack-channel="midnight-hospital" horrorstack-kind="movie" group-title="Midnight Hospital",Stonehearst Asylum (2014)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/2060697.mkv
+
+#EXTINF:-1 horrorstack-channel="midnight-hospital" horrorstack-kind="movie" group-title="Midnight Hospital",The Hospital 2 (2015)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/287704.mp4
+
+#EXTINF:-1 horrorstack-channel="midnight-hospital" horrorstack-kind="movie" group-title="Midnight Hospital",Asylum of Fear (2018)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/136702.mkv
+
+#EXTINF:-1 horrorstack-channel="possession-room" horrorstack-kind="movie" group-title="Possession Room",The Exorcist (1973)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/853831.mp4
+
+#EXTINF:-1 horrorstack-channel="possession-room" horrorstack-kind="movie" group-title="Possession Room",Hellbound: Hellraiser II (1988)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/2155983.mp4
+
+#EXTINF:-1 horrorstack-channel="possession-room" horrorstack-kind="movie" group-title="Possession Room",The Exorcist III (1990)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/238875.mp4
+
+#EXTINF:-1 horrorstack-channel="possession-room" horrorstack-kind="movie" group-title="Possession Room",Hellraiser III: Hell On Earth (1992)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/2155984.mp4
+
+#EXTINF:-1 horrorstack-channel="possession-room" horrorstack-kind="movie" group-title="Possession Room",Hellraiser (2022)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1028933.mp4
+
+#EXTINF:-1 horrorstack-channel="possession-room" horrorstack-kind="movie" group-title="Possession Room",The Exorcist: Believer (2023)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1354239.mp4
+
+#EXTINF:-1 horrorstack-channel="possession-room" horrorstack-kind="movie" group-title="Possession Room",The Pope's Exorcist (2023)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1188855.mp4
+
+#EXTINF:-1 horrorstack-channel="haddonfield" horrorstack-kind="movie" group-title="Haddonfield",Halloween (1978)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/2140554.mp4
+
+#EXTINF:-1 horrorstack-channel="haddonfield" horrorstack-kind="movie" group-title="Haddonfield",Halloween (2018)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/2140555.mp4
+
+#EXTINF:-1 horrorstack-channel="haddonfield" horrorstack-kind="movie" group-title="Haddonfield",Halloween Kills  (2021)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/753506.mp4
+
+#EXTINF:-1 horrorstack-channel="haddonfield" horrorstack-kind="movie" group-title="Haddonfield",Halloween Ends (2022)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1035495.mp4
+
+#EXTINF:-1 horrorstack-channel="elm-street" horrorstack-kind="movie" group-title="Elm Street",A Nightmare On Elm Street (1984) JOHNNY DEPP
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/978552.mp4
+
+#EXTINF:-1 horrorstack-channel="elm-street" horrorstack-kind="movie" group-title="Elm Street",A Nightmare on Elm Street 3: Dream Warriors (1987)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/2017874.mp4
+
+#EXTINF:-1 horrorstack-channel="elm-street" horrorstack-kind="movie" group-title="Elm Street",A Nightmare On Elm Street: The Dream Child (1989)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1199884.mp4
+
+#EXTINF:-1 horrorstack-channel="texas-chainsaw" horrorstack-kind="movie" group-title="Texas Chainsaw Massacre",The Texas Chain Saw Massacre (1974)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/735771.mkv
+
+#EXTINF:-1 horrorstack-channel="texas-chainsaw" horrorstack-kind="movie" group-title="Texas Chainsaw Massacre",Leatherface: The Texas Chainsaw Massacre III (1990)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/2140560.mkv
+
+#EXTINF:-1 horrorstack-channel="texas-chainsaw" horrorstack-kind="movie" group-title="Texas Chainsaw Massacre",The Return Of The Texas Chainsaw Massacre (1994) MATTHEW MCCONAUGHEY
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/2013885.mp4
+
+#EXTINF:-1 horrorstack-channel="texas-chainsaw" horrorstack-kind="movie" group-title="Texas Chainsaw Massacre",Texas Chainsaw Massacre  (2022)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/861218.mp4
+
+#EXTINF:-1 horrorstack-channel="graveyard-shift" horrorstack-kind="movie" group-title="Graveyard Shift",Child's Play 1 (1988) Chucky
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1696450.mp4
+
+#EXTINF:-1 horrorstack-channel="graveyard-shift" horrorstack-kind="movie" group-title="Graveyard Shift",Child's Play 2 (1990) Chucky
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1696451.mp4
+
+#EXTINF:-1 horrorstack-channel="graveyard-shift" horrorstack-kind="movie" group-title="Graveyard Shift",Child's Play 3 (1991) Chucky
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1696452.mp4
+
+#EXTINF:-1 horrorstack-channel="graveyard-shift" horrorstack-kind="movie" group-title="Graveyard Shift",Final Destination 1 (2000)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1468832.mp4
+
+#EXTINF:-1 horrorstack-channel="graveyard-shift" horrorstack-kind="movie" group-title="Graveyard Shift",Final Destination 2 (2003)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1468833.mp4
+
+#EXTINF:-1 horrorstack-channel="graveyard-shift" horrorstack-kind="movie" group-title="Graveyard Shift",Final Destination 3 (2006)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1468834.mp4
+
+#EXTINF:-1 horrorstack-channel="graveyard-shift" horrorstack-kind="movie" group-title="Graveyard Shift",Final Destination 4 (2009)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1468835.mp4
+
+#EXTINF:-1 horrorstack-channel="graveyard-shift" horrorstack-kind="movie" group-title="Graveyard Shift",Final Destination 5 (2011)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1468836.mp4
+
+#EXTINF:-1 horrorstack-channel="graveyard-shift" horrorstack-kind="movie" group-title="Graveyard Shift",Child's Play (2019) Chucky
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1696457.mp4
+
+#EXTINF:-1 horrorstack-channel="graveyard-shift" horrorstack-kind="movie" group-title="Graveyard Shift",Final Destination 6 Bloodlines (2025)
+http://line.tellyshow.cc/movie/1fe83793ef/2018d1e3b275/1868303.mkv
+
+#EXTINF:-1 horrorstack-channel="english-horror-247" horrorstack-kind="live" group-title="English 24/7 Horror",US| 24/7 HORROR MOVIES
+http://line.tellyshow.cc/live/1fe83793ef/2018d1e3b275/558791.ts
+
+#EXTINF:-1 horrorstack-channel="uk-horror" horrorstack-kind="live" group-title="UK Horror",UK| HORROR CHANNEL
+http://line.tellyshow.cc/live/1fe83793ef/2018d1e3b275/45272.ts
+
+#EXTINF:-1 horrorstack-channel="uk-horror" horrorstack-kind="live" group-title="UK Horror",UK| HORROR XTRA
+http://line.tellyshow.cc/live/1fe83793ef/2018d1e3b275/1014221.ts
