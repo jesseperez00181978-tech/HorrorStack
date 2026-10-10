@@ -1626,19 +1626,6 @@ input:focus-visible {
     }
 
     const queueItem = currentQueue()[queueIndex] || null;
-    const officialUrl = queueItem ? OFFICIAL_WATCH_LINKS[queueItem.name] : "";
-    let sourceHost = "";
-    try { sourceHost = new URL(cleanUrl).hostname.toLowerCase(); } catch {}
-
-    // The old direct movie backend can expire independently of HorrorStack.
-    // Never let those dead movie URLs take the whole movie channel down.
-    if (queueItem?.kind === "movie" && sourceHost === "line.dndnscloud.ru" && officialUrl) {
-      officialWatch.hidden = false;
-      officialWatch.href = officialUrl;
-      showMessage("<strong>Direct movie source expired.</strong> Use Official watch option for this title.");
-      return;
-    }
-
     if (window.AndroidPlayer && typeof window.AndroidPlayer.play === "function") {
       try {
         window.AndroidPlayer.play(cleanUrl, playerTitle.textContent || "HorrorStack");
@@ -1650,7 +1637,7 @@ input:focus-visible {
     }
 
     if (location.protocol === "https:" && cleanUrl.startsWith("http:")) {
-      showMessage("<strong>Blocked mixed-content stream.</strong> This feed uses HTTP while HorrorStack is running over HTTPS. Use the external-player fallback for this feed until HorrorStack has a native Android player.", true);
+      showMessage("<strong>Blocked mixed-content stream.</strong> This feed uses HTTP while HorrorStack is running over HTTPS. Open the installed HorrorStack Android app to play this feed inside HorrorStack. This Chrome page cannot play HTTP streams over HTTPS.", true);
       return;
     }
 
@@ -2038,8 +2025,13 @@ input:focus-visible {
   function queueForChannel(key) {
     // A manually selected source takes priority. Keep imported queues in local
     // storage as backups instead of silently deleting them on Save & Play.
-    if (loadStreams()[key]) return [];
+    const manual = loadStreams()[key];
     const saved = loadImportedQueues();
+    const isLegacy = url => { try { return new URL(url).hostname === 'line.dndnscloud.ru'; } catch { return false; } };
+    // Migrate an old override only when a replacement actually exists.
+    const replacement = (saved[key] || []).filter(item => !isLegacy(item.url));
+    if (manual && !(isLegacy(manual) && replacement.length)) return [];
+    if (manual && isLegacy(manual) && replacement.length) return replacement;
     if (saved[key]?.length) return saved[key];
     const original = MARATHON_SOURCE[key];
     if (!original) return [];
@@ -2134,12 +2126,19 @@ input:focus-visible {
       if (!result.count) throw new Error('No matching horror channels or movies found. Your existing feeds have not changed.');
       const newFirst = document.getElementById('replaceImportedPlaylist').checked;
       const previousQueues = localStorage.getItem(PLAYLIST_KEY);
+      const previousStreams = localStorage.getItem(STORAGE_KEY);
+      const streams = loadStreams();
       const existing = loadImportedQueues();
       const combined = Object.assign(Object.create(null), existing);
       // Never replace the entire local collection for a partial provider playlist.
-      // The official public M3U and manually saved URLs are separate and untouched.
+      // Keep manual sources as backups when the user selects new feeds first.
       for (const [key, incoming] of Object.entries(result.groups)) {
-        const oldItems = existing[key] || [];
+        const oldItems = [...(existing[key] || [])];
+        if (newFirst && streams[key]) {
+          oldItems.push({ name: channelData[key].title + ' (saved backup)', url: streams[key],
+            kind: /\/movie\/|\.(mp4|mkv|webm|mov|m4v)(?:[?#]|$)/i.test(streams[key]) ? 'movie' : 'live' });
+          delete streams[key];
+        }
         const ordered = newFirst ? [...incoming, ...oldItems] : [...oldItems, ...incoming];
         const seen = new Set();
         combined[key] = ordered.filter(item => {
@@ -2150,9 +2149,12 @@ input:focus-visible {
       }
       try {
         localStorage.setItem(PLAYLIST_KEY, JSON.stringify(combined));
+        if (newFirst) saveStreams(streams);
       } catch (error) {
         if (previousQueues === null) localStorage.removeItem(PLAYLIST_KEY);
         else localStorage.setItem(PLAYLIST_KEY, previousQueues);
+        if (previousStreams === null) localStorage.removeItem(STORAGE_KEY);
+        else localStorage.setItem(STORAGE_KEY, previousStreams);
         throw new Error('Could not save this playlist. Free some device storage and try again.');
       }
       const retained = Object.keys(existing).filter(key => !Object.hasOwn(result.groups, key)).length;

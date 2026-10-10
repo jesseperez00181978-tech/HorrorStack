@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#07040a">
-<title>HorrorStack TV v0.4.2</title>
+<title>HorrorStack TV • Movies</title>
 
 <style>
 :root {
@@ -830,6 +830,59 @@ input:focus-visible {
   }
 }
 
+
+.movie-library { padding:24px 0 44px; border-top:1px solid rgba(230,170,180,.18); }
+.movie-library-controls { display:flex; gap:12px; flex-wrap:wrap; margin:18px 0; }
+.movie-library-controls label { display:flex; flex-direction:column; gap:6px; flex:1 1 170px; font:600 1rem/1.4 sans-serif; }
+.movie-library-controls input, .movie-library-controls select { width:100%; min-height:48px; padding:12px; border-radius:10px; color:#fff; background:#171017; border:1px solid #666; font:1rem sans-serif; }
+.movie-library-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr)); gap:14px; }
+.movie-library-card { padding:18px; border:1px solid #674153; border-radius:14px; background:linear-gradient(145deg,#231420,#0c090e); overflow-wrap:anywhere; }
+.movie-library-card h3 { margin:0 0 10px; color:#fff; font:700 1.08rem/1.4 sans-serif; }
+.movie-library-card p { margin:0 0 14px; font:.9rem/1.4 sans-serif; color:#cabac9; }
+.movie-library-card button { width:100%; min-height:44px; background:#8f001b; color:white; border:1px solid #c14453; border-radius:9px; font:700 1rem sans-serif; cursor:pointer; }
+#movieLibraryStatus { font:1rem/1.5 sans-serif; color:#d0c6d1; margin:12px 0 22px; }
+
+/* Separate movie and channel views keep even large IPTV catalogs short. */
+.movie-library[hidden], .featured-section[hidden], .legal-horror-section[hidden],
+.coming-soon[hidden], #movieLibraryMore[hidden] { display:none !important; }
+.view-toggle.is-active { background:#8b001b; border:1px solid #cd4861; color:white; }
+.playlist-options { margin:0 0 12px; }
+.playlist-options summary { cursor:pointer; padding:10px 12px; background:#1b111d; border:1px solid #543549; border-radius:10px; font:700 .9rem Arial,sans-serif; }
+.playlist-options label, .playlist-options p { margin-top:12px; display:block; }
+.movie-library-grid { grid-template-columns:1fr; gap:8px; }
+.movie-library-card { display:flex; gap:10px; align-items:center; padding:12px; border-radius:12px; }
+.movie-library-card .movie-info { flex:1 1 0; min-width:0; }
+.movie-library-card h3 { margin:0 0 4px; font-size:1rem; line-height:1.3; }
+.movie-library-card p { margin:0; font-size:.76rem; }
+.movie-library-card button { width:auto; flex:0 0 auto; min-width:70px; padding:0 12px; font-size:.85rem; }
+.movie-more { display:block; width:100%; margin:16px auto 4px; padding:13px; border-radius:12px; color:#fff; background:#4c1725; border:1px solid #a74b62; font:700 .92rem Arial,sans-serif; cursor:pointer; }
+@media(max-width:760px) {
+  .site-header { padding:16px 14px 10px; gap:10px; }
+  .main-logo { font-size:2rem; }
+  .brand-area .eyebrow { display:none; }
+  .site-description { font-size:.82rem; }
+  .header-controls { gap:6px; }
+  .header-controls .control-btn { padding:9px 10px; font-size:.8rem; }
+  .channel-grid { gap:10px; }
+  .channel-card { min-height:190px; border-radius:15px; }
+  .channel-card .channel-content { left:14px; right:14px; bottom:13px; }
+  .channel-card .channel-icon { font-size:2rem; top:9px; right:13px; opacity:.8; }
+  .channel-card .channel-status { font-size:.68rem; margin-bottom:3px; }
+  .channel-card h3 { font-size:1.33rem; margin-bottom:5px; }
+  .channel-card p:not(.channel-status) {
+    font-size:.81rem; line-height:1.34; margin-bottom:9px;
+    display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:2; overflow:hidden;
+  }
+  .channel-card .watch-btn { min-width:0; padding:9px 12px; gap:12px; font-size:.81rem; border-radius:9px; }
+  .featured-section { padding-top:8px; }
+  .section-heading { margin-bottom:12px; }
+  .section-heading h2 { font-size:1.5rem; }
+  .movie-library { padding:14px 0 32px; }
+  .movie-library .section-heading p:not(.section-kicker) { font-size:.85rem; }
+  .movie-library-controls { margin:10px 0; gap:8px; }
+  .movie-library-controls label { font-size:.82rem; }
+  .movie-library-controls input, .movie-library-controls select { min-height:42px; }
+}
 .private-playlist-bar { display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:0 0 24px; }
 .private-playlist-bar p { font-size:1rem; line-height:1.5; flex:1 1 220px; }
 .private-playlist-panel { margin:16px 24px; }
@@ -878,11 +931,13 @@ input:focus-visible {
   <header class="site-header">
     <div class="brand-area">
       <p class="eyebrow">Broadcasting from somewhere in the dark</p>
-      <h1 class="main-logo">🎃 HorrorStack TV</h1><p>Player repair · 1.0.3</p>
+      <h1 class="main-logo">🎃 HorrorStack TV</h1><p>October 2026 • 24/7 channel update</p>
       <p class="site-description">24/7 horror channels built for sleepless nights.</p>
     </div>
 
     <div class="header-controls">
+      <button class="control-btn view-toggle is-active" type="button" data-view="channels" aria-pressed="true">📺 Channels</button>
+      <button class="control-btn view-toggle" type="button" data-view="movies" aria-pressed="false">🎬 Movies</button>
       <button class="control-btn" id="importPlaylist" type="button">Import playlist</button>
       <input id="playlistFile" type="file" accept=".m3u,.m3u8,text/plain,audio/x-mpegurl,application/vnd.apple.mpegurl" hidden>
       <button class="control-btn" id="soundToggle" type="button" aria-pressed="false">🔇 Sound Off</button>
@@ -895,10 +950,11 @@ input:focus-visible {
       <p id="playlistImportStatus" role="status">Import your provider’s M3U file to connect channels on this device.</p>
       <button class="control-btn" id="removeImportedPlaylists" type="button" hidden>Remove imported playlists</button>
     </div>
-    <div class="private-playlist-bar">
+    <details class="private-playlist-bar playlist-options">
+      <summary>⚙️ Playlist options</summary>
       <label><input id="replaceImportedPlaylist" type="checkbox" checked> Play newly imported feeds first (keep saved backups)</label>
       <p>Only matching movie groups are imported. Previously saved streams and public entries are preserved.</p>
-    </div>
+    </details>
     <details class="private-playlist-bar" id="pastePlaylistPanel">
       <summary>Import M3U text or URL</summary>
       <label for="remotePlaylistUrl">Private M3U playlist URL (kept on this device, not sent to GitHub)</label>
@@ -908,7 +964,27 @@ input:focus-visible {
       <textarea id="playlistText" rows="6" style="width:100%;max-width:100%;color:#fff;background:#171017" placeholder="Paste your #EXTM3U playlist here"></textarea>
       <button class="control-btn" id="importPlaylistText" type="button">Import pasted playlist</button>
     </details>
-    <section class="featured-section">
+
+    <section class="movie-library" id="movieLibrary" aria-label="Your movies on demand" hidden>
+      <div class="section-heading"><div>
+        <p class="section-kicker">Your private collection</p>
+        <h2>🎬 Movies On Demand</h2>
+        <p>Browse playable films in your imported M3U playlist. Stream links stay on this device.</p>
+      </div></div>
+      <div class="movie-library-controls">
+        <label for="movieLibrarySearch">Search movies
+          <input id="movieLibrarySearch" type="search" placeholder="Phantasm, Halloween, Saw..." autocomplete="off">
+        </label>
+        <label for="movieLibraryGroup">Movie collection
+          <select id="movieLibraryGroup"><option value="">All collections</option></select>
+        </label>
+      </div>
+      <p id="movieLibraryStatus" role="status">Import your private playlist to browse movies here.</p>
+      <div id="movieLibraryGrid" class="movie-library-grid"></div>
+      <button id="movieLibraryMore" class="movie-more" type="button" hidden>Show more movies ↓</button>
+    </section>
+
+    <section class="featured-section" id="channelSection">
       <div class="section-heading">
         <div>
           <p class="section-kicker">Live nightmares</p>
@@ -1054,7 +1130,7 @@ input:focus-visible {
       </div>
     </section>
 
-    <section class="legal-horror-section">
+    <section class="legal-horror-section" id="legalHorrorSection">
       <div class="section-heading">
         <div>
           <p class="section-kicker">Verified destinations</p>
@@ -1130,7 +1206,7 @@ input:focus-visible {
     <section class="coming-soon">
       <p class="section-kicker">The signal is growing</p>
       <h2>More nightmares are coming.</h2>
-      <p>HorrorStack v0.4.2 includes the channel player, saved legal stream URLs, native MP4 and HLS playback, atmospheric effects, and a curated section for verified legal horror services.</p>
+      <p>HorrorStack includes a private on-demand movie library, custom channels, the channel player, and links to official horror services.</p>
     </section>
   </main>
 
@@ -1299,6 +1375,7 @@ input:focus-visible {
     "texas-chainsaw": { title: "Texas Chainsaw Massacre", info: "The Texas Chain Saw Massacre films." },
     "haddonfield-247": { title: "Haddonfield 24/7", info: "Your authorized Halloween 24/7 broadcast, or a nonstop loop of your saved playable Halloween movies." },
     "texas-chainsaw-247": { title: "TCM 24/7", info: "Your authorized Texas Chainsaw 24/7 broadcast, or a nonstop loop of your saved playable TCM movies." },
+    "horror-movies": { title: "Horror Movies", info: "Your private movies on demand, separate from live TV." },
     "midnight-pulp": { title: "Midnight Pulp", info: "Midnight Pulp live broadcast." },
     "english-horror-247": { title: "English 24/7 Horror Movies", info: "Continuous horror movies. The provider controls the schedule." },
     "uk-horror": { title: "UK Horror Channel", info: "UK Horror Channel live broadcast. The provider controls the schedule." }
@@ -1541,24 +1618,14 @@ input:focus-visible {
     updatePlayerLinks(cleanUrl);
 
     if (!cleanUrl) {
-      showMessage("<strong>No signal assigned.</strong> Add a legal MP4 or HLS URL below.");
+      if (currentChannelKey === 'haddonfield-247' || currentChannelKey === 'texas-chainsaw-247') {
+        const title = channelData[currentChannelKey].title;
+        showMessage('<strong>' + title + ' needs a playable source on this device.</strong> Import your authorized provider M3U or saved playable franchise movies. This update restores the channel but does not include a licensed 24/7 movie feed.');
+      } else showMessage("<strong>No signal assigned.</strong> Import your private M3U or add a playable stream URL below.");
       return;
     }
 
     const queueItem = currentQueue()[queueIndex] || null;
-    const officialUrl = queueItem ? OFFICIAL_WATCH_LINKS[queueItem.name] : "";
-    let sourceHost = "";
-    try { sourceHost = new URL(cleanUrl).hostname.toLowerCase(); } catch {}
-
-    // The old direct movie backend can expire independently of HorrorStack.
-    // Never let those dead movie URLs take the whole movie channel down.
-    if (queueItem?.kind === "movie" && sourceHost === "line.dndnscloud.ru" && officialUrl) {
-      officialWatch.hidden = false;
-      officialWatch.href = officialUrl;
-      showMessage("<strong>Direct movie source expired.</strong> Use Official watch option for this title.");
-      return;
-    }
-
     if (window.AndroidPlayer && typeof window.AndroidPlayer.play === "function") {
       try {
         window.AndroidPlayer.play(cleanUrl, playerTitle.textContent || "HorrorStack");
@@ -1570,7 +1637,7 @@ input:focus-visible {
     }
 
     if (location.protocol === "https:" && cleanUrl.startsWith("http:")) {
-      showMessage("<strong>Blocked mixed-content stream.</strong> This feed uses HTTP while HorrorStack is running over HTTPS. Use the external-player fallback for this feed until HorrorStack has a native Android player.", true);
+      showMessage("<strong>Blocked mixed-content stream.</strong> This feed uses HTTP while HorrorStack is running over HTTPS. Open the installed HorrorStack Android app to play this feed inside HorrorStack. This Chrome page cannot play HTTP streams over HTTPS.", true);
       return;
     }
 
@@ -1669,7 +1736,7 @@ input:focus-visible {
     playNative();
   }
 
-  function openChannel(channelKey) {
+  function openChannel(channelKey, selectedMovieIndex = 0) {
     const channel = channelData[channelKey];
     if (!channel) return;
 
@@ -1682,9 +1749,10 @@ input:focus-visible {
         : channel.info;
 
       const streams = loadStreams();
-      queueIndex = 0;
       const queue = currentQueue();
-      const savedUrl = queue[0]?.url || streams[channelKey] || "";
+      queueIndex = Number.isInteger(selectedMovieIndex) && selectedMovieIndex >= 0 && selectedMovieIndex < queue.length
+        ? selectedMovieIndex : 0;
+      const savedUrl = queue[queueIndex]?.url || streams[channelKey] || "";
       renderQueue();
       streamUrl.value = savedUrl;
 
@@ -1725,8 +1793,9 @@ input:focus-visible {
     else delete streams[currentChannelKey];
 
     saveStreams(streams);
-    removeCurrentImportedQueue();
+    queueIndex = 0;
     renderQueue();
+    updateImportStatus();
     playStream(value);
   }
 
@@ -1816,7 +1885,8 @@ input:focus-visible {
       midnightpulp: 'midnight-pulp', midnightpulpus: 'midnight-pulp',
       englishhorror247: 'english-horror-247', english247horrormovies: 'english-horror-247',
       eng247horrormovies: 'english-horror-247', usa247horror: 'english-horror-247',
-      ukhorrorchannel: 'uk-horror', ukhorror: 'uk-horror', uk247horror: 'uk-horror'
+      ukhorrorchannel: 'uk-horror', ukhorror: 'uk-horror', uk247horror: 'uk-horror',
+      horrormovies: 'horror-movies', horrorvod: 'horror-movies'
     };
     for (const raw of String(text).split(/\r?\n/)) {
       const line = raw.trim();
@@ -1837,10 +1907,17 @@ input:focus-visible {
         const normalize = value => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
         const inferred = matchProviderChannel(name, attrs['group-title']);
         const marathonKey = (inferred === 'haddonfield-247' || inferred === 'texas-chainsaw-247') ? inferred : '';
-        const key = attrs['horrorstack-channel'] || marathonKey || aliases[normalize(attrs['tvg-id'])] || aliases[normalize(name)] || inferred || aliases[normalize(attrs['group-title'])];
         const url = safeStreamUrl(line);
-        if (!Object.hasOwn(channelData, key || '') || !url || !name) { ignored++; continue; }
-        const kind = attrs['horrorstack-kind'] === 'movie' || /\/movie\//i.test(new URL(url).pathname) || /\.(mp4|mkv|webm|mov|m4v|avi)(?:[?#]|$)/i.test(url) ? 'movie' : 'live';
+        if (!url || !name) { ignored++; continue; }
+        const moviePath = new URL(url).pathname;
+        const kind = attrs['horrorstack-kind'] === 'movie' || /\/movie\//i.test(moviePath) ||
+          /\.(mp4|mkv|webm|mov|m4v|avi)(?:[?#]|$)/i.test(url) ? 'movie' : 'live';
+        const horrorMovieTitle = /\b(?:scream|friday the 13th|jason voorhees|saw(?: [1-9ivx]|$)|child'?s play|chucky|final destination|pumpkinhead|hellraiser|the exorcist|terrifier|candyman|sinister|insidious|the conjuring|hatchet|midsommar|as above so below|haunt|the hills have eyes)\b/i.test(name);
+        const horrorMovieGroup = /\b(?:horror|slasher|supernatural|scary|haunted|horror movies?|horror vod)\b/i.test(attrs['group-title'] || '');
+        const key = attrs['horrorstack-channel'] || marathonKey || aliases[normalize(attrs['tvg-id'])] ||
+          aliases[normalize(name)] || inferred || aliases[normalize(attrs['group-title'])] ||
+          (kind === 'movie' && (horrorMovieTitle || horrorMovieGroup) ? 'horror-movies' : '');
+        if (!Object.hasOwn(channelData, key || '') || (key === 'horror-movies' && kind !== 'movie')) { ignored++; continue; }
         groups[key] ||= [];
         if (!groups[key].some(item => item.url === url)) { if (groups[key].length < 400) { groups[key].push({ name, url, kind }); count++; } else ignored++; }
       }
@@ -1862,12 +1939,102 @@ input:focus-visible {
     } catch { return Object.create(null); }
   }
 
+
+
+  let movieLibraryPageSize = 10;
+  function selectHorrorView(view, scrollTop = true) {
+    const onMovies = view === 'movies';
+    document.getElementById('movieLibrary').hidden = !onMovies;
+    document.getElementById('channelSection').hidden = onMovies;
+    document.getElementById('legalHorrorSection').hidden = onMovies;
+    document.querySelector('.coming-soon').hidden = onMovies;
+    document.querySelectorAll('[data-view]').forEach(button => {
+      const active = button.dataset.view === (onMovies ? 'movies' : 'channels');
+      button.setAttribute('aria-pressed', String(active));
+      button.classList.toggle('is-active', active);
+    });
+    if (scrollTop) window.scrollTo({ top:0, behavior:'smooth' });
+  }
+  document.querySelectorAll('[data-view]').forEach(button =>
+    button.addEventListener('click', () => selectHorrorView(button.dataset.view)));
+  document.getElementById('movieLibraryMore').addEventListener('click', () => {
+    movieLibraryPageSize += 10;
+    renderMovieLibrary();
+  });
+
+  // This browser indexes local on-demand movie entries only, never live feeds.
+  // No private provider credentials or movie URLs belong in the GitHub repo.
+  function renderMovieLibrary() {
+    const grid = document.getElementById('movieLibraryGrid');
+    const filter = document.getElementById('movieLibraryGroup');
+    const search = document.getElementById('movieLibrarySearch').value.trim().toLowerCase();
+    const selectedGroup = filter.value;
+    const queues = loadImportedQueues();
+    const movies = [], seen = new Set(), groups = new Map();
+    for (const [key, entries] of Object.entries(queues)) {
+      for (let index = 0; index < entries.length; index++) {
+        const item = entries[index];
+        if (item.kind !== 'movie' || seen.has(item.url)) continue;
+        seen.add(item.url);
+        movies.push({ name: item.name, channel: key, index });
+        groups.set(key, channelData[key]?.title || key);
+      }
+    }
+    filter.replaceChildren(new Option('All collections', ''));
+    for (const [key, title] of [...groups].sort((a,b) => a[1].localeCompare(b[1])))
+      filter.add(new Option(title, key));
+    filter.value = groups.has(selectedGroup) ? selectedGroup : '';
+    const matched = movies.filter(item => (!filter.value || item.channel === filter.value) &&
+      item.name.toLowerCase().includes(search));
+    grid.replaceChildren();
+    for (const movie of matched.slice(0, movieLibraryPageSize)) {
+      const card = document.createElement('article');
+      card.className = 'movie-library-card';
+      const title = document.createElement('h3');
+      title.textContent = movie.name;
+      const category = document.createElement('p');
+      category.textContent = groups.get(movie.channel);
+      const play = document.createElement('button');
+      play.type = 'button';
+      play.textContent = '▶ Play';
+      play.setAttribute('aria-label', 'Watch ' + movie.name);
+      play.addEventListener('click', () => openChannel(movie.channel, movie.index));
+      const info = document.createElement('div');
+      info.className = 'movie-info';
+      info.append(title, category);
+      card.append(info, play);
+      grid.append(card);
+    }
+    const more = document.getElementById('movieLibraryMore');
+    more.hidden = matched.length <= movieLibraryPageSize;
+    more.textContent = 'Show more movies (' + Math.min(10, matched.length - movieLibraryPageSize) + ' more) ↓';
+    document.getElementById('movieLibraryStatus').textContent = movies.length
+      ? `${movies.length} imported movies · ${matched.length} matching · showing ${Math.min(matched.length, movieLibraryPageSize)}. Playback depends on your authorized provider.`
+      : 'No on-demand movies are saved on this device yet. Import a private M3U file or provider URL above. Movies saved on another phone do not transfer automatically.';
+  }
+  document.getElementById('movieLibrarySearch').addEventListener('input', () => {
+    movieLibraryPageSize = 10;
+    renderMovieLibrary();
+  });
+  document.getElementById('movieLibraryGroup').addEventListener('change', () => {
+    movieLibraryPageSize = 10;
+    renderMovieLibrary();
+  });
+
   const MARATHON_SOURCE = Object.freeze({ 'haddonfield-247': 'haddonfield', 'texas-chainsaw-247': 'texas-chainsaw' });
   function queueForChannel(key) {
+    // A manually selected source takes priority. Keep imported queues in local
+    // storage as backups instead of silently deleting them on Save & Play.
+    const manual = loadStreams()[key];
     const saved = loadImportedQueues();
+    const isLegacy = url => { try { return new URL(url).hostname === 'line.dndnscloud.ru'; } catch { return false; } };
+    // Migrate an old override only when a replacement actually exists.
+    const replacement = (saved[key] || []).filter(item => !isLegacy(item.url));
+    if (manual && !(isLegacy(manual) && replacement.length)) return [];
+    if (manual && isLegacy(manual) && replacement.length) return replacement;
     if (saved[key]?.length) return saved[key];
     const original = MARATHON_SOURCE[key];
-    if (!original || loadStreams()[key]) return [];
+    if (!original) return [];
     // No stream was supplied for 24/7. Reuse playable franchise movies without
     // modifying the original on-demand collection or copying its private URLs.
     return (saved[original] || []).filter(item => item.kind === 'movie');
@@ -1879,6 +2046,7 @@ input:focus-visible {
     const n = Object.keys(data).length;
     document.getElementById('playlistImportStatus').textContent = message || (n ? `${n} channel playlists saved on this device. Account links stay on this device.` : 'Import your provider’s M3U file to connect channels on this device.');
     document.getElementById('removeImportedPlaylists').hidden = !n;
+    renderMovieLibrary();
     document.querySelectorAll('[data-open-channel]').forEach(link => {
       const key = link.dataset.openChannel;
       const items = queueForChannel(key);
@@ -1958,12 +2126,19 @@ input:focus-visible {
       if (!result.count) throw new Error('No matching horror channels or movies found. Your existing feeds have not changed.');
       const newFirst = document.getElementById('replaceImportedPlaylist').checked;
       const previousQueues = localStorage.getItem(PLAYLIST_KEY);
+      const previousStreams = localStorage.getItem(STORAGE_KEY);
+      const streams = loadStreams();
       const existing = loadImportedQueues();
       const combined = Object.assign(Object.create(null), existing);
       // Never replace the entire local collection for a partial provider playlist.
-      // The official public M3U and manually saved URLs are separate and untouched.
+      // Keep manual sources as backups when the user selects new feeds first.
       for (const [key, incoming] of Object.entries(result.groups)) {
-        const oldItems = existing[key] || [];
+        const oldItems = [...(existing[key] || [])];
+        if (newFirst && streams[key]) {
+          oldItems.push({ name: channelData[key].title + ' (saved backup)', url: streams[key],
+            kind: /\/movie\/|\.(mp4|mkv|webm|mov|m4v)(?:[?#]|$)/i.test(streams[key]) ? 'movie' : 'live' });
+          delete streams[key];
+        }
         const ordered = newFirst ? [...incoming, ...oldItems] : [...oldItems, ...incoming];
         const seen = new Set();
         combined[key] = ordered.filter(item => {
@@ -1974,9 +2149,12 @@ input:focus-visible {
       }
       try {
         localStorage.setItem(PLAYLIST_KEY, JSON.stringify(combined));
+        if (newFirst) saveStreams(streams);
       } catch (error) {
         if (previousQueues === null) localStorage.removeItem(PLAYLIST_KEY);
         else localStorage.setItem(PLAYLIST_KEY, previousQueues);
+        if (previousStreams === null) localStorage.removeItem(STORAGE_KEY);
+        else localStorage.setItem(STORAGE_KEY, previousStreams);
         throw new Error('Could not save this playlist. Free some device storage and try again.');
       }
       const retained = Object.keys(existing).filter(key => !Object.hasOwn(result.groups, key)).length;
@@ -2081,6 +2259,7 @@ input:focus-visible {
     playStream(items[queueIndex].url);
   });
   updateImportStatus();
+  selectHorrorView("channels", false);
 
   enterButton.addEventListener("click", () => enterHorrorStack(true));
   enterSilentButton.addEventListener("click", () => enterHorrorStack(false));

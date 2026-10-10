@@ -270,7 +270,9 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override public void onPlayerError(PlaybackException error) {
-                if (error.errorCode >= 4000 && error.errorCode < 5000) {
+                // Retry container parsing and codec failures with the in-app VLC engine.
+                // Provider movies such as Texas Chain Saw Massacre (1974) use MKV.
+                if (error.errorCode >= 3000 && error.errorCode < 5000) {
                     long position = inlinePlayer == null ? inlinePosition : inlinePlayer.getCurrentPosition();
                     String fallbackUrl = inlineUrl;
                     updatePageMessage("<strong>Switching decoder...</strong> Opening HorrorStack software playback.");
