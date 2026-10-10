@@ -892,11 +892,19 @@ input:focus-visible {
 
   <main class="container">
     <div class="private-playlist-bar">
-      <p id="playlistImportStatus" role="status">Import your M3U file to connect channels on this device.</p>
+      <p id="playlistImportStatus" role="status">Import your provider’s M3U file to connect channels on this device.</p>
       <button class="control-btn" id="removeImportedPlaylists" type="button" hidden>Remove imported playlists</button>
     </div>
+    <div class="private-playlist-bar">
+      <label><input id="replaceImportedPlaylist" type="checkbox" checked> Play newly imported feeds first (keep saved backups)</label>
+      <p>Only matching movie groups are imported. Previously saved streams and public entries are preserved.</p>
+    </div>
     <details class="private-playlist-bar" id="pastePlaylistPanel">
-      <summary>Paste M3U text</summary>
+      <summary>Import M3U text or URL</summary>
+      <label for="remotePlaylistUrl">Private M3U playlist URL (kept on this device, not sent to GitHub)</label>
+      <input id="remotePlaylistUrl" type="url" autocomplete="off" spellcheck="false" placeholder="https://provider.example/get.php?..." style="width:100%;color:#fff;background:#171017;padding:12px;border:1px solid #666;border-radius:8px">
+      <button class="control-btn" id="importPlaylistUrl" type="button">Load playlist URL</button>
+      <p>On Android, the app loads provider URLs directly on your device. Browser imports may be blocked by HTTPS/CORS; in that case download the M3U file and use Import playlist.</p>
       <textarea id="playlistText" rows="6" style="width:100%;max-width:100%;color:#fff;background:#171017" placeholder="Paste your #EXTM3U playlist here"></textarea>
       <button class="control-btn" id="importPlaylistText" type="button">Import pasted playlist</button>
     </details>
@@ -939,12 +947,11 @@ input:focus-visible {
           <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🌽</div>
           <div class="channel-content">
             <p class="channel-status">Harvest in progress</p>
-            <h3>Scarecrow Field</h3>
-            <p>Farm horror, cornfields, scarecrows, and rural nightmares.</p>
+            <h3>Gatlin Road</h3>
+            <p>Children of the Corn, scarecrows, cornfields, and rural nightmares.</p>
             <a href="#" class="watch-btn" data-open-channel="scarecrow-field"><span>Watch Channel</span><span>▶</span></a>
           </div>
         </article>
-
         <article class="channel-card haunted-house">
           <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🏚️</div>
           <div class="channel-content">
@@ -954,7 +961,6 @@ input:focus-visible {
             <a href="#" class="watch-btn" data-open-channel="haunted-house"><span>Watch Channel</span><span>▶</span></a>
           </div>
         </article>
-
         <article class="channel-card midnight-hospital">
           <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🏥</div>
           <div class="channel-content">
@@ -984,6 +990,13 @@ input:focus-visible {
             <a href="#" class="watch-btn" data-open-channel="haddonfield"><span>Watch Channel</span><span>▶</span></a>
           </div>
         </article>
+        <article class="channel-card haddonfield">
+          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🎃</div>
+          <div class="channel-content"><p class="channel-status">Your 24/7 stream or movie loop</p>
+            <h3>Haddonfield 24/7</h3><p>Halloween movies nonstop, using your authorized stream or looping your saved Haddonfield films.</p>
+            <a href="#" class="watch-btn" data-open-channel="haddonfield-247"><span>Connect 24/7</span><span>▶</span></a>
+          </div>
+        </article>
 
 <article class="channel-card haddonfield">
           <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🌙</div>
@@ -995,6 +1008,13 @@ input:focus-visible {
           <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🪚</div>
           <div class="channel-content"><p class="channel-status">Your playlist</p><h3>Texas Chainsaw Massacre</h3><p>The Texas Chain Saw Massacre films. Leatherface’s movie marathon.</p>
             <a href="#" class="watch-btn" data-open-channel="texas-chainsaw"><span>Watch Channel</span><span>▶</span></a>
+          </div>
+        </article>
+        <article class="channel-card creeper-road">
+          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🪚</div>
+          <div class="channel-content"><p class="channel-status">Your 24/7 stream or movie loop</p>
+            <h3>TCM 24/7</h3><p>Leatherface movies nonstop, using your authorized stream or looping your saved Texas Chainsaw films.</p>
+            <a href="#" class="watch-btn" data-open-channel="texas-chainsaw-247"><span>Connect 24/7</span><span>▶</span></a>
           </div>
         </article>
 <article class="channel-card graveyard-shift">
@@ -1075,6 +1095,34 @@ input:focus-visible {
             </p>
           </div>
         </article>
+
+        <article class="channel-card legal-channel-card">
+          <div class="card-overlay"></div>
+          <div class="channel-art"></div>
+          <div class="channel-icon">😈</div>
+
+          <div class="channel-content">
+            <div class="official-badge">✓ Official Free Movie</div>
+            <p class="channel-status">Free on Pluto TV</p>
+            <h3>Night of the Demons (1988)</h3>
+            <p>Halloween night at an abandoned funeral parlor. Angela, a séance, and an extremely poor series of teenage decisions.</p>
+
+            <a
+              href="https://pluto.tv/us/movies/5d3a3f9070c43ed39c5d914e/"
+              class="watch-btn"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Watch Night of the Demons on Pluto TV"
+            >
+              <span>Watch Free on Pluto TV</span>
+              <span>↗</span>
+            </a>
+
+            <p class="external-note">
+              Opens the official Pluto TV movie page. HorrorStack does not host or redistribute the film.
+            </p>
+          </div>
+        </article>
      
      </div>
     </section>
@@ -1122,6 +1170,7 @@ input:focus-visible {
         <button class="control-btn" id="importFromPlayer" type="button">Import playlist</button>
         <button class="control-btn" id="retryInternal" type="button">Play inside HorrorStack</button>
         <a id="externalPlayer" class="control-btn" href="#" hidden rel="noreferrer">Open in video player</a>
+        <a id="officialWatch" class="control-btn" href="#" hidden rel="noreferrer">Official watch option</a>
         <button id="downloadChannelPlaylist" class="control-btn" type="button" hidden>Save channel playlist</button>
       </div>
     </div>
@@ -1170,6 +1219,23 @@ input:focus-visible {
   const streamUrl = document.getElementById("streamUrl");
   const saveStream = document.getElementById("saveStream");
   const clearStream = document.getElementById("clearStream");
+  const officialWatch = document.getElementById("officialWatch");
+
+  const OFFICIAL_WATCH_LINKS = {
+    "Phantasm - Phantasm: Ravager (2016) [On demand]": "https://tubitv.com/movies/505789/phantasm-ravager",
+    "Phantasm (1979) [On demand]": "https://pluto.tv/us/movies/5fb34a8a8bff97001a641a5d/",
+    "Phantasm II (1988) [On demand]": "https://tv.apple.com/us/movie/phantasm-ii/umc.cmc.3uit5dohslarsh0kw3l62ivgm",
+    "Phantasm III: Lord of the Dead (1994) [On demand]": "https://tubitv.com/movies/505791/phantasm-iii-lord-of-the-dead",
+    "Phantasm IV: Oblivion (1998) [On demand]": "https://tubitv.com/movies/505793/phantasm-iv-oblivion",
+    "Creeper Road - Jeepers Creepers (2001) [On demand]": "https://tv.apple.com/us/movie/jeepers-creepers/umc.cmc.796j17v519pnxpmwnx1wlt2as",
+    "Creeper Road - Jeepers Creepers 2 (2003) [On demand]": "https://tv.apple.com/us/movie/jeepers-creepers-2/umc.cmc.4q9viu810avkcohlmol8m4zko",
+    "Creeper Road - Jeepers Creepers 3 (2017) [On demand]": "https://tv.apple.com/us/movie/jeepers-creepers-3/umc.cmc.44b9t6ejij6ncjoenmivmzc0r",
+    "Creeper Road - Jeepers Creepers: Reborn (2022) [On demand]": "https://tv.apple.com/us/movie/jeepers-creepers-reborn/umc.cmc.4cqrxmz9zixmwp0zvnp0jk75b",
+    "Children of the Corn II: The Final Sacrifice [On demand - English]": "https://tv.apple.com/us/movie/children-of-the-corn-ii-the-final-sacrifice/umc.cmc.3fglypv13656jy1dvi3gdp8u2",
+    "Children of the Corn III: Urban Harvest (1995) [On demand - English]": "https://tv.apple.com/us/movie/children-of-the-corn-iii-urban-harvest/umc.cmc.3oa99b6x6pyb55p1fv0u97pz7",
+    "Children of the Corn: Runaway (2018) [On demand - English]": "https://tv.apple.com/us/movie/children-of-the-corn-runaway/umc.cmc.42o7us95gm5q6w8ucmvtvqoo6",
+    "Children of the Corn (2020 remake) [On demand - English]": "https://tv.apple.com/us/movie/children-of-the-corn/umc.cmc.30763nu94fjmlyn3vvraow42f"
+  };
 
   const PLAYLIST_KEY = "horrorstack-private-playlists-v1";
   let queueIndex = 0;
@@ -1184,12 +1250,31 @@ input:focus-visible {
       info: "The Jeepers Creepers films, collected in release order."
     },
     "scarecrow-field": {
-      title: "Scarecrow Field",
-      info: "Farm horror, cornfields, scarecrows, and rural nightmares."
+      title: "Gatlin Road",
+      info: "Children of the Corn, scarecrows, cornfields, and rural nightmares.",
+      catalog: [
+        "Children of the Corn (1984)",
+        "Children of the Corn II: The Final Sacrifice (1993)",
+        "Children of the Corn III: Urban Harvest (1995)",
+        "Children of the Corn IV: The Gathering (1996)",
+        "Children of the Corn V: Fields of Terror (1998)",
+        "Children of the Corn 666: Isaac's Return (1999)",
+        "Children of the Corn: Revelation (2001)",
+        "Children of the Corn (2009)",
+        "Children of the Corn: Genesis (2011)",
+        "Children of the Corn: Runaway (2018)",
+        "Children of the Corn (2020)"
+      ]
     },
     "haunted-house": {
       title: "Haunted House",
-      info: "Ghost stories, haunted homes, séances, and supernatural terror."
+      info: "Ghost stories, haunted homes, séances, supernatural terror, and the Night of the Demons films.",
+      catalog: [
+        "Night of the Demons (1988)",
+        "Night of the Demons 2 (1994)",
+        "Night of the Demons 3 (1997)",
+        "Night of the Demons (2009)"
+      ]
     },
     "midnight-hospital": {
       title: "Midnight Hospital",
@@ -1212,6 +1297,8 @@ input:focus-visible {
   Object.assign(channelData, {
     "elm-street": { title: "Elm Street", info: "A Nightmare on Elm Street films." },
     "texas-chainsaw": { title: "Texas Chainsaw Massacre", info: "The Texas Chain Saw Massacre films." },
+    "haddonfield-247": { title: "Haddonfield 24/7", info: "Your authorized Halloween 24/7 broadcast, or a nonstop loop of your saved playable Halloween movies." },
+    "texas-chainsaw-247": { title: "TCM 24/7", info: "Your authorized Texas Chainsaw 24/7 broadcast, or a nonstop loop of your saved playable TCM movies." },
     "midnight-pulp": { title: "Midnight Pulp", info: "Midnight Pulp live broadcast." },
     "english-horror-247": { title: "English 24/7 Horror Movies", info: "Continuous horror movies. The provider controls the schedule." },
     "uk-horror": { title: "UK Horror Channel", info: "UK Horror Channel live broadcast. The provider controls the schedule." }
@@ -1458,6 +1545,20 @@ input:focus-visible {
       return;
     }
 
+    const queueItem = currentQueue()[queueIndex] || null;
+    const officialUrl = queueItem ? OFFICIAL_WATCH_LINKS[queueItem.name] : "";
+    let sourceHost = "";
+    try { sourceHost = new URL(cleanUrl).hostname.toLowerCase(); } catch {}
+
+    // The old direct movie backend can expire independently of HorrorStack.
+    // Never let those dead movie URLs take the whole movie channel down.
+    if (queueItem?.kind === "movie" && sourceHost === "line.dndnscloud.ru" && officialUrl) {
+      officialWatch.hidden = false;
+      officialWatch.href = officialUrl;
+      showMessage("<strong>Direct movie source expired.</strong> Use Official watch option for this title.");
+      return;
+    }
+
     if (window.AndroidPlayer && typeof window.AndroidPlayer.play === "function") {
       try {
         window.AndroidPlayer.play(cleanUrl, playerTitle.textContent || "HorrorStack");
@@ -1475,7 +1576,6 @@ input:focus-visible {
 
     showMessage("<strong>Connecting...</strong> Tuning the HorrorStack signal.");
 
-    const queueItem = currentQueue()[queueIndex] || null;
     const explicitMovie = queueItem?.kind === "movie";
     const explicitLive = queueItem?.kind === "live";
     const obviousDirectFile = /\.(mp4|webm|mov|m4v)(?:[?#]|$)/i.test(cleanUrl);
@@ -1577,7 +1677,9 @@ input:focus-visible {
 
     triggerStaticTransition(() => {
       playerTitle.textContent = channel.title;
-      playerInfo.textContent = channel.info;
+      playerInfo.textContent = channel.catalog?.length
+        ? `${channel.info} Titles: ${channel.catalog.join(" • ")}`
+        : channel.info;
 
       const streams = loadStreams();
       queueIndex = 0;
@@ -1650,14 +1752,65 @@ input:focus-visible {
     } catch { return ''; }
   }
 
+  function matchProviderChannel(name, group) {
+    const title = String(name || '').toLowerCase().replace(/[_|:–—-]+/g, ' ').replace(/\s+/g, ' ').trim();
+    const categoryName = String(group || '').toLowerCase().replace(/[_|:–—-]+/g, ' ').replace(/\s+/g, ' ').trim();
+    // A 24/7 broadcast is distinct from an individual franchise film.
+    const broadcastTitle = /\b(?:24\/7|24 7|247|marathon|nonstop|continuous)\b/.test(title);
+    const broadcastGroup = /\b(?:24\/7|24 7|247)\b/.test(categoryName) &&
+      /^(?:haddonfield|halloween|tcm|texas chainsaw(?: massacre)?)$/.test(title);
+    if (broadcastTitle || broadcastGroup) {
+      if (/\b(?:haddonfield|halloween|michael myers)\b/.test(title)) return 'haddonfield-247';
+      if (/\b(?:tcm|texas chain\s*saw|leatherface)\b/.test(title)) return 'texas-chainsaw-247';
+    }
+    const franchiseRules = [
+      [/\bhaddonfield\b/, 'haddonfield'],
+      [/\b(?:horror by alter|bloody disgusting|horror tv)\b/, 'graveyard-shift'],
+      [/\bphantasm\b/, 'phantasm'],
+      [/\bjeepers creepers\b/, 'creeper-road'],
+      [/\bchildren of the corn\b|\bscarecrow\b/, 'scarecrow-field'],
+      [/\bnight of the demons\b/, 'haunted-house'],
+      [/\b(?:a )?nightmare on elm street\b|\bfreddy(?:'s)? revenge\b|\bfreddy(?:'s)? dead\b/, 'elm-street'],
+      [/\btexas chain\s*saw\b|\bleatherface\b/, 'texas-chainsaw'],
+      [/^(?:(?:us|usa|uk|en|eng|english|24\/7|24 7|vod|movies?|fhd|hd|sd|4k)\s+)*halloween(?:\s*(?:\(\d{4}\)|[2-6]\b|ii\b|iii\b|iv\b|v\b|vi\b|h20\b|kills\b|ends\b|resurrection\b|the curse\b|the return\b|the revenge\b|\d{4}\b|$))/, 'haddonfield'],
+      [/\bmidnight pulp\b/, 'midnight-pulp'],
+      [/\buk\b.*\bhorror\b|\bhorror channel\b|\blegend\b.*\bhorror\b/, 'uk-horror'],
+      [/\b(?:24\/7|24 7|247)\b.*\bhorror\b|\bhorror\b.*\b(?:24\/7|24 7|247)\b/, 'english-horror-247']
+    ];
+    for (const [pattern, key] of franchiseRules) if (pattern.test(title)) return key;
+    // Use explicit horror categories only; unrelated provider channels are skipped.
+    const category = String(group || '').toLowerCase();
+    if (/\b(?:horror|supernatural|haunted)\b/.test(category)) {
+      if (/\b(?:haunting|haunted|poltergeist|conjuring|insidious|amityville)\b/.test(title)) return 'haunted-house';
+      if (/\b(?:exorcist|exorcism|possession|possessed|hellraiser)\b/.test(title)) return 'possession-room';
+      if (/\b(?:hospital|asylum|sanatorium)\b/.test(title)) return 'midnight-hospital';
+      return 'graveyard-shift';
+    }
+    return '';
+  }
+
   function parsePrivateM3u(text) {
     if (!String(text).replace(/^\uFEFF/, '').trimStart().startsWith('#EXTM3U')) throw new Error('Choose an M3U playlist file.');
     const groups = Object.create(null);
     let pending = null, ignored = 0, count = 0;
     const aliases = {
       hauntedhouse: 'haunted-house', midnighthospital: 'midnight-hospital',
-      scarecrowfield: 'scarecrow-field', possessionroom: 'possession-room',
+      scarecrowfield: 'scarecrow-field', gatlinroad: 'scarecrow-field', possessionroom: 'possession-room',
+      childrenofthecorn: 'scarecrow-field', childrenofthecorn1984: 'scarecrow-field',
+      childrenofthecorniithefinalsacrifice: 'scarecrow-field', childrenofthecorn2thefinalsacrifice: 'scarecrow-field',
+      childrenofthecorniiiurbanharvest: 'scarecrow-field', childrenofthecorn3urbanharvest: 'scarecrow-field',
+      childrenofthecornivthegathering: 'scarecrow-field', childrenofthecorn4thegathering: 'scarecrow-field',
+      childrenofthecornvfieldsofterror: 'scarecrow-field', childrenofthecorn5fieldsofterror: 'scarecrow-field',
+      childrenofthecorn666isaacsreturn: 'scarecrow-field', childrenofthecornrevelation: 'scarecrow-field',
+      childrenofthecorn2009: 'scarecrow-field', childrenofthecorngenesis: 'scarecrow-field',
+      childrenofthecornrunaway: 'scarecrow-field', childrenofthecorn2020: 'scarecrow-field',
+      nightofthedemons: 'haunted-house', nightofthedemons1988: 'haunted-house',
+      nightofthedemons2: 'haunted-house', nightofthedemonsii: 'haunted-house',
+      nightofthedemons3: 'haunted-house', nightofthedemonsiii: 'haunted-house',
+      nightofthedemonsdemonhouse: 'haunted-house', nightofthedemons2009: 'haunted-house',
       creeperroad: 'creeper-road', phantasm: 'phantasm', haddonfield: 'haddonfield',
+      haddonfield247: 'haddonfield-247', halloween247: 'haddonfield-247', halloweenmarathon: 'haddonfield-247',
+      tcm247: 'texas-chainsaw-247', texaschainsaw247: 'texas-chainsaw-247', texaschainsawmassacre247: 'texas-chainsaw-247',
       graveyardshift: 'graveyard-shift', localnowhorrorstream: 'graveyard-shift', elmstreet: 'elm-street',
       texaschainsaw: 'texas-chainsaw', texaschainsawmassacre: 'texas-chainsaw',
       midnightpulp: 'midnight-pulp', midnightpulpus: 'midnight-pulp',
@@ -1682,12 +1835,14 @@ input:focus-visible {
         const { attrs, name } = pending;
         pending = null;
         const normalize = value => String(value || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-        const key = attrs['horrorstack-channel'] || aliases[normalize(attrs['tvg-id'])] || aliases[normalize(name)];
+        const inferred = matchProviderChannel(name, attrs['group-title']);
+        const marathonKey = (inferred === 'haddonfield-247' || inferred === 'texas-chainsaw-247') ? inferred : '';
+        const key = attrs['horrorstack-channel'] || marathonKey || aliases[normalize(attrs['tvg-id'])] || aliases[normalize(name)] || inferred || aliases[normalize(attrs['group-title'])];
         const url = safeStreamUrl(line);
         if (!Object.hasOwn(channelData, key || '') || !url || !name) { ignored++; continue; }
-        const kind = attrs['horrorstack-kind'] === 'movie' || /\.(mp4|mkv|webm|mov)(?:[?#]|$)/i.test(url) ? 'movie' : 'live';
+        const kind = attrs['horrorstack-kind'] === 'movie' || /\/movie\//i.test(new URL(url).pathname) || /\.(mp4|mkv|webm|mov|m4v|avi)(?:[?#]|$)/i.test(url) ? 'movie' : 'live';
         groups[key] ||= [];
-        if (!groups[key].some(item => item.url === url)) { groups[key].push({ name, url, kind }); count++; }
+        if (!groups[key].some(item => item.url === url)) { if (groups[key].length < 400) { groups[key].push({ name, url, kind }); count++; } else ignored++; }
       }
     }
     if (pending) ignored++;
@@ -1707,17 +1862,31 @@ input:focus-visible {
     } catch { return Object.create(null); }
   }
 
-  function currentQueue() { return loadImportedQueues()[currentChannelKey] || []; }
+  const MARATHON_SOURCE = Object.freeze({ 'haddonfield-247': 'haddonfield', 'texas-chainsaw-247': 'texas-chainsaw' });
+  function queueForChannel(key) {
+    const saved = loadImportedQueues();
+    if (saved[key]?.length) return saved[key];
+    const original = MARATHON_SOURCE[key];
+    if (!original || loadStreams()[key]) return [];
+    // No stream was supplied for 24/7. Reuse playable franchise movies without
+    // modifying the original on-demand collection or copying its private URLs.
+    return (saved[original] || []).filter(item => item.kind === 'movie');
+  }
+  function currentQueue() { return queueForChannel(currentChannelKey); }
 
   function updateImportStatus(message) {
     const data = loadImportedQueues();
     const n = Object.keys(data).length;
-    document.getElementById('playlistImportStatus').textContent = message || (n ? `${n} channel playlists saved on this device. Account links stay on this device.` : 'Import your M3U file to connect channels on this device.');
+    document.getElementById('playlistImportStatus').textContent = message || (n ? `${n} channel playlists saved on this device. Account links stay on this device.` : 'Import your provider’s M3U file to connect channels on this device.');
     document.getElementById('removeImportedPlaylists').hidden = !n;
     document.querySelectorAll('[data-open-channel]').forEach(link => {
-      const items = data[link.dataset.openChannel] || [];
+      const key = link.dataset.openChannel;
+      const items = queueForChannel(key);
       const label = link.querySelector('span');
-      if (label) label.textContent = items.length && items.every(x => x.kind === 'movie') ? `Choose movie (${items.length})` : 'Watch Channel';
+      if (label) {
+        if (Object.hasOwn(MARATHON_SOURCE, key)) label.textContent = (items.length || loadStreams()[key]) ? 'Watch 24/7' : 'Connect 24/7';
+        else label.textContent = items.length && items.every(x => x.kind === 'movie') ? `Choose movie (${items.length})` : 'Watch Channel';
+      }
     });
   }
 
@@ -1727,6 +1896,14 @@ input:focus-visible {
     localStorage.setItem(PLAYLIST_KEY, JSON.stringify(data));
     queueIndex = 0;
     updateImportStatus();
+  }
+
+  function updateOfficialWatch() {
+    const item = currentQueue()[queueIndex] || null;
+    const url = item ? OFFICIAL_WATCH_LINKS[item.name] : "";
+    officialWatch.hidden = !url;
+    officialWatch.href = url || "#";
+    officialWatch.textContent = url ? "Official watch option" : "Official watch option";
   }
 
   function renderQueue() {
@@ -1739,7 +1916,11 @@ input:focus-visible {
     const movies = items.length > 0 && items.every(item => item.kind === 'movie');
     document.getElementById('loopLabel').hidden = !movies;
     if (movies) document.getElementById('loopMovies').checked = true;
-    document.getElementById('queueDescription').textContent = movies ? '24/7 marathon mode: movies play in order and restart automatically after the last title.' : 'Live feed. The provider controls the movie schedule.';
+    document.getElementById('queueDescription').textContent = movies
+      ? '24/7 marathon: your playable movies advance automatically and restart when Loop is enabled.'
+      : items.length ? 'Live feed. The provider controls the movie schedule.'
+      : 'No movie queue loaded. Import an authorized 24/7 feed or playable franchise films.';
+    updateOfficialWatch();
   }
 
   function updatePlayerLinks(url) {
@@ -1755,7 +1936,7 @@ input:focus-visible {
       // Creeper Road uses direct MP4 movie URLs. Give Android an explicit MP4
       // VIEW intent so it hands these four movies to an installed video player
       // instead of treating the HTTP URL like a normal browser navigation.
-      const mime = currentChannelKey === 'creeper-road' ? 'video/mp4' : 'video/*';
+      const mime = /\.mp4$/i.test(u.pathname) ? 'video/mp4' : 'video/*';
       anchor.href = `intent:${path}#Intent;scheme=${u.protocol.slice(0,-1)};action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;type=${mime};end`;
       anchor.removeAttribute('target');
     } else { anchor.href = safe; anchor.target = '_blank'; }
@@ -1774,9 +1955,32 @@ input:focus-visible {
     try {
       if (text.length > 10 * 1024 * 1024) throw new Error('Choose a playlist smaller than 10 MB.');
       const result = parsePrivateM3u(text);
-      if (!result.count) throw new Error('No recognized HorrorStack channels found. Choose your horrorstack.m3u file.');
-      localStorage.setItem(PLAYLIST_KEY, JSON.stringify(Object.assign(loadImportedQueues(), result.groups)));
-      updateImportStatus(`Imported ${result.count} feeds or movies into ${Object.keys(result.groups).length} channels.`);
+      if (!result.count) throw new Error('No matching horror channels or movies found. Your existing feeds have not changed.');
+      const newFirst = document.getElementById('replaceImportedPlaylist').checked;
+      const previousQueues = localStorage.getItem(PLAYLIST_KEY);
+      const existing = loadImportedQueues();
+      const combined = Object.assign(Object.create(null), existing);
+      // Never replace the entire local collection for a partial provider playlist.
+      // The official public M3U and manually saved URLs are separate and untouched.
+      for (const [key, incoming] of Object.entries(result.groups)) {
+        const oldItems = existing[key] || [];
+        const ordered = newFirst ? [...incoming, ...oldItems] : [...oldItems, ...incoming];
+        const seen = new Set();
+        combined[key] = ordered.filter(item => {
+          if (seen.has(item.url)) return false;
+          seen.add(item.url);
+          return true;
+        });
+      }
+      try {
+        localStorage.setItem(PLAYLIST_KEY, JSON.stringify(combined));
+      } catch (error) {
+        if (previousQueues === null) localStorage.removeItem(PLAYLIST_KEY);
+        else localStorage.setItem(PLAYLIST_KEY, previousQueues);
+        throw new Error('Could not save this playlist. Free some device storage and try again.');
+      }
+      const retained = Object.keys(existing).filter(key => !Object.hasOwn(result.groups, key)).length;
+      updateImportStatus(`Imported ${result.count} feeds or movies into ${Object.keys(result.groups).length} groups. ${retained} other saved groups preserved, prior sources kept as backups. ${result.ignored} unrelated or excess entries skipped. Playback has not yet been checked.`);
       if (currentChannelKey) {
         queueIndex = 0; renderQueue();
         const url = currentQueue()[0]?.url || loadStreams()[currentChannelKey] || '';
@@ -1790,6 +1994,7 @@ input:focus-visible {
     }
   }
   window.importHorrorPlaylist = importPlaylistText;
+  window.horrorstackIptvStatus = updateImportStatus;
   function choosePlaylist() {
     if (window.AndroidPlayer && typeof window.AndroidPlayer.importPlaylist === 'function') {
       window.AndroidPlayer.importPlaylist();
@@ -1797,6 +2002,29 @@ input:focus-visible {
   }
   document.getElementById('importPlaylist').addEventListener('click', choosePlaylist);
   document.getElementById('importFromPlayer').addEventListener('click', choosePlaylist);
+  document.getElementById('importPlaylistUrl').addEventListener('click', async () => {
+    const field = document.getElementById('remotePlaylistUrl');
+    const url = field.value.trim();
+    try {
+      const parsed = new URL(url);
+      if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('Use an HTTP(S) playlist URL.');
+      if (window.AndroidPlayer && typeof window.AndroidPlayer.importPlaylistUrl === 'function') {
+        field.value = '';
+        updateImportStatus('Loading private playlist directly on this Android device...');
+        window.AndroidPlayer.importPlaylistUrl(url);
+        return;
+      }
+      if (location.protocol === 'https:' && parsed.protocol === 'http:') throw new Error('This provider uses HTTP. Download the M3U using your provider’s link, then use Import playlist.');
+      updateImportStatus('Loading private playlist...');
+      const response = await fetch(url, { credentials: 'omit', redirect: 'follow', referrerPolicy: 'no-referrer' });
+      if (!response.ok) throw new Error('Provider returned HTTP ' + response.status);
+      const content = await response.text();
+      if (!content.trimStart().startsWith('#EXTM3U')) throw new Error('Provider did not return an M3U playlist.');
+      if (importPlaylistText(content)) field.value = '';
+    } catch (error) {
+      updateImportStatus('Could not import URL: ' + (error instanceof TypeError ? 'provider may block browser requests (CORS). Download the M3U file and import it instead.' : error.message));
+    }
+  });
   document.getElementById('importPlaylistText').addEventListener('click', () => {
     const input = document.getElementById('playlistText');
     if (importPlaylistText(input.value)) input.value = '';
@@ -1816,6 +2044,15 @@ input:focus-visible {
       event.preventDefault(); window.AndroidPlayer.playExternal(url);
     }
   });
+  officialWatch.addEventListener('click', event => {
+    const item = currentQueue()[queueIndex] || null;
+    const url = item ? OFFICIAL_WATCH_LINKS[item.name] : "";
+    if (!url) {
+      event.preventDefault();
+      showMessage('No current official watch option is saved for this title.', true);
+      return;
+    }
+  });
   document.getElementById('removeImportedPlaylists').addEventListener('click', () => {
     try { localStorage.removeItem(PLAYLIST_KEY); updateImportStatus(); if (currentChannelKey) { queueIndex = 0; renderQueue(); const url = loadStreams()[currentChannelKey] || ''; streamUrl.value = url; playStream(url); } }
     catch { updateImportStatus('The device could not remove the imported playlists.'); }
@@ -1823,6 +2060,7 @@ input:focus-visible {
   document.getElementById('queueSelection').addEventListener('change', event => {
     queueIndex = Number(event.target.value);
     const item = currentQueue()[queueIndex];
+    updateOfficialWatch();
     if (item) { streamUrl.value = item.url; playStream(item.url); }
   });
   document.getElementById('downloadChannelPlaylist').addEventListener('click', () => {
@@ -1836,7 +2074,8 @@ input:focus-visible {
     const items = currentQueue();
     if (!items.length || !items.every(item => item.kind === 'movie')) return;
     if (queueIndex + 1 < items.length) queueIndex++;
-    else queueIndex = 0;
+    else if (document.getElementById('loopMovies').checked) queueIndex = 0;
+    else { showMessage('Marathon ended. Enable 24/7 marathon loop to restart.'); return; }
     document.getElementById('queueSelection').value = String(queueIndex);
     streamUrl.value = items[queueIndex].url;
     playStream(items[queueIndex].url);
