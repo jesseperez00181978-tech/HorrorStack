@@ -878,7 +878,7 @@ input:focus-visible {
   <header class="site-header">
     <div class="brand-area">
       <p class="eyebrow">Broadcasting from somewhere in the dark</p>
-      <h1 class="main-logo">🎃 HorrorStack TV</h1><p>Player repair · 1.0.3</p>
+      <h1 class="main-logo">🎃 HorrorStack TV</h1><p>October 2026 • 24/7 channel update</p>
       <p class="site-description">24/7 horror channels built for sleepless nights.</p>
     </div>
 
@@ -1541,7 +1541,10 @@ input:focus-visible {
     updatePlayerLinks(cleanUrl);
 
     if (!cleanUrl) {
-      showMessage("<strong>No signal assigned.</strong> Add a legal MP4 or HLS URL below.");
+      if (currentChannelKey === 'haddonfield-247' || currentChannelKey === 'texas-chainsaw-247') {
+        const title = channelData[currentChannelKey].title;
+        showMessage('<strong>' + title + ' needs a playable source on this device.</strong> Import your authorized provider M3U or saved playable franchise movies. This update restores the channel but does not include a licensed 24/7 movie feed.');
+      } else showMessage("<strong>No signal assigned.</strong> Import your private M3U or add a playable stream URL below.");
       return;
     }
 
@@ -1725,8 +1728,9 @@ input:focus-visible {
     else delete streams[currentChannelKey];
 
     saveStreams(streams);
-    removeCurrentImportedQueue();
+    queueIndex = 0;
     renderQueue();
+    updateImportStatus();
     playStream(value);
   }
 
@@ -1864,10 +1868,13 @@ input:focus-visible {
 
   const MARATHON_SOURCE = Object.freeze({ 'haddonfield-247': 'haddonfield', 'texas-chainsaw-247': 'texas-chainsaw' });
   function queueForChannel(key) {
+    // A manually selected source takes priority. Keep imported queues in local
+    // storage as backups instead of silently deleting them on Save & Play.
+    if (loadStreams()[key]) return [];
     const saved = loadImportedQueues();
     if (saved[key]?.length) return saved[key];
     const original = MARATHON_SOURCE[key];
-    if (!original || loadStreams()[key]) return [];
+    if (!original) return [];
     // No stream was supplied for 24/7. Reuse playable franchise movies without
     // modifying the original on-demand collection or copying its private URLs.
     return (saved[original] || []).filter(item => item.kind === 'movie');
