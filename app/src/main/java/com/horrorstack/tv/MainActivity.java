@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                             pending = line;
                         } else if ((line.startsWith("https://") || line.startsWith("http://")) && pending != null) {
                             String label = pending.toLowerCase(Locale.ROOT);
-                            if (label.matches("(?s).*(horror|halloween|haddonfield|tcm|nightmare|elm.street|freddy|chainsaw|leatherface|phantasm|jeepers.creepers|children.of.the.corn|gatlin|night.of.the.demons|scarecrow|possession|haunted|midnight.pulp|insidious|hellraiser).*")) {
+                            if (label.matches("(?s).*(horror|halloween|haddonfield|tcm|nightmare|elm.street|freddy|chainsaw|leatherface|phantasm|jeepers.creepers|children.of.the.corn|gatlin|night.of.the.demons|scarecrow|possession|haunted|midnight.pulp|insidious|hellraiser|scream|friday.the.13th|jason|saw|chucky|child.s.play|final.destination|pumpkinhead|terrifier|slasher).*")) {
                                 int extra = pending.length() + line.length() + 2;
                                 if (selected.length() + extra > 9 * 1024 * 1024) throw new java.io.IOException("Matched playlist exceeds 9 MB");
                                 selected.append(pending).append('\n').append(line).append('\n');
