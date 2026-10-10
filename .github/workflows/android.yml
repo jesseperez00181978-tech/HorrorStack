@@ -32,12 +32,27 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Build safe test APK
-        run: gradle :app:assembleSandbox --stacktrace -Dorg.gradle.jvmargs=-Xmx3g
+      # Keep one debug signing identity for future phone preview updates.
+      # GitHub runner keys normally change each run, producing install conflicts.
+      - name: Reuse phone preview signing identity
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: horrorstack-phone-preview-debug-key-v1
+
+      - name: Build safe test and smaller phone preview APKs
+        run: gradle :app:assembleSandbox :app:assemblePhonePreview --stacktrace -Dorg.gradle.jvmargs=-Xmx3g
 
       - name: Upload HorrorStack Test APK
         uses: actions/upload-artifact@v4
         with:
           name: HorrorStack-test
           path: app/build/outputs/apk/sandbox/app-sandbox.apk
+          if-no-files-found: error
+
+      - name: Upload HorrorStack Phone Preview APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: HorrorStack-phone-preview-arm64
+          path: app/build/outputs/apk/phonePreview/app-phonePreview.apk
           if-no-files-found: error
