@@ -270,33 +270,20 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override public void onPlayerError(PlaybackException error) {
-                // Retry container parsing and codec failures with the in-app VLC engine.
+                // Retry eligible transport, container and codec failures once inside the app.
                 // Provider movies such as Texas Chain Saw Massacre (1974) use MKV.
-                if (error.errorCode >= 3000 && error.errorCode < 5000) {
+                if (PlaybackErrors.shouldTryAlternateEngine(error)) {
                     long position = inlinePlayer == null ? inlinePosition : inlinePlayer.getCurrentPosition();
                     String fallbackUrl = inlineUrl;
-                    updatePageMessage("<strong>Switching decoder...</strong> Opening HorrorStack software playback.");
+                    updatePageMessage("<strong>Switching decoder...</strong> Opening HorrorStack alternate internal player.");
                     releaseInlineEngine(true);
-                    if (fallbackUrl != null) openSoftwareFullscreen(fallbackUrl, position);
+                    if (fallbackUrl != null) openSoftwareFullscreen(fallbackUrl, position, PlaybackErrors.describe(error));
                     return;
                 }
                 inlineView.setCustomErrorMessage("This channel could not play (" + error.getErrorCodeName()
                         + "). Check the connection or try another channel.");
                 inlineView.showController();
-                // Show the status below the video: the overlay can clip long errors.
-                // Never display exception messages or URLs, which may contain credentials.
-                String detail = "Playback failed: " + error.getErrorCodeName() + ".";
-                Throwable cause = error;
-                for (int depth = 0; cause != null && depth < 16; depth++) {
-                    if (cause instanceof androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException) {
-                        int status = ((androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException) cause).responseCode;
-                        detail = "The stream request returned HTTP " + status
-                                + ". Please report this number and whether you were using Wi-Fi or mobile data.";
-                        break;
-                    }
-                    cause = cause.getCause();
-                }
-                updatePageMessage(detail);
+                updatePageMessage(PlaybackErrors.describe(error));
             }
         });
 
@@ -326,9 +313,10 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void openSoftwareFullscreen(String url, long position) {
+    private void openSoftwareFullscreen(String url, long position, String previousError) {
         Intent fallback = new Intent(MainActivity.this, SoftwarePlayerActivity.class);
         fallback.putExtra("url", url);
+        fallback.putExtra("previousError", previousError);
         fallback.putExtra("position", Math.max(0, position));
         fallback.putExtra("title", inlineTitle);
         startActivity(fallback);

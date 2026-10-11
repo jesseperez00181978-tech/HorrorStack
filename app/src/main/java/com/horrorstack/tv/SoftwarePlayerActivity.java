@@ -136,7 +136,10 @@ public class SoftwarePlayerActivity extends AppCompatActivity {
                     status.setText(time(player.getTime()) + " / " + time(duration) + " · Software player");
                     break;
                 case MediaPlayer.Event.EncounteredError:
-                    status.setText("The software player could not play this source. Retry or return to channels.");
+                    String previousError = getIntent().getStringExtra("previousError");
+                    status.setText("Both internal players could not open this stream. "
+                            + (previousError == null ? "" : previousError + " ")
+                            + "Retry or return to channels.");
                     break;
                 case MediaPlayer.Event.EndReached:
                     position = 0;

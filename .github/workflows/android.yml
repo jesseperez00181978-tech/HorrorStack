@@ -2,6 +2,11 @@ name: Build HorrorStack APK
 
 on:
   workflow_dispatch:
+  pull_request:
+    paths:
+      - "app/**"
+      - "build.gradle.kts"
+      - ".github/workflows/android.yml"
   push:
     branches:
       - main
