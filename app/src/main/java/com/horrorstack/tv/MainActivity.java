@@ -283,7 +283,20 @@ public class MainActivity extends AppCompatActivity {
                 inlineView.setCustomErrorMessage("This channel could not play (" + error.getErrorCodeName()
                         + "). Check the connection or try another channel.");
                 inlineView.showController();
-                updatePageMessage("The native player could not open this source. Check the connection or try another channel.");
+                // Show the status below the video: the overlay can clip long errors.
+                // Never display exception messages or URLs, which may contain credentials.
+                String detail = "Playback failed: " + error.getErrorCodeName() + ".";
+                Throwable cause = error;
+                for (int depth = 0; cause != null && depth < 16; depth++) {
+                    if (cause instanceof androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException) {
+                        int status = ((androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException) cause).responseCode;
+                        detail = "The stream request returned HTTP " + status
+                                + ". Please report this number and whether you were using Wi-Fi or mobile data.";
+                        break;
+                    }
+                    cause = cause.getCause();
+                }
+                updatePageMessage(detail);
             }
         });
 
