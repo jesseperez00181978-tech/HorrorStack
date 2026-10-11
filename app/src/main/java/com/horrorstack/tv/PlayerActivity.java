@@ -71,18 +71,18 @@ public class PlayerActivity extends AppCompatActivity {
         view.showController();
         player.addListener(new Player.Listener() {
             @Override public void onPlayerError(PlaybackException error) {
-                // Retry container parsing and codec failures with the in-app VLC engine.
+                // Retry eligible transport, container and codec failures once inside the app.
                 // Provider movies such as Texas Chain Saw Massacre (1974) use MKV.
-                if (error.errorCode >= 3000 && error.errorCode < 5000) {
+                if (PlaybackErrors.shouldTryAlternateEngine(error)) {
                     Intent fallback = new Intent(PlayerActivity.this, SoftwarePlayerActivity.class);
                     fallback.putExtra("url", uri.toString());
+                    fallback.putExtra("previousError", PlaybackErrors.describe(error));
                     fallback.putExtra("position", player == null ? position : player.getCurrentPosition());
                     startActivity(fallback);
                     finish();
                     return;
                 }
-                view.setCustomErrorMessage("This channel could not play (" + error.getErrorCodeName()
-                        + "). Check the connection or try another channel.");
+                view.setCustomErrorMessage(PlaybackErrors.describe(error));
                 view.showController();
             }
         });
