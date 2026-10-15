@@ -1,0 +1,31 @@
+const fs = require('node:fs');
+const vm = require('node:vm');
+const assert = require('node:assert/strict');
+const html = fs.readFileSync('index.html', 'utf8');
+for (const [, script] of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)) new vm.Script(script);
+const storage = new Map();
+const context = vm.createContext({ URL, localStorage: {getItem: k => storage.get(k)}, PLAYLIST_KEY:'queues',
+  channelData: Object.fromEntries(['haddonfield','haddonfield-247','texas-chainsaw','texas-chainsaw-247','english-horror-247','uk-horror','midnight-pulp','horror-movies'].map(k => [k,{}])),
+  loadStreams: () => JSON.parse(storage.get('manual') || '{}') });
+const section = (a,b) => html.slice(html.indexOf(a), html.indexOf(b, html.indexOf(a)));
+vm.runInContext(section('  function safeStreamUrl(', '  let movieLibraryPageSize'), context);
+vm.runInContext(section('  function queueForChannel(', '  function currentQueue('), context);
+const run = code => vm.runInContext(code, context);
+const parse = (name,group,url,attrs='') => run(`parsePrivateM3u(${JSON.stringify(`#EXTM3U\n#EXTINF:-1 group-title="${group}" ${attrs},${name}\n${url}`)})`);
+assert.equal(parse('US | Halloween HD','24/7','https://example.com/live/u/p/1.ts').groups['haddonfield-247'][0].kind,'live');
+assert.equal(parse('Texas Chainsaw Massacre FHD','24-7 Movies','https://example.com/live/u/p/2.ts').groups['texas-chainsaw-247'][0].kind,'live');
+assert.ok(parse('English Horror','24/7','https://example.com/live/u/p/3.ts').groups['english-horror-247']);
+assert.ok(parse('Halloween 1978','24/7','https://example.com/movie/u/p/4.mkv').groups.haddonfield);
+assert.ok(parse('Haddonfield 24/7','Horror','https://example.com/movie/u/p/4.mkv','horrorstack-channel="haddonfield-247"').groups.haddonfield);
+storage.set('queues',JSON.stringify({haddonfield:[{name:'Halloween',kind:'movie',url:'https://example.com/movie/a.mkv'}]}));
+assert.equal(run("queueForChannel('haddonfield-247').length"),0);
+storage.set('queues',JSON.stringify({'haddonfield-247':[{name:'movie',kind:'movie',url:'https://example.com/movie/a.mkv'},{name:'Live',kind:'live',url:'https://example.com/live/a.ts'}]}));
+assert.equal(run("queueForChannel('haddonfield-247')[0].name"),'Live');
+assert.equal(run("loadImportedQueues().haddonfield[0].name"),'movie');
+storage.set('manual',JSON.stringify({'haddonfield-247':'https://example.com/movie/override.mkv'}));
+assert.equal(run("manualSourceForChannel('haddonfield-247')"),'');
+assert.equal(run("queueForChannel('haddonfield-247')[0].name"),'Live');
+storage.set('manual',JSON.stringify({'haddonfield-247':'https://example.com/live/manual.ts'}));
+assert.equal(run("queueForChannel('haddonfield-247').length"),0);
+assert.equal(fs.readFileSync('app/src/main/assets/index.html','utf8'),html);
+console.log('Passed: script syntax, provider matching, VOD separation, saved-data migration, live overrides, Android asset parity.');

@@ -1068,8 +1068,8 @@ input:focus-visible {
         </article>
         <article class="channel-card haddonfield">
           <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🎃</div>
-          <div class="channel-content"><p class="channel-status">Your 24/7 stream or movie loop</p>
-            <h3>Haddonfield 24/7</h3><p>Halloween movies nonstop, using your authorized stream or looping your saved Haddonfield films.</p>
+          <div class="channel-content"><p class="channel-status">Your provider’s live IPTV stream</p>
+            <h3>Haddonfield 24/7</h3><p>The Halloween 24/7 live channel from your imported provider playlist.</p>
             <a href="#" class="watch-btn" data-open-channel="haddonfield-247"><span>Connect 24/7</span><span>▶</span></a>
           </div>
         </article>
@@ -1088,8 +1088,8 @@ input:focus-visible {
         </article>
         <article class="channel-card creeper-road">
           <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🪚</div>
-          <div class="channel-content"><p class="channel-status">Your 24/7 stream or movie loop</p>
-            <h3>TCM 24/7</h3><p>Leatherface movies nonstop, using your authorized stream or looping your saved Texas Chainsaw films.</p>
+          <div class="channel-content"><p class="channel-status">Your provider’s live IPTV stream</p>
+            <h3>TCM 24/7</h3><p>The Texas Chainsaw 24/7 live channel from your imported provider playlist.</p>
             <a href="#" class="watch-btn" data-open-channel="texas-chainsaw-247"><span>Connect 24/7</span><span>▶</span></a>
           </div>
         </article>
@@ -1373,8 +1373,8 @@ input:focus-visible {
   Object.assign(channelData, {
     "elm-street": { title: "Elm Street", info: "A Nightmare on Elm Street films." },
     "texas-chainsaw": { title: "Texas Chainsaw Massacre", info: "The Texas Chain Saw Massacre films." },
-    "haddonfield-247": { title: "Haddonfield 24/7", info: "Your authorized Halloween 24/7 broadcast, or a nonstop loop of your saved playable Halloween movies." },
-    "texas-chainsaw-247": { title: "TCM 24/7", info: "Your authorized Texas Chainsaw 24/7 broadcast, or a nonstop loop of your saved playable TCM movies." },
+    "haddonfield-247": { title: "Haddonfield 24/7", info: "Your provider’s Halloween 24/7 live broadcast." },
+    "texas-chainsaw-247": { title: "TCM 24/7", info: "Your provider’s Texas Chainsaw 24/7 live broadcast." },
     "horror-movies": { title: "Horror Movies", info: "Your private movies on demand, separate from live TV." },
     "midnight-pulp": { title: "Midnight Pulp", info: "Midnight Pulp live broadcast." },
     "english-horror-247": { title: "English 24/7 Horror Movies", info: "Continuous horror movies. The provider controls the schedule." },
@@ -1614,13 +1614,13 @@ input:focus-visible {
   function playStream(url) {
     stopVideo();
 
-    const cleanUrl = safeStreamUrl(url);
+    const cleanUrl = LIVE_CHANNELS.has(currentChannelKey) && isMovieUrl(url) ? '' : safeStreamUrl(url);
     updatePlayerLinks(cleanUrl);
 
     if (!cleanUrl) {
       if (currentChannelKey === 'haddonfield-247' || currentChannelKey === 'texas-chainsaw-247') {
         const title = channelData[currentChannelKey].title;
-        showMessage('<strong>' + title + ' needs a playable source on this device.</strong> Import your authorized provider M3U or saved playable franchise movies. This update restores the channel but does not include a licensed 24/7 movie feed.');
+        showMessage('<strong>' + title + ' needs a playable source on this device.</strong> Import your provider playlist containing this live IPTV channel. Movies are available separately under Movies.');
       } else showMessage("<strong>No signal assigned.</strong> Import your private M3U or add a playable stream URL below.");
       return;
     }
@@ -1752,7 +1752,7 @@ input:focus-visible {
       const queue = currentQueue();
       queueIndex = Number.isInteger(selectedMovieIndex) && selectedMovieIndex >= 0 && selectedMovieIndex < queue.length
         ? selectedMovieIndex : 0;
-      const savedUrl = queue[queueIndex]?.url || streams[channelKey] || "";
+      const savedUrl = queue[queueIndex]?.url || manualSourceForChannel(channelKey) || "";
       renderQueue();
       streamUrl.value = savedUrl;
 
@@ -1779,6 +1779,10 @@ input:focus-visible {
     if (!currentChannelKey) return;
 
     const value = streamUrl.value.trim();
+    if (LIVE_CHANNELS.has(currentChannelKey) && isMovieUrl(value)) {
+      showMessage('This is a movie URL. Add your provider’s live IPTV channel URL here instead.', true);
+      return;
+    }
 
     try {
       if (value && !safeStreamUrl(value)) throw new Error("Unsupported URL");
@@ -1821,16 +1825,26 @@ input:focus-visible {
     } catch { return ''; }
   }
 
+  const LIVE_CHANNELS = new Set(['haddonfield-247', 'texas-chainsaw-247', 'english-horror-247', 'uk-horror', 'midnight-pulp']);
+  function isMovieUrl(url) {
+    try { return /\/movie\/|\.(mp4|mkv|webm|mov|m4v|avi)$/i.test(new URL(url).pathname); }
+    catch { return false; }
+  }
+  function manualSourceForChannel(key) {
+    const url = loadStreams()[key] || '';
+    return LIVE_CHANNELS.has(key) && isMovieUrl(url) ? '' : url;
+  }
+
   function matchProviderChannel(name, group) {
     const title = String(name || '').toLowerCase().replace(/[_|:–—-]+/g, ' ').replace(/\s+/g, ' ').trim();
     const categoryName = String(group || '').toLowerCase().replace(/[_|:–—-]+/g, ' ').replace(/\s+/g, ' ').trim();
     // A 24/7 broadcast is distinct from an individual franchise film.
     const broadcastTitle = /\b(?:24\/7|24 7|247|marathon|nonstop|continuous)\b/.test(title);
-    const broadcastGroup = /\b(?:24\/7|24 7|247)\b/.test(categoryName) &&
-      /^(?:haddonfield|halloween|tcm|texas chainsaw(?: massacre)?)$/.test(title);
+    const broadcastGroup = /\b(?:24\/7|24 7|247)\b/.test(categoryName);
     if (broadcastTitle || broadcastGroup) {
       if (/\b(?:haddonfield|halloween|michael myers)\b/.test(title)) return 'haddonfield-247';
       if (/\b(?:tcm|texas chain\s*saw|leatherface)\b/.test(title)) return 'texas-chainsaw-247';
+      if (/\bhorror\b/.test(title)) return /\buk\b/.test(title) ? 'uk-horror' : 'english-horror-247';
     }
     const franchiseRules = [
       [/\bhaddonfield\b/, 'haddonfield'],
@@ -1914,9 +1928,10 @@ input:focus-visible {
           /\.(mp4|mkv|webm|mov|m4v|avi)(?:[?#]|$)/i.test(url) ? 'movie' : 'live';
         const horrorMovieTitle = /\b(?:scream|friday the 13th|jason voorhees|saw(?: [1-9ivx]|$)|child'?s play|chucky|final destination|pumpkinhead|hellraiser|the exorcist|terrifier|candyman|sinister|insidious|the conjuring|hatchet|midsommar|as above so below|haunt|the hills have eyes)\b/i.test(name);
         const horrorMovieGroup = /\b(?:horror|slasher|supernatural|scary|haunted|horror movies?|horror vod)\b/i.test(attrs['group-title'] || '');
-        const key = attrs['horrorstack-channel'] || marathonKey || aliases[normalize(attrs['tvg-id'])] ||
+        let key = attrs['horrorstack-channel'] || marathonKey || aliases[normalize(attrs['tvg-id'])] ||
           aliases[normalize(name)] || inferred || aliases[normalize(attrs['group-title'])] ||
           (kind === 'movie' && (horrorMovieTitle || horrorMovieGroup) ? 'horror-movies' : '');
+        if (kind === 'movie' && LIVE_CHANNELS.has(key)) key = key === 'haddonfield-247' ? 'haddonfield' : key === 'texas-chainsaw-247' ? 'texas-chainsaw' : 'horror-movies';
         if (!Object.hasOwn(channelData, key || '') || (key === 'horror-movies' && kind !== 'movie')) { ignored++; continue; }
         groups[key] ||= [];
         if (!groups[key].some(item => item.url === url)) { if (groups[key].length < 400) { groups[key].push({ name, url, kind }); count++; } else ignored++; }
@@ -1934,6 +1949,17 @@ input:focus-visible {
         if (!Array.isArray(data?.[key])) continue;
         const valid = data[key].filter(item => item && typeof item.name === 'string' && safeStreamUrl(item.url) && ['movie', 'live'].includes(item.kind));
         if (valid.length) clean[key] = valid;
+      }
+      for (const key of LIVE_CHANNELS) {
+        const entries = clean[key] || [];
+        const movies = entries.filter(item => item.kind === 'movie' || isMovieUrl(item.url));
+        clean[key] = entries.filter(item => !movies.includes(item));
+        if (!clean[key].length) delete clean[key];
+        if (movies.length) {
+          const target = key === 'haddonfield-247' ? 'haddonfield' : key === 'texas-chainsaw-247' ? 'texas-chainsaw' : 'horror-movies';
+          clean[target] ||= [];
+          for (const movie of movies) if (!clean[target].some(item => item.url === movie.url)) clean[target].push({ ...movie, kind: 'movie' });
+        }
       }
       return clean;
     } catch { return Object.create(null); }
@@ -2021,23 +2047,17 @@ input:focus-visible {
     renderMovieLibrary();
   });
 
-  const MARATHON_SOURCE = Object.freeze({ 'haddonfield-247': 'haddonfield', 'texas-chainsaw-247': 'texas-chainsaw' });
   function queueForChannel(key) {
-    // A manually selected source takes priority. Keep imported queues in local
-    // storage as backups instead of silently deleting them on Save & Play.
-    const manual = loadStreams()[key];
+    const manual = manualSourceForChannel(key);
     const saved = loadImportedQueues();
     const isLegacy = url => { try { return new URL(url).hostname === 'line.dndnscloud.ru'; } catch { return false; } };
-    // Migrate an old override only when a replacement actually exists.
-    const replacement = (saved[key] || []).filter(item => !isLegacy(item.url));
+    const eligible = (saved[key] || []).filter(item => !LIVE_CHANNELS.has(key) ||
+      (item.kind === 'live' && !isMovieUrl(item.url)));
+    const replacement = eligible.filter(item => !isLegacy(item.url));
     if (manual && !(isLegacy(manual) && replacement.length)) return [];
     if (manual && isLegacy(manual) && replacement.length) return replacement;
-    if (saved[key]?.length) return saved[key];
-    const original = MARATHON_SOURCE[key];
-    if (!original) return [];
-    // No stream was supplied for 24/7. Reuse playable franchise movies without
-    // modifying the original on-demand collection or copying its private URLs.
-    return (saved[original] || []).filter(item => item.kind === 'movie');
+    // Live channels never fall back to on-demand franchise movies.
+    return eligible;
   }
   function currentQueue() { return queueForChannel(currentChannelKey); }
 
@@ -2052,7 +2072,7 @@ input:focus-visible {
       const items = queueForChannel(key);
       const label = link.querySelector('span');
       if (label) {
-        if (Object.hasOwn(MARATHON_SOURCE, key)) label.textContent = (items.length || loadStreams()[key]) ? 'Watch 24/7' : 'Connect 24/7';
+        if (LIVE_CHANNELS.has(key)) label.textContent = (items.length || manualSourceForChannel(key)) ? 'Watch 24/7' : 'Connect 24/7';
         else label.textContent = items.length && items.every(x => x.kind === 'movie') ? `Choose movie (${items.length})` : 'Watch Channel';
       }
     });
@@ -2087,7 +2107,7 @@ input:focus-visible {
     document.getElementById('queueDescription').textContent = movies
       ? '24/7 marathon: your playable movies advance automatically and restart when Loop is enabled.'
       : items.length ? 'Live feed. The provider controls the movie schedule.'
-      : 'No movie queue loaded. Import an authorized 24/7 feed or playable franchise films.';
+      : 'No live feed loaded. Import your provider playlist to connect this channel.';
     updateOfficialWatch();
   }
 
@@ -2161,7 +2181,7 @@ input:focus-visible {
       updateImportStatus(`Imported ${result.count} feeds or movies into ${Object.keys(result.groups).length} groups. ${retained} other saved groups preserved, prior sources kept as backups. ${result.ignored} unrelated or excess entries skipped. Playback has not yet been checked.`);
       if (currentChannelKey) {
         queueIndex = 0; renderQueue();
-        const url = currentQueue()[0]?.url || loadStreams()[currentChannelKey] || '';
+        const url = currentQueue()[0]?.url || manualSourceForChannel(currentChannelKey) || '';
         streamUrl.value = url; playStream(url);
       }
       return true;
@@ -2232,7 +2252,7 @@ input:focus-visible {
     }
   });
   document.getElementById('removeImportedPlaylists').addEventListener('click', () => {
-    try { localStorage.removeItem(PLAYLIST_KEY); updateImportStatus(); if (currentChannelKey) { queueIndex = 0; renderQueue(); const url = loadStreams()[currentChannelKey] || ''; streamUrl.value = url; playStream(url); } }
+    try { localStorage.removeItem(PLAYLIST_KEY); updateImportStatus(); if (currentChannelKey) { queueIndex = 0; renderQueue(); const url = manualSourceForChannel(currentChannelKey) || ''; streamUrl.value = url; playStream(url); } }
     catch { updateImportStatus('The device could not remove the imported playlists.'); }
   });
   document.getElementById('queueSelection').addEventListener('change', event => {
