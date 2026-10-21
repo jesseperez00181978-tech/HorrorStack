@@ -2051,13 +2051,23 @@ input:focus-visible {
     const manual = manualSourceForChannel(key);
     const saved = loadImportedQueues();
     const isLegacy = url => { try { return new URL(url).hostname === 'line.dndnscloud.ru'; } catch { return false; } };
+    // Preserve backup feeds when a manual URL is saved.
     const eligible = (saved[key] || []).filter(item => !LIVE_CHANNELS.has(key) ||
       (item.kind === 'live' && !isMovieUrl(item.url)));
-    const replacement = eligible.filter(item => !isLegacy(item.url));
-    if (manual && !(isLegacy(manual) && replacement.length)) return [];
-    if (manual && isLegacy(manual) && replacement.length) return replacement;
-    // Live channels never fall back to on-demand franchise movies.
-    return eligible;
+    const manualItem = manual ? { name: channelData[key].title + ' (saved source)',
+      url: manual, kind: isMovieUrl(manual) ? 'movie' : 'live' } : null;
+    const newer = eligible.filter(item => !isLegacy(item.url));
+    const older = eligible.filter(item => isLegacy(item.url));
+    // Known legacy feeds go behind fresh imports, but none are deleted.
+    const ordered = manualItem && isLegacy(manual) && newer.length
+      ? [...newer, manualItem, ...older]
+      : [...(manualItem ? [manualItem] : []), ...eligible];
+    const seen = new Set();
+    return ordered.filter(item => {
+      if (seen.has(item.url)) return false;
+      seen.add(item.url);
+      return true;
+    });
   }
   function currentQueue() { return queueForChannel(currentChannelKey); }
 
