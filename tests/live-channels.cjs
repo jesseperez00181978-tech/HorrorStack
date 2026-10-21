@@ -26,6 +26,11 @@ storage.set('manual',JSON.stringify({'haddonfield-247':'https://example.com/movi
 assert.equal(run("manualSourceForChannel('haddonfield-247')"),'');
 assert.equal(run("queueForChannel('haddonfield-247')[0].name"),'Live');
 storage.set('manual',JSON.stringify({'haddonfield-247':'https://example.com/live/manual.ts'}));
-assert.equal(run("queueForChannel('haddonfield-247').length"),0);
+assert.equal(run("queueForChannel('haddonfield-247').length"),2);
+assert.equal(run("queueForChannel('haddonfield-247')[0].url"),'https://example.com/live/manual.ts');
+assert.equal(run("queueForChannel('haddonfield-247')[1].name"),'Live');
+storage.set('manual',JSON.stringify({'haddonfield-247':'https://line.dndnscloud.ru/live/old.ts'}));
+assert.equal(run("queueForChannel('haddonfield-247')[0].name"),'Live');
+assert.equal(run("queueForChannel('haddonfield-247')[1].name"),'Haddonfield 24/7 (saved source)');
 assert.equal(fs.readFileSync('app/src/main/assets/index.html','utf8'),html);
 console.log('Passed: script syntax, provider matching, VOD separation, saved-data migration, live overrides, Android asset parity.');
