@@ -5,7 +5,7 @@ const html = fs.readFileSync('index.html', 'utf8');
 for (const [, script] of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)) new vm.Script(script);
 const storage = new Map();
 const context = vm.createContext({ URL, localStorage: {getItem: k => storage.get(k)}, PLAYLIST_KEY:'queues',
-  channelData: Object.fromEntries(['haddonfield','haddonfield-247','texas-chainsaw','texas-chainsaw-247','english-horror-247','uk-horror','midnight-pulp','horror-movies'].map(k => [k,{}])),
+  channelData: Object.fromEntries(['haddonfield','haddonfield-247','texas-chainsaw','texas-chainsaw-247','american-horror-story-247','english-horror-247','uk-horror','midnight-pulp','horror-movies'].map(k => [k,{}])),
   loadStreams: () => JSON.parse(storage.get('manual') || '{}') });
 const section = (a,b) => html.slice(html.indexOf(a), html.indexOf(b, html.indexOf(a)));
 vm.runInContext(section('  function safeStreamUrl(', '  let movieLibraryPageSize'), context);
@@ -15,6 +15,12 @@ const parse = (name,group,url,attrs='') => run(`parsePrivateM3u(${JSON.stringify
 assert.equal(parse('US | Halloween HD','24/7','https://example.com/live/u/p/1.ts').groups['haddonfield-247'][0].kind,'live');
 assert.equal(parse('Texas Chainsaw Massacre FHD','24-7 Movies','https://example.com/live/u/p/2.ts').groups['texas-chainsaw-247'][0].kind,'live');
 assert.ok(parse('English Horror','24/7','https://example.com/live/u/p/3.ts').groups['english-horror-247']);
+assert.equal(parse('24/7 AMERICAN HORROR STORY','TV','https://example.com/live/u/p/ahs.ts').groups['american-horror-story-247'][0].kind,'live');
+assert.ok(parse('American Horror Stories','24/7','https://example.com/live/u/p/stories.ts').groups['american-horror-story-247']);
+assert.ok(parse('AHS 24/7','Horror','https://example.com/live/u/p/ahs-alt.ts').groups['american-horror-story-247']);
+assert.ok(parse('Evil Dead Rise (2023)','Movies','https://example.com/movie/u/p/rise.mkv').groups['horror-movies']);
+assert.ok(parse('Evil Dead Rise (2023)','Horror','https://example.com/movie/u/p/rise-2.mkv').groups['horror-movies']);
+assert.ok(parse('24/7 American Horror Story','TV','https://example.com/movie/u/p/episode.mkv').groups['horror-movies']);
 assert.ok(parse('Halloween 1978','24/7','https://example.com/movie/u/p/4.mkv').groups.haddonfield);
 assert.ok(parse('Haddonfield 24/7','Horror','https://example.com/movie/u/p/4.mkv','horrorstack-channel="haddonfield-247"').groups.haddonfield);
 storage.set('queues',JSON.stringify({haddonfield:[{name:'Halloween',kind:'movie',url:'https://example.com/movie/a.mkv'}]}));

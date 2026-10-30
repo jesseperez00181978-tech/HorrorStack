@@ -28,6 +28,9 @@ jobs:
       - name: Sync live GitHub UI into Android app
         run: cp index.html app/src/main/assets/index.html
 
+      - name: Test 24/7 matching and movie separation
+        run: node tests/live-channels.cjs
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
