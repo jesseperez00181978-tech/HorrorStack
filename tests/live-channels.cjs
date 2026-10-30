@@ -5,7 +5,7 @@ const html = fs.readFileSync('index.html', 'utf8');
 for (const [, script] of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)) new vm.Script(script);
 const storage = new Map();
 const context = vm.createContext({ URL, localStorage: {getItem: k => storage.get(k)}, PLAYLIST_KEY:'queues',
-  channelData: Object.fromEntries(['haddonfield','haddonfield-247','texas-chainsaw','texas-chainsaw-247','american-horror-story-247','english-horror-247','uk-horror','midnight-pulp','horror-movies'].map(k => [k,{}])),
+  channelData: Object.fromEntries(['haddonfield','haddonfield-247','texas-chainsaw','texas-chainsaw-247','american-horror-story-247','english-horror-247','uk-horror','midnight-pulp','horror-movies'].map(k => [k,{title:k === 'haddonfield-247' ? 'Haddonfield 24/7' : k}])),
   loadStreams: () => JSON.parse(storage.get('manual') || '{}') });
 const section = (a,b) => html.slice(html.indexOf(a), html.indexOf(b, html.indexOf(a)));
 vm.runInContext(section('  function safeStreamUrl(', '  let movieLibraryPageSize'), context);

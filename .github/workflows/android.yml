@@ -5,6 +5,7 @@ on:
   pull_request:
     paths:
       - "app/**"
+      - "tests/**"
       - "build.gradle.kts"
       - ".github/workflows/android.yml"
   push:
@@ -13,6 +14,7 @@ on:
     paths:
       - "index.html"
       - "app/**"
+      - "tests/**"
       - "build.gradle.kts"
       - "settings.gradle.kts"
       - ".github/workflows/android.yml"
