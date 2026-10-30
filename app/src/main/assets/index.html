@@ -1102,6 +1102,16 @@ input:focus-visible {
             <a href="#" class="watch-btn" data-open-channel="american-horror-story-247"><span>Connect 24/7</span><span>▶</span></a>
           </div>
         </article>
+
+        <article class="channel-card possession-room">
+          <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">👻</div>
+          <div class="channel-content">
+            <p class="channel-status">Your provider's 24/7 live IPTV stream</p>
+            <h3>Paranormal Activity 24/7</h3>
+            <p>Connect an Paranormal Activity live marathon from your authorized provider playlist.</p>
+            <a href="#" class="watch-btn" data-open-channel="paranormal-activity-247"><span>Connect 24/7</span><span>▶</span></a>
+          </div>
+        </article>
         <article class="channel-card graveyard-shift">
           <div class="card-overlay"></div><div class="channel-art"></div><div class="channel-icon">🎞️</div>
           <div class="channel-content"><p class="channel-status">Your playlist</p><h3>Midnight Pulp</h3><p>The Midnight Pulp live feed from your imported playlist.</p>
@@ -1384,6 +1394,7 @@ input:focus-visible {
     "texas-chainsaw": { title: "Texas Chainsaw Massacre", info: "The Texas Chain Saw Massacre films." },
     "haddonfield-247": { title: "Haddonfield 24/7", info: "Your provider’s Halloween 24/7 live broadcast." },
     "texas-chainsaw-247": { title: "TCM 24/7", info: "Your provider’s Texas Chainsaw 24/7 live broadcast." },
+    "paranormal-activity-247": { title: "Paranormal Activity 24/7", info: "Your provider’s Paranormal Activity live broadcast." },
     "american-horror-story-247": { title: "American Horror Story 24/7", info: "Your provider’s American Horror Story or American Horror Stories live broadcast." },
     "horror-movies": { title: "Horror Movies", info: "Your private movies on demand, separate from live TV." },
     "midnight-pulp": { title: "Midnight Pulp", info: "Midnight Pulp live broadcast." },
@@ -1628,7 +1639,7 @@ input:focus-visible {
     updatePlayerLinks(cleanUrl);
 
     if (!cleanUrl) {
-      if (currentChannelKey === 'haddonfield-247' || currentChannelKey === 'texas-chainsaw-247' || currentChannelKey === 'american-horror-story-247') {
+      if (currentChannelKey === 'haddonfield-247' || currentChannelKey === 'texas-chainsaw-247' || currentChannelKey === 'american-horror-story-247' || currentChannelKey === 'paranormal-activity-247') {
         const title = channelData[currentChannelKey].title;
         showMessage('<strong>' + title + ' needs a playable source on this device.</strong> Import your provider playlist containing this live IPTV channel. Movies are available separately under Movies.');
       } else showMessage("<strong>No signal assigned.</strong> Import your private M3U or add a playable stream URL below.");
@@ -1835,7 +1846,7 @@ input:focus-visible {
     } catch { return ''; }
   }
 
-  const LIVE_CHANNELS = new Set(['haddonfield-247', 'texas-chainsaw-247', 'american-horror-story-247', 'english-horror-247', 'uk-horror', 'midnight-pulp']);
+  const LIVE_CHANNELS = new Set(['paranormal-activity-247', 'haddonfield-247', 'texas-chainsaw-247', 'american-horror-story-247', 'english-horror-247', 'uk-horror', 'midnight-pulp']);
   function isMovieUrl(url) {
     try { return /\/movie\/|\.(mp4|mkv|webm|mov|m4v|avi)$/i.test(new URL(url).pathname); }
     catch { return false; }
@@ -1852,6 +1863,7 @@ input:focus-visible {
     const broadcastTitle = /\b(?:24\/7|24 7|247|marathon|nonstop|continuous)\b/.test(title);
     const broadcastGroup = /\b(?:24\/7|24 7|247)\b/.test(categoryName);
     if (broadcastTitle || broadcastGroup) {
+      if (/\bparanormal activity\b/.test(title)) return 'paranormal-activity-247';
       if (/\bamerican horror stor(?:y|ies)\b|\bahs\b/.test(title)) return 'american-horror-story-247';
       if (/\b(?:haddonfield|halloween|michael myers)\b/.test(title)) return 'haddonfield-247';
       if (/\b(?:tcm|texas chain\s*saw|leatherface)\b/.test(title)) return 'texas-chainsaw-247';
@@ -1905,6 +1917,8 @@ input:focus-visible {
       creeperroad: 'creeper-road', phantasm: 'phantasm', haddonfield: 'haddonfield',
       haddonfield247: 'haddonfield-247', halloween247: 'haddonfield-247', halloweenmarathon: 'haddonfield-247',
       tcm247: 'texas-chainsaw-247', texaschainsaw247: 'texas-chainsaw-247', texaschainsawmassacre247: 'texas-chainsaw-247',
+      paranormalactivity247: 'paranormal-activity-247', '247paranormalactivity': 'paranormal-activity-247',
+      paranormalactivitymarathon: 'paranormal-activity-247',
       americanhorrorstory247: 'american-horror-story-247', americanhorrorstories247: 'american-horror-story-247',
       '247americanhorrorstory': 'american-horror-story-247', '247americanhorrorstories': 'american-horror-story-247',
       ahs247: 'american-horror-story-247', '247ahs': 'american-horror-story-247',
@@ -1940,7 +1954,7 @@ input:focus-visible {
         const moviePath = new URL(url).pathname;
         const kind = attrs['horrorstack-kind'] === 'movie' || /\/movie\//i.test(moviePath) ||
           /\.(mp4|mkv|webm|mov|m4v|avi)(?:[?#]|$)/i.test(url) ? 'movie' : 'live';
-        const horrorMovieTitle = /\b(?:scream|friday the 13th|jason voorhees|saw(?: [1-9ivx]|$)|child'?s play|chucky|final destination|pumpkinhead|evil dead(?: rise)?|hellraiser|the exorcist|terrifier|candyman|sinister|insidious|the conjuring|hatchet|midsommar|as above so below|haunt|the hills have eyes)\b/i.test(name);
+        const horrorMovieTitle = /\b(?:paranormal activity|scream|friday the 13th|jason voorhees|saw(?: [1-9ivx]|$)|child'?s play|chucky|final destination|pumpkinhead|evil dead(?: rise)?|hellraiser|the exorcist|terrifier|candyman|sinister|insidious|the conjuring|hatchet|midsommar|as above so below|haunt|the hills have eyes)\b/i.test(name);
         const horrorMovieGroup = /\b(?:horror|slasher|supernatural|scary|haunted|horror movies?|horror vod)\b/i.test(attrs['group-title'] || '');
         let key = attrs['horrorstack-channel'] || marathonKey || aliases[normalize(attrs['tvg-id'])] ||
           aliases[normalize(name)] || inferred || aliases[normalize(attrs['group-title'])] ||

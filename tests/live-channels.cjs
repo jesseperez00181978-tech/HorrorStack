@@ -5,7 +5,7 @@ const html = fs.readFileSync('index.html', 'utf8');
 for (const [, script] of html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)) new vm.Script(script);
 const storage = new Map();
 const context = vm.createContext({ URL, localStorage: {getItem: k => storage.get(k)}, PLAYLIST_KEY:'queues',
-  channelData: Object.fromEntries(['haddonfield','haddonfield-247','texas-chainsaw','texas-chainsaw-247','american-horror-story-247','english-horror-247','uk-horror','midnight-pulp','horror-movies'].map(k => [k,{title:k === 'haddonfield-247' ? 'Haddonfield 24/7' : k}])),
+  channelData: Object.fromEntries(['paranormal-activity-247','haddonfield','haddonfield-247','texas-chainsaw','texas-chainsaw-247','american-horror-story-247','english-horror-247','uk-horror','midnight-pulp','horror-movies'].map(k => [k,{title:k === 'haddonfield-247' ? 'Haddonfield 24/7' : k}])),
   loadStreams: () => JSON.parse(storage.get('manual') || '{}') });
 const section = (a,b) => html.slice(html.indexOf(a), html.indexOf(b, html.indexOf(a)));
 vm.runInContext(section('  function safeStreamUrl(', '  let movieLibraryPageSize'), context);
@@ -40,3 +40,8 @@ assert.equal(run("queueForChannel('haddonfield-247')[0].name"),'Live');
 assert.equal(run("queueForChannel('haddonfield-247')[1].name"),'Haddonfield 24/7 (saved source)');
 assert.equal(fs.readFileSync('app/src/main/assets/index.html','utf8'),html);
 console.log('Passed: script syntax, provider matching, VOD separation, saved-data migration, live overrides, Android asset parity.');
+
+assert.ok(parse('24/7 PARANORMAL ACTIVITY','TV','https://example.com/live/pa.ts').groups['paranormal-activity-247']);
+assert.ok(parse('Paranormal Activity HD','24/7','https://example.com/live/pa2.ts').groups['paranormal-activity-247']);
+assert.ok(parse('Paranormal Activity 24/7','TV','https://example.com/movie/pa.mp4').groups['horror-movies']);
+assert.equal(parse('Paranormal Investigations 24/7','TV','https://example.com/live/other.ts').count,0);
