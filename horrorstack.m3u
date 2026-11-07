@@ -210,3 +210,6 @@ http://line.tellyshow.cc/live/1fe83793ef/2018d1e3b275/45272.ts
 
 #EXTINF:-1 horrorstack-channel="uk-horror" horrorstack-kind="live" group-title="UK Horror",UK| HORROR XTRA
 http://line.tellyshow.cc/live/1fe83793ef/2018d1e3b275/1014221.ts
+
+#EXTINF:-1 tvg-id="PlutoTVHorror.us" horrorstack-channel="pluto-horror" horrorstack-kind="live" group-title="English 24/7 Horror",Pluto TV Horror
+https://jmp2.uk/plu-569546031a619b8f07ce6e25.m3u8
