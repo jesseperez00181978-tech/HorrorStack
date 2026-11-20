@@ -51,4 +51,13 @@ assert.ok(parse('Provider Channel','TV','https://example.com/live/terminator-id.
 assert.ok(parse('Terminator 24/7','TV','https://example.com/movie/terminator.mp4').groups['horror-movies']);
 assert.equal(parse('The Terminator (1984)','Movies','https://example.com/movie/terminator-1984.mp4').groups['terminator-247'],undefined);
 assert.equal(parse('Exterminator 24/7','TV','https://example.com/live/other.ts').count,0);
-console.log('Passed: script syntax, provider matching, VOD separation, saved-data migration, live overrides, Android asset parity.');
+// Guard the Android-native URL-import prefilter, which runs before the JS M3U parser.
+const androidMain = fs.readFileSync('app/src/main/java/com/horrorstack/tv/MainActivity.java', 'utf8');
+const nativePattern = androidMain.match(/label\.matches\("\(\?s\)\.\*\(([^"]+)\)\.\*"\)/);
+assert.ok(nativePattern, 'Android M3U URL-import filter should be present');
+const nativeMatches = new RegExp(nativePattern[1], 'i');
+assert.ok(nativeMatches.test('group-title="TV",24/7 PARANORMAL ACTIVITY'), 'Android must retain Paranormal Activity 24/7');
+assert.ok(nativeMatches.test('group-title="TV",TERMINATOR 24/7'), 'Android must retain Terminator 24/7');
+assert.equal(nativeMatches.test('group-title="TV",PARANORMAL INVESTIGATIONS 24/7'), false);
+
+console.log('Passed: script syntax, provider matching, VOD separation, saved-data migration, live overrides, Android import filter, asset parity.');
