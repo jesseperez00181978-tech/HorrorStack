@@ -672,6 +672,7 @@ input:focus-visible {
 }
 
 .video-wrap {
+  position: relative;
   margin: 20px;
   border-radius: 16px;
   overflow: hidden;
@@ -686,6 +687,10 @@ input:focus-visible {
   background: #000;
 }
 
+.movie-intro { position:absolute;inset:0 0 auto;aspect-ratio:16/9;z-index:2;display:grid;place-items:center;text-align:center;pointer-events:none;background:linear-gradient(180deg,#0003,#000a),url('assets/horrorstack-theater.webp') center/cover no-repeat,#050307; }
+.movie-intro[hidden] {display:none;}
+.movie-intro strong {display:block;color:white;font-size:clamp(1.2rem,3.4vw,2.4rem);text-shadow:0 2px 12px #000;}
+.movie-intro small {display:block;margin-top:9px;color:#ecd0d7;font:bold .72rem Arial,sans-serif;letter-spacing:.16em;text-transform:uppercase;}
 .player-message {
   padding: 16px 18px;
   color: var(--muted);
@@ -1258,6 +1263,7 @@ input:focus-visible {
 
     <div class="video-wrap">
       <video id="horrorVideo" controls playsinline preload="metadata"></video>
+      <div class="movie-intro" id="movieIntro" aria-label="Starting movie" hidden><div><strong>Starting movie...</strong><small>Enjoy the show</small></div></div>
       <div class="player-message" id="playerMessage" role="status">
         <strong>No signal assigned.</strong> Add a legal MP4 or HLS URL below.
       </div>
@@ -1319,6 +1325,10 @@ input:focus-visible {
   const playerTitle = document.getElementById("playerTitle");
   const playerInfo = document.getElementById("playerInfo");
   const horrorVideo = document.getElementById("horrorVideo");
+  const movieIntro = document.getElementById("movieIntro");
+  const showMovieIntro = () => { movieIntro.hidden = false; };
+  const hideMovieIntro = () => { movieIntro.hidden = true; };
+  window.horrorstackPlayerReady = hideMovieIntro;
   const playerMessage = document.getElementById("playerMessage");
   const streamUrl = document.getElementById("streamUrl");
   const saveStream = document.getElementById("saveStream");
@@ -1613,6 +1623,7 @@ input:focus-visible {
   }
 
   function stopVideo() {
+    hideMovieIntro();
     horrorVideo.pause();
     horrorVideo.removeAttribute("src");
     horrorVideo.load();
@@ -1620,6 +1631,7 @@ input:focus-visible {
   }
 
   function showMessage(text, isError = false) {
+    if (isError && !/retrying|recovering|interruption/i.test(text)) hideMovieIntro();
     playerMessage.innerHTML = isError
       ? `<strong>Signal error.</strong> ${text}`
       : text;
@@ -1656,6 +1668,7 @@ input:focus-visible {
       return;
     }
 
+    showMovieIntro();
     const queueItem = currentQueue()[queueIndex] || null;
     if (window.AndroidPlayer && typeof window.AndroidPlayer.play === "function") {
       try {
@@ -2367,6 +2380,7 @@ input:focus-visible {
   });
 
   horrorVideo.addEventListener("playing", () => {
+    hideMovieIntro();
     showMessage("<strong>Now playing.</strong> HorrorStack signal locked.");
   });
 

@@ -21,6 +21,7 @@ import java.util.Locale;
 public class PlayerActivity extends AppCompatActivity {
     private ExoPlayer player;
     private PlayerView view;
+    private View poster;
     private Uri uri;
     private long position;
     private boolean playWhenReady = true;
@@ -38,6 +39,7 @@ public class PlayerActivity extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
         setContentView(R.layout.activity_player);
         view = findViewById(R.id.playerView);
+        poster = findViewById(R.id.fullscreenPoster);
         view.setFullscreenButtonClickListener(isFullscreen -> finish());
 
         String url = getIntent().getStringExtra("url");
@@ -67,10 +69,15 @@ public class PlayerActivity extends AppCompatActivity {
                         .setEnableDecoderFallback(true))
                 .setMediaSourceFactory(new DefaultMediaSourceFactory(this).setDataSourceFactory(http)).build();
         view.setPlayer(player);
+        poster.setVisibility(View.VISIBLE);
         view.setCustomErrorMessage(null);
         view.showController();
         player.addListener(new Player.Listener() {
+            @Override public void onIsPlayingChanged(boolean isPlaying) {
+                if (isPlaying) poster.setVisibility(View.GONE);
+            }
             @Override public void onPlayerError(PlaybackException error) {
+                poster.setVisibility(View.GONE);
                 // Retry eligible transport, container and codec failures once inside the app.
                 // Provider movies such as Texas Chain Saw Massacre (1974) use MKV.
                 if (PlaybackErrors.shouldTryAlternateEngine(error)) {

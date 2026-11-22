@@ -20,6 +20,7 @@ public class SoftwarePlayerActivity extends AppCompatActivity {
     private LibVLC vlc;
     private MediaPlayer player;
     private VLCVideoLayout video;
+    private FrameLayout poster;
     private TextView status;
     private Button pause;
     private SeekBar seek;
@@ -53,8 +54,23 @@ public class SoftwarePlayerActivity extends AppCompatActivity {
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(Color.BLACK);
+        FrameLayout videoFrame = new FrameLayout(this);
         video = new VLCVideoLayout(this);
-        root.addView(video, new LinearLayout.LayoutParams(-1, 0, 1));
+        videoFrame.addView(video, new FrameLayout.LayoutParams(-1, -1));
+        poster = new FrameLayout(this);
+        ImageView theater = new ImageView(this);
+        theater.setImageResource(R.drawable.horrorstack_theater);
+        theater.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        poster.addView(theater, new FrameLayout.LayoutParams(-1, -1));
+        TextView posterText = new TextView(this);
+        posterText.setText("Starting movie...");
+        posterText.setGravity(android.view.Gravity.CENTER);
+        posterText.setTextSize(22);
+        posterText.setTextColor(Color.WHITE);
+        posterText.setBackgroundColor(0x66000000);
+        poster.addView(posterText, new FrameLayout.LayoutParams(-1, -1));
+        videoFrame.addView(poster, new FrameLayout.LayoutParams(-1, -1));
+        root.addView(videoFrame, new LinearLayout.LayoutParams(-1, 0, 1));
         status = new TextView(this);
         status.setTextColor(Color.WHITE);
         status.setPadding(16, 4, 16, 4);
@@ -109,6 +125,7 @@ public class SoftwarePlayerActivity extends AppCompatActivity {
     }
 
     private void startPlayer() {
+        poster.setVisibility(View.VISIBLE);
         ArrayList<String> options = new ArrayList<>();
         options.add("--network-caching=1500");
         vlc = new LibVLC(this, options);
@@ -119,6 +136,7 @@ public class SoftwarePlayerActivity extends AppCompatActivity {
             if (player == null) return;
             switch (event.type) {
                 case MediaPlayer.Event.Playing:
+                    poster.setVisibility(View.GONE);
                     if (!initialSeek) {
                         initialSeek = true;
                         if (position > 0 && player.isSeekable()) player.setTime(position);
@@ -136,6 +154,7 @@ public class SoftwarePlayerActivity extends AppCompatActivity {
                     status.setText(time(player.getTime()) + " / " + time(duration) + " · Software player");
                     break;
                 case MediaPlayer.Event.EncounteredError:
+                    poster.setVisibility(View.GONE);
                     String previousError = getIntent().getStringExtra("previousError");
                     status.setText("Both internal players could not open this stream. "
                             + (previousError == null ? "" : previousError + " ")
