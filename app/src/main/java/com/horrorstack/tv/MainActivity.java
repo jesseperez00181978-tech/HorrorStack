@@ -33,6 +33,9 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
     private PlayerView inlineView;
+    private FrameLayout inlineContainer;
+    private View inlinePoster;
+    private boolean inlineHasStarted;
     private ExoPlayer inlinePlayer;
     private String inlineUrl;
     private String inlineTitle = "HorrorStack";
@@ -61,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
 
         webView = findViewById(R.id.webView);
         inlineView = findViewById(R.id.inlinePlayerView);
+        inlineContainer = findViewById(R.id.inlinePlayerContainer);
+        inlinePoster = findViewById(R.id.inlinePoster);
         inlineView.setFullscreenButtonClickListener(isFullscreen -> openInlineFullscreen());
 
         WebSettings s = webView.getSettings();
@@ -241,6 +246,8 @@ public class MainActivity extends AppCompatActivity {
     private void startInlineEngine() {
         if (inlineUrl == null || !isWebStream(inlineUrl)) return;
         releaseInlineEngine(false);
+        inlineHasStarted = false;
+        inlinePoster.setVisibility(View.VISIBLE);
 
         DefaultHttpDataSource.Factory http = new DefaultHttpDataSource.Factory()
                 .setUserAgent("HorrorStack/1.0.3")
@@ -259,17 +266,28 @@ public class MainActivity extends AppCompatActivity {
 
         inlinePlayer.addListener(new Player.Listener() {
             @Override public void onIsPlayingChanged(boolean isPlaying) {
-                if (isPlaying) updatePageMessage("<strong>Now playing.</strong> HorrorStack native internal player is active.");
+                if (isPlaying) {
+                    inlineHasStarted = true;
+                    runOnUiThread(() -> {
+                        inlinePoster.setVisibility(View.GONE);
+                        webView.evaluateJavascript("window.horrorstackPlayerReady?.()", null);
+                    });
+                    updatePageMessage("<strong>Now playing.</strong> HorrorStack native internal player is active.");
+                }
             }
 
             @Override public void onPlaybackStateChanged(int state) {
-                if (state == Player.STATE_BUFFERING)
+                if (state == Player.STATE_BUFFERING) {
+                    if (!inlineHasStarted) inlinePoster.setVisibility(View.VISIBLE);
                     updatePageMessage("<strong>Buffering...</strong> HorrorStack is locking onto the stream.");
+                }
                 else if (state == Player.STATE_ENDED)
                     webView.evaluateJavascript("document.getElementById('horrorVideo')?.dispatchEvent(new Event('ended'));", null);
             }
 
             @Override public void onPlayerError(PlaybackException error) {
+                inlinePoster.setVisibility(View.GONE);
+                webView.evaluateJavascript("window.horrorstackPlayerReady?.()", null);
                 // Retry eligible transport, container and codec failures once inside the app.
                 // Provider movies such as Texas Chain Saw Massacre (1974) use MKV.
                 if (PlaybackErrors.shouldTryAlternateEngine(error)) {
@@ -335,7 +353,7 @@ public class MainActivity extends AppCompatActivity {
             inlinePosition = 0;
             inlinePlayWhenReady = true;
             inlineVisible = false;
-            inlineView.setVisibility(View.GONE);
+            inlineContainer.setVisibility(View.GONE);
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             restoreHtmlVideo();
         }
@@ -360,7 +378,7 @@ public class MainActivity extends AppCompatActivity {
     private void positionInline(double left, double top, double width, double height, double ratio, boolean visible) {
         runOnUiThread(() -> {
             if (!visible || width <= 2 || height <= 2) {
-                inlineView.setVisibility(View.GONE);
+                inlineContainer.setVisibility(View.GONE);
                 inlineVisible = false;
                 return;
             }
@@ -370,8 +388,8 @@ public class MainActivity extends AppCompatActivity {
                     Math.max(1, (int)Math.round(height * scale)));
             params.leftMargin = (int)Math.round(left * scale);
             params.topMargin = (int)Math.round(top * scale);
-            inlineView.setLayoutParams(params);
-            inlineView.setVisibility(View.VISIBLE);
+            inlineContainer.setLayoutParams(params);
+            inlineContainer.setVisibility(View.VISIBLE);
             inlineVisible = true;
         });
     }
